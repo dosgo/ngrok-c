@@ -17,7 +17,7 @@ Because not use makefile, so write a script sh compile, run build.sh
 
 
 #openwrt
-run cpopenwrt.sh
+run openwrtbuild.sh
 
 
 
