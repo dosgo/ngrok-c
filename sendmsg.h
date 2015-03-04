@@ -1,11 +1,12 @@
 #ifndef __SENDMSG_H__
 #define __SENDMSG_H__
 #include <string>
-#include <windows.h>
 #include <map>
 #include "polarssl/ssl.h"
 #if WIN32
+#include <windows.h>
 #else
+#include <netinet/in.h> 
  typedef long long __int64;
  void milliseconds_sleep( unsigned long mSec);
 #endif

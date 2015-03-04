@@ -117,13 +117,11 @@ int SendPing(ssl_context *ssl)
 int SendReqTunnel(ssl_context *ssl,string protocol,string Subdomain,int RemotePort)
 {
     char RemotePortStr[10];
-    itoa(RemotePort,RemotePortStr,10);
+    sprintf(RemotePortStr,"%d",RemotePort);
     char guid[37];
     random_uuid(guid);
-    printf("guid;%s\r\n",guid);
     guid[9]='\0';
     string guid_str=string(guid);
-    printf("guid_str:%s\r\n",guid_str.c_str());
     string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
     //printf("SendReqTunnelstr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
