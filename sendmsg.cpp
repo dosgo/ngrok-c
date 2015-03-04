@@ -8,7 +8,6 @@
 typedef long long __int64;
 #endif
 #include "bytestool.h"
-#include "strtool.h"
 #include "sendmsg.h"
 #include<stdlib.h>
 using namespace std;
@@ -51,6 +50,7 @@ void sleeps(int ti)
 
 char *random_uuid( char buf[37] )
 {
+    srand((unsigned) time(NULL));
     const char *c = "89ab";
     char *p = buf;
     int n;
@@ -71,13 +71,13 @@ char *random_uuid( char buf[37] )
         }
 
         p += 2;
+
         switch( n )
         {
             case 3:
             case 5:
             case 7:
             case 9:
-                *p++ = '-';
                 break;
         }
     }
@@ -120,9 +120,10 @@ int SendReqTunnel(ssl_context *ssl,string protocol,string Subdomain,int RemotePo
     itoa(RemotePort,RemotePortStr,10);
     char guid[37];
     random_uuid(guid);
+    printf("guid;%s\r\n",guid);
+    guid[9]='\0';
     string guid_str=string(guid);
-    guid_str = strtool::replace(guid_str, "-", "");
-    guid_str= guid_str.substr(1,9);
+    printf("guid_str:%s\r\n",guid_str.c_str());
     string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
     //printf("SendReqTunnelstr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
