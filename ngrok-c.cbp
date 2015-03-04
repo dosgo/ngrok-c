@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/ngrok-polarssl" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/ngrokc" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -21,7 +21,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/ngrok-polarssl" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/ngrokc" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -31,7 +31,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="D:\c\ngrok-polarsslthread\libpolarssl.a" />
+					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
 					<Add library="C:\TDM-GCC-32\lib\libws2_32.a" />
 				</Linker>
 			</Target>
