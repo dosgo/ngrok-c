@@ -6,4 +6,4 @@ gcc -c -g cJSON.c -o cJSON.o
 g++ -c -g main.cpp -o main.o
 g++ -c -g msjexhnd.cpp -o msjexhnd.o
 g++ -c -g sendmsg.cpp -o sendmsg.o
-g++ -g main.o sendmsg.o cJSON.o msjexhnd.o -o "ngrokpolarssl.exe" -L"lib"  "libpolarssl.a"  -lws2_32  -lpthread
+g++ -g main.o sendmsg.o cJSON.o msjexhnd.o -o "ngrokc.exe" -L"lib"  "libpolarssl.a"  -lws2_32  -lpthread

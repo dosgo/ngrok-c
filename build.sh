@@ -17,4 +17,4 @@ $CC -c $1 sslbio.cpp -g -o $DIR/sslbio.o
 $CC -c $1 main.cpp -g -o $DIR/main.o
 #$CC -c forkthread.cpp -o $DIR/forkthread.o
 
-$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o linuxlib/libpolarssl.a -o $DIR/ngrokc-polarssl  -lpthread
+$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o linuxlib/libpolarssl.a -o $DIR/ngrokc  -lpthread

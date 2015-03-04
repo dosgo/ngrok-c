@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="ngrok-polarssl" />
+		<Option title="ngrok-c" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -16,7 +16,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="D:\c\ngrok-polarsslthread\libpolarssl.a" />
+					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
 					<Add library="C:\TDM-GCC-32\lib\libws2_32.a" />
 				</Linker>
 			</Target>
