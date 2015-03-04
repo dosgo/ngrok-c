@@ -1,1 +1,7 @@
-ngrok client for c language,Due to the use of GO ngrok language development, porting to embedded devices some inconvenience, such as openwrt, so use C language rewrite a client. Very mini, the need to support polarssl library. 
+ngrok-c
+
+ngrok client for c language.
+
+
+
+
