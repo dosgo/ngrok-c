@@ -7,7 +7,10 @@
 
 
 
-##build
+##build  
+
+ddns.cpp with https.cpp not used.
+
 
 #windows
 Build.bat run in cmd.
