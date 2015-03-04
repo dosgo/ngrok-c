@@ -40,7 +40,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
     if( ( ret = ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
     {
-        printf( "Verifying peer X.509 certificate...failed \r\n" );
+       // printf( "Verifying peer X.509 certificate...failed \r\n" );
     }
     else
     {

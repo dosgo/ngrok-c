@@ -510,7 +510,7 @@ void* sockmain( void *arg )
 			if ( recvlen == packlen )
 			{
 				memcpy( tempjson, buffer, packlen );
-				printf( "json:%s\r\n", tempjson );
+			//	printf( "json:%s\r\n", tempjson );
 				json = cJSON_Parse( tempjson );
 				cJSON *Type = cJSON_GetObjectItem( json, "Type" );
 				if ( strcmp( Type->valuestring, "ReqProxy" ) == 0 )
