@@ -1,0 +1,454 @@
+# depslib dependency file v1.0
+1423405950 source:f:\ngrok-polarssl\main.cpp
+	<string.h>
+	<stdio.h>
+	<signal.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	<windows.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	<errno.h>
+	<pthread.h>
+	"sendmsg.h"
+	"sslbio.h"
+	"cJSON.h"
+	"ddns.h"
+	"bytestool.h"
+	<iostream>
+	<iomanip>
+
+1423405877 f:\ngrok-polarssl\sendmsg.h
+	<string>
+	"polarssl/ssl.h"
+
+1376459676 f:\ngrok-polarssl\cjson.h
+
+1422849470 f:\ngrok-polarssl\bytestool.h
+
+1422611280 source:f:\ngrok-polarssl\msjexhnd.cpp
+	<windows.h>
+	<tchar.h>
+	"msjexhnd.h"
+
+1422611258 f:\ngrok-polarssl\msjexhnd.h
+
+1422858002 source:f:\ngrok-polarssl\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1423406007 source:f:\ngrok-polarssl\sendmsg.cpp
+	<string>
+	"polarssl/ssl.h"
+	<windows.h>
+	<arpa/inet.h>
+	<errno.h>
+	"bytestool.h"
+	"strtool.h"
+	"sendmsg.h"
+	<stdlib.h>
+
+1422447010 f:\ngrok-polarssl\strtool.h
+	<iostream>
+	<vector>
+
+1423237612 f:\ngrok-polarssl\sslbio.h
+	<malloc.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	"sendmsg.h"
+
+1423237622 source:f:\ngrok-polarssl\sslbio.cpp
+	"sslbio.h"
+
+1423402292 source:f:\ngrok-polarssl\ddns.cpp
+	"ddns.h"
+
+1423215386 f:\ngrok-polarssl\httpclientc.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<stdio.h>
+	<sys/socket.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<errno.h>
+	"httpclient.h"
+
+1423215106 f:\ngrok-polarssl\httpclient.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<cstring>
+	<locale>
+
+1423399993 source:f:\ngrok-polarssl\https.cpp
+	"https.h"
+
+1423325354 f:\ngrok-polarssl\https.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<windows.h>
+	<sys/socket.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<errno.h>
+	<cstring>
+	<locale>
+	"sslbio.h"
+
+1423328343 f:\ngrok-polarssl\ddns.h
+	<string>
+	"cJSON.h"
+	"https.h"
+
+1422858002 source:f:\ngrok-polarsslthread\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1376459676 f:\ngrok-polarsslthread\cjson.h
+
+1423402292 source:f:\ngrok-polarsslthread\ddns.cpp
+	"ddns.h"
+
+1423328343 f:\ngrok-polarsslthread\ddns.h
+	<string>
+	"cJSON.h"
+	"https.h"
+
+1423325354 f:\ngrok-polarsslthread\https.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<windows.h>
+	<sys/socket.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<errno.h>
+	<cstring>
+	<locale>
+	"sslbio.h"
+
+1423237612 f:\ngrok-polarsslthread\sslbio.h
+	<malloc.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	"sendmsg.h"
+
+1425366784 f:\ngrok-polarsslthread\sendmsg.h
+	<string>
+	<windows.h>
+	<map>
+	"polarssl/ssl.h"
+
+1423399993 source:f:\ngrok-polarsslthread\https.cpp
+	"https.h"
+
+1425367100 source:f:\ngrok-polarsslthread\sendmsg.cpp
+	<string>
+	"polarssl/ssl.h"
+	<windows.h>
+	<arpa/inet.h>
+	<errno.h>
+	"bytestool.h"
+	"strtool.h"
+	"sendmsg.h"
+	<stdlib.h>
+
+1423546806 f:\ngrok-polarsslthread\bytestool.h
+
+1422447010 f:\ngrok-polarsslthread\strtool.h
+	<iostream>
+	<vector>
+
+1425367603 source:f:\ngrok-polarsslthread\sslbio.cpp
+	"sslbio.h"
+
+1425368187 source:f:\ngrok-polarsslthread\main.cpp
+	<string.h>
+	<stdio.h>
+	<map>
+	<list>
+	<signal.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	<windows.h>
+	<sys/select.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<sys/time.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	<errno.h>
+	<pthread.h>
+	"sendmsg.h"
+	"sslbio.h"
+	"cJSON.h"
+	"bytestool.h"
+	"nonblocking.h"
+	<iostream>
+	<iomanip>
+
+1425268360 f:\ngrok-polarsslthread\nonblocking.h
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<list>
+	"sslbio.h"
+
+1425368222 source:f:\ngrok-polarsslthread\nonblocking.cpp
+	<windows.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<fcntl.h>
+	"nonblocking.h"
+
+1422858002 source:d:\ngrok-polarsslthread\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1376459676 d:\ngrok-polarsslthread\cjson.h
+
+1423402292 source:d:\ngrok-polarsslthread\ddns.cpp
+	"ddns.h"
+
+1423328343 d:\ngrok-polarsslthread\ddns.h
+	<string>
+	"cJSON.h"
+	"https.h"
+
+1423325354 d:\ngrok-polarsslthread\https.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<windows.h>
+	<sys/socket.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<errno.h>
+	<cstring>
+	<locale>
+	"sslbio.h"
+
+1423237612 d:\ngrok-polarsslthread\sslbio.h
+	<malloc.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	"sendmsg.h"
+
+1423405878 d:\ngrok-polarsslthread\sendmsg.h
+	<string>
+	"polarssl/ssl.h"
+
+1423399993 source:d:\ngrok-polarsslthread\https.cpp
+	"https.h"
+
+1423704410 source:d:\ngrok-polarsslthread\nonblocking.cpp
+	<windows.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<fcntl.h>
+	"nonblocking.h"
+
+1423662398 d:\ngrok-polarsslthread\nonblocking.h
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	"sslbio.h"
+
+1423543028 source:d:\ngrok-polarsslthread\sendmsg.cpp
+	<string>
+	"polarssl/ssl.h"
+	<windows.h>
+	<arpa/inet.h>
+	<errno.h>
+	"bytestool.h"
+	"strtool.h"
+	"sendmsg.h"
+	<stdlib.h>
+
+1423546806 d:\ngrok-polarsslthread\bytestool.h
+
+1422447010 d:\ngrok-polarsslthread\strtool.h
+	<iostream>
+	<vector>
+
+1423546772 source:d:\ngrok-polarsslthread\sslbio.cpp
+	"sslbio.h"
+
+1423704359 source:d:\ngrok-polarsslthread\main.cpp
+	<string.h>
+	<stdio.h>
+	<map>
+	<list>
+	<signal.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	<windows.h>
+	<sys/select.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<sys/time.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	<errno.h>
+	<pthread.h>
+	"sendmsg.h"
+	"sslbio.h"
+	"cJSON.h"
+	"bytestool.h"
+	"nonblocking.h"
+	<iostream>
+	<iomanip>
+
+1422858002 source:d:\c\ngrok-polarsslthread\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1376459676 d:\c\ngrok-polarsslthread\cjson.h
+
+1425369353 source:d:\c\ngrok-polarsslthread\main.cpp
+	<string.h>
+	<stdio.h>
+	<errno.h>
+	<pthread.h>
+	<map>
+	<list>
+	<iostream>
+	<iomanip>
+	<signal.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	<windows.h>
+	<sys/select.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<sys/time.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	"sendmsg.h"
+	"sslbio.h"
+	"cJSON.h"
+	"bytestool.h"
+	"nonblocking.h"
+
+1425366784 d:\c\ngrok-polarsslthread\sendmsg.h
+	<string>
+	<windows.h>
+	<map>
+	"polarssl/ssl.h"
+
+1423237612 d:\c\ngrok-polarsslthread\sslbio.h
+	<malloc.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+	"sendmsg.h"
+
+1423546806 d:\c\ngrok-polarsslthread\bytestool.h
+
+1425369464 d:\c\ngrok-polarsslthread\nonblocking.h
+	<windows.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<list>
+	"sslbio.h"
+
+1425367603 source:d:\c\ngrok-polarsslthread\sslbio.cpp
+	"sslbio.h"
+

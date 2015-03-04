@@ -1,0 +1,27 @@
+//=====================================================
+Exception code: C0000005 ACCESS_VIOLATION
+Fault address:  0042209C 01:0002109C F:\ngrok-polarssl\bin\Debug\ngrok-polarssl.exe
+
+Registers:
+EAX:000006C8
+EBX:000006C8
+ECX:006353B8
+EDX:00630180
+ESI:00000614
+EDI:00000000
+CS:EIP:0023:0042209C
+SS:ESP:002B:02B0FDB0  EBP:02B0FE08
+DS:002B  ES:002B  FS:0053  GS:002B
+Flags:00010202
+
+Call stack:
+Address   Frame     Logical addr  Module
+0042209C  02B0FE08  0001:0002109C F:\ngrok-polarssl\bin\Debug\ngrok-polarssl.exe
+004045F9  02B0FF28  0001:000035F9 F:\ngrok-polarssl\bin\Debug\ngrok-polarssl.exe
+00470466  02B0FF48  0001:0006F466 F:\ngrok-polarssl\bin\Debug\ngrok-polarssl.exe
+76031287  02B0FF80  0001:00010287 C:\Windows\syswow64\msvcrt.dll
+76031328  02B0FF88  0001:00010328 C:\Windows\syswow64\msvcrt.dll
+74CF336A  02B0FF94  0001:0000336A C:\Windows\syswow64\kernel32.dll
+76FE9F72  02B0FFD4  0001:00029F72 C:\Windows\SysWOW64\ntdll.dll
+76FE9F45  02B0FFEC  0001:00029F45 C:\Windows\SysWOW64\ntdll.dll
+
