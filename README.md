@@ -43,13 +43,11 @@ sdname  -Subdomain.
 
 
 ##Example
-ngrok-polarssl -SER[Shost:ngrokd.ngrok.com,Sport:443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example]  
-
-ngrok-polarssl -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example]
+- ngrokc -SER[Shost:ngrokd.ngrok.com,Sport:443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example]  
+- ngrokc -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example]
 
 You can also register multiple Tunnel, but can only have one of each type.  
-
-ngrok-polarssl -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example] -AddTun[Type:https,Lhost:127.0.0.1,Lport:81,Sdname:Example1]
+- ngrokc -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example] -AddTun[Type:https,Lhost:127.0.0.1,Lport:81,Sdname:Example1]
 
  
 
