@@ -53,6 +53,7 @@ int		linktime	= 45;
 int		mainsock;
 int		lastdnstime;
 int		lastdnsback;
+int     isauth=0;
 
 ssl_info *mainsslinfo;
 void* sockmain( void *arg );
@@ -63,6 +64,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 map<int,sockinfo*>socklist;
 map<string,TunnelInfo*>tunnellist;
+map<string,int>tunneloklist;
 list<int>clearsocklist;
 
 void cs( int n )
@@ -117,6 +119,7 @@ void* regkey( void *arg )
 
 int CheckStatus()
 {
+    TunnelInfo	*tunnelinfo;
 	if ( proxyrun == 0 )
 	{
 		proxyrun = 1;
@@ -136,6 +139,22 @@ int CheckStatus()
 		}
 		pingtime = get_curr_unixtime();
 	}
+	//sleep 3ms
+    sleeps(3000);
+	//检查是否
+	if(mainrun==1&&isauth==1)
+    {
+          /* 遍历添加 */
+          map<string, TunnelInfo*>::iterator it;
+          for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
+          {
+              if(tunneloklist.count(it->first)==0)
+              {
+                tunnelinfo = it->second;
+                SendReqTunnel( &mainsslinfo->ssl, it->first, tunnelinfo->subdomain, tunnelinfo->remoteport );
+              }
+          }
+    }
 	return(0);
 }
 
@@ -182,7 +201,7 @@ int main( int argc, char **argv )
 			printf( "update dns\r\n" );
 		}
 		CheckStatus();
-		sleeps( ping * 100 );
+		sleeps( ping * 1000);
 	}
 	return(0);
 }
@@ -477,7 +496,7 @@ void* sockmain( void *arg )
 
 
 	unsigned char	buffer[MAXBUF];
-	TunnelInfo	*tunnelinfo;
+	//TunnelInfo	*tunnelinfo;
 
 	mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
 	if ( connect( mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
@@ -538,13 +557,14 @@ void* sockmain( void *arg )
                     {
                         ClientId = string( cid );
                         SendPing( &mainsslinfo->ssl );
+                        isauth=1;
                         /* 遍历添加 */
-                        map<string, TunnelInfo*>::iterator it;
-                        for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
-                        {
-                            tunnelinfo = it->second;
-                            SendReqTunnel( &mainsslinfo->ssl, it->first, tunnelinfo->subdomain, tunnelinfo->remoteport );
-                        }
+                       // map<string, TunnelInfo*>::iterator it;
+                       // for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
+                      //  {
+                         //   tunnelinfo = it->second;
+                      //      SendReqTunnel( &mainsslinfo->ssl, it->first, tunnelinfo->subdomain, tunnelinfo->remoteport );
+                     //   }
                     }
                     else
                     {
@@ -570,13 +590,15 @@ void* sockmain( void *arg )
                     {
                         char	*url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
                         char	*protocol	= cJSON_GetObjectItem( Payload, "Protocol" )->valuestring;
+                        //
+                        tunneloklist[string(protocol)]=1;
                         printf("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
                     }
                     else
                     {
-                        cJSON_Delete( json );
-                        printf("Add tunnel failed ,Please check subdomain or remoteport.");
-                        break;
+                        printf("Add tunnel failed,%s\r\n",error);
+                       // cJSON_Delete( json );
+                      //  break;
                     }
 				}
 				cJSON_Delete( json );
@@ -590,6 +612,8 @@ void* sockmain( void *arg )
 	ssl_close_notify( &mainsslinfo->ssl );
 exit:
 	printf( "main thread close \r\n" );
+	isauth=0;
+	tunneloklist.clear();
 	mainrun = 0;
 	if ( mainsock != -1 )
 		net_close( mainsock );
