@@ -499,13 +499,13 @@ void* sockmain( void *arg )
 	//TunnelInfo	*tunnelinfo;
 
 	mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
+	mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
 	if ( connect( mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
         printf( "connect failed!\r\n" );
 		goto exit;
 	}
 
-	mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
 	if(ssl_init_info((int*)&mainsock, mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
