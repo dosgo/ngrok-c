@@ -50,7 +50,7 @@ You can also register multiple Tunnel, but can only have one of each type.
 - ngrokc -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example] -AddTun[Type:https,Lhost:127.0.0.1,Lport:81,Sdname:Example1]
 
  
-2015/7/10更新增加
+##2015/7/10更新增加
 
 
 如，你只要把xx.xxx.org解析到tunnel.mobi，那么访问xx.xxx.org就可以了..比Sdname好。。
