@@ -9,6 +9,7 @@
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
 #include "sendmsg.h"
+
 struct ssl_info
 {
     entropy_context entropy;
