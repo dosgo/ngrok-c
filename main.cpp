@@ -151,7 +151,11 @@ int CheckStatus()
               if(tunneloklist.count(it->first)==0)
               {
                 tunnelinfo = it->second;
+<<<<<<< HEAD
                 SendReqTunnel( &mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+=======
+                SendReqTunnel( &mainsslinfo->ssl, it->first, tunnelinfo->subdomain, tunnelinfo->remoteport );
+>>>>>>> a340cc58318741fc9ecdbe3236afe7acda661f7a
               }
           }
     }
@@ -499,7 +503,11 @@ void* sockmain( void *arg )
 	//TunnelInfo	*tunnelinfo;
 
 	mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
+<<<<<<< HEAD
     mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+=======
+	mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+>>>>>>> a340cc58318741fc9ecdbe3236afe7acda661f7a
 	if ( connect( mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
         printf( "connect failed!\r\n" );
@@ -558,6 +566,16 @@ void* sockmain( void *arg )
                         ClientId = string( cid );
                         SendPing( &mainsslinfo->ssl );
                         isauth=1;
+<<<<<<< HEAD
+=======
+                        /* 遍历添加 */
+                       // map<string, TunnelInfo*>::iterator it;
+                       // for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
+                      //  {
+                         //   tunnelinfo = it->second;
+                      //      SendReqTunnel( &mainsslinfo->ssl, it->first, tunnelinfo->subdomain, tunnelinfo->remoteport );
+                     //   }
+>>>>>>> a340cc58318741fc9ecdbe3236afe7acda661f7a
                     }
                     else
                     {

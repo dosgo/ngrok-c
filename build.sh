@@ -9,12 +9,13 @@ rm -rf $DIR/sslbio.o
 rm -rf $DIR/nonblocking.o
 rm -rf $DIR/ngrokc
 CC=g++
+YH="-Wall -fexceptions -O2"
 
-$CC -c $1 sendmsg.cpp -g -o $DIR/sendmsg.o
-$CC -c $1 cJSON.c  -g -o $DIR/cJSON.o
-$CC -c $1 nonblocking.cpp -g -o $DIR/nonblocking.o
-$CC -c $1 sslbio.cpp -g -o $DIR/sslbio.o
-$CC -c $1 main.cpp -g -o $DIR/main.o
+$CC $YH -c $1 sendmsg.cpp  -o $DIR/sendmsg.o
+$CC $YH -c $1 cJSON.c   -o $DIR/cJSON.o
+$CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
+$CC $YH -c $1 sslbio.cpp  -o $DIR/sslbio.o
+$CC $YH -c $1 main.cpp  -o $DIR/main.o
 #$CC -c forkthread.cpp -o $DIR/forkthread.o
 
-$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o libpolarssl-linux.a -o $DIR/ngrokc  -lpthread
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o libpolarssl-linux.a -o $DIR/ngrokc  -lpthread
