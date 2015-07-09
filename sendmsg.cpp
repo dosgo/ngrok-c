@@ -114,7 +114,7 @@ int SendPing(ssl_context *ssl)
     return len;
 }
 
-int SendReqTunnel(ssl_context *ssl,string protocol,string Subdomain,int RemotePort)
+int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
 {
     char RemotePortStr[10];
     sprintf(RemotePortStr,"%d",RemotePort);
@@ -122,7 +122,7 @@ int SendReqTunnel(ssl_context *ssl,string protocol,string Subdomain,int RemotePo
     random_uuid(guid);
     guid[9]='\0';
     string guid_str=string(guid);
-    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
+    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
     //printf("SendReqTunnelstr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
@@ -362,6 +362,15 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 								memcpy( tunnelinfo->subdomain, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
 							}
 						}
+						if ( strncmp( jsonstr, "Hostname", 8 ) == 0 )
+						{
+							ypos = strpos( jsonstr, ':' );
+							if ( ypos != -1 )
+							{
+								memcpy( tunnelinfo->hostname, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
+							}
+						}
+
 						pos = pos + xpos + 1;
 					}
 

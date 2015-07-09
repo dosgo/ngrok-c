@@ -3,10 +3,11 @@
 #include <string>
 #include <map>
 #include "polarssl/ssl.h"
+
 #if WIN32
 #include <windows.h>
 #else
-#include <netinet/in.h> 
+#include <netinet/in.h>
  typedef long long __int64;
  void milliseconds_sleep( unsigned long mSec);
 #endif
@@ -15,6 +16,7 @@ struct TunnelInfo
 {
     char localhost[255];
     char subdomain[255];
+    char hostname[255];
     char httpauth[255];
     int localport;
     struct sockaddr_in local_addr;
@@ -32,7 +34,7 @@ int SendAuth(ssl_context *ssl,string ClientId,string user);
 int SendRegProxy(ssl_context *ssl,string ClientId);
 int SendPing(ssl_context *ssl);
 int SendPong(ssl_context *ssl);
-int SendReqTunnel(ssl_context *ssl,string protocol,string Subdomain,int RemotePort);
+int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort);
 int IsLittleEndian();
 int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen);
 __int64 ntoh64(__int64 val );
