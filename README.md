@@ -59,7 +59,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 有空的话增加openssl的支持
 
 
-
+- 感谢981213的makefile文件
 
 
 
