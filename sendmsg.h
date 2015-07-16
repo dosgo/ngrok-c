@@ -10,6 +10,10 @@
 #include <netinet/in.h>
  typedef long long __int64;
  void milliseconds_sleep( unsigned long mSec);
+ #include <string.h>
+ #ifndef __UCLIBC__
+ #include <sys/select.h>
+ #endif
 #endif
 using namespace std;
 struct TunnelInfo
