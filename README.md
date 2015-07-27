@@ -60,6 +60,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 - 感谢981213的makefile文件
+- 感谢maz-1 修复ubuntu下编译bug
 
 
 
