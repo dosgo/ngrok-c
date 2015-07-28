@@ -32,10 +32,10 @@ void clearsock(int sock,sockinfo * sock_info)
           if(sock_info->sslinfo!=NULL)
           {
             //linux error
-//              ssl_close_notify(&sock_info->sslinfo->ssl);
               SSL_shutdown( sock_info->sslinfo->ssl );
+              SSL_free( sock_info->sslinfo->ssl );
+              SSL_CTX_free( sock_info->sslinfo->ctx  );
               free(sock_info->sslinfo);
-
               sock_info->sslinfo=NULL;
           }
       }
