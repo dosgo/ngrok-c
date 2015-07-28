@@ -16,6 +16,39 @@ int setnonblocking(int sServer,int _nMode)
     #endif
 }
 
+
+#if OPENSSL
+void clearsock(int sock,sockinfo * sock_info)
+{
+
+      if(sock_info->istype==1)
+      {
+            if(sock_info->packbuflen>0&&sock_info->packbuf!=NULL)
+           {
+              free(sock_info->packbuf);
+              sock_info->packbuf=NULL;
+           }
+
+          if(sock_info->sslinfo!=NULL)
+          {
+            //linux error
+//              ssl_close_notify(&sock_info->sslinfo->ssl);
+              SSL_shutdown( sock_info->sslinfo->ssl );
+              free(sock_info->sslinfo);
+
+              sock_info->sslinfo=NULL;
+          }
+      }
+   //   net_close(sock);
+      //ÊÍ·ÅÄÚ´æ
+      if(sock_info!=NULL)
+      {
+        free(sock_info);
+        sock_info=NULL;
+      }
+
+}
+#else
 void clearsock(int sock,sockinfo * sock_info)
 {
 
@@ -45,6 +78,8 @@ void clearsock(int sock,sockinfo * sock_info)
       }
 
 }
+#endif
+
 
 
 int check_sock(int sock)

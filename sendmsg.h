@@ -1,8 +1,13 @@
 #ifndef __SENDMSG_H__
 #define __SENDMSG_H__
+#include "config.h"
 #include <string>
 #include <map>
+#if OPENSSL
+#include "openssl/ssl.h"
+#else
 #include "polarssl/ssl.h"
+#endif
 
 #if WIN32
 #include <windows.h>
@@ -34,13 +39,23 @@ int GetProtocol(char *url,char *Protocol);
 int strpos( char *str, char c );
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
 int pack(unsigned char * buffer,string msgstr);
+#if OPENSSL
+int SendAuth(SSL* ssl,string ClientId,string user);
+int SendRegProxy(SSL* ssl,string ClientId);
+int SendPing(SSL* ssl);
+int SendPong(SSL* ssl);
+int SendReqTunnel(SSL* ssl,string protocol,string HostName,string Subdomain,int RemotePort);
+int readlen(SSL* ssl,unsigned char *buffer, int readlen,int bufferlen);
+#else
 int SendAuth(ssl_context *ssl,string ClientId,string user);
 int SendRegProxy(ssl_context *ssl,string ClientId);
 int SendPing(ssl_context *ssl);
 int SendPong(ssl_context *ssl);
 int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort);
-int IsLittleEndian();
 int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen);
+#endif
+
+int IsLittleEndian();
 __int64 ntoh64(__int64 val );
 __int64 hton64(__int64 val );
 #endif

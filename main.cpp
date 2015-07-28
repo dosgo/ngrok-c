@@ -1,3 +1,4 @@
+#include "config.h"
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -7,6 +8,12 @@
 #include <iostream>
 #include <iomanip>
 #include <signal.h>
+#include "sslbio.h"
+#if OPENSSL
+#include <openssl/ssl.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#else
 #include <polarssl/net.h>
 #include <polarssl/debug.h>
 #include <polarssl/ssl.h>
@@ -14,6 +21,8 @@
 #include <polarssl/ctr_drbg.h>
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
+#endif
+
 #if  WIN32
 #include <windows.h>
 #else
@@ -30,7 +39,6 @@
 #endif
 
 #include "sendmsg.h"
-#include "sslbio.h"
 #include "cJSON.h"
 #include "bytestool.h"
 #include "nonblocking.h"
@@ -55,7 +63,11 @@ int		lastdnstime;
 int		lastdnsback;
 int     isauth=0;
 
+#if OPENSSL
+openssl_info *mainsslinfo;
+#else
 ssl_info *mainsslinfo;
+#endif
 void* sockmain( void *arg );
 void* proxy( void *arg );
 
@@ -131,7 +143,12 @@ int CheckStatus()
 		pthread_t tmain;
 		pthread_create(&tmain,NULL,&sockmain,NULL);
 	}else  {
+	    #if OPENSSL
+		int sendlen = SendPing( mainsslinfo->ssl );
+		#else
 		int sendlen = SendPing( &mainsslinfo->ssl );
+		#endif
+
 		if ( sendlen < 1 || (pongtime < (pingtime - 35) && pingtime != 0) )
 		{
 			shutdown( mainsock, 2 );
@@ -151,7 +168,11 @@ int CheckStatus()
               if(tunneloklist.count(it->first)==0)
               {
                 tunnelinfo = it->second;
+                #if OPENSSL
+                SendReqTunnel(mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                #else
                 SendReqTunnel( &mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                #endif
 
               }
           }
@@ -292,7 +313,11 @@ void* proxy( void *arg )
 				if ( FD_ISSET( it1->first, &readSet ) )
 				{
 					sockinfo *tempinfo1 = it1->second;
+					#if OPENSSL
+					openssl_info *sslinfo1 = tempinfo1->sslinfo;
+					#else
 					ssl_info *sslinfo1 = tempinfo1->sslinfo;
+					#endif
 					if ( tempinfo1->isconnect == 1 )
 					{
 						/* 远程的转发给本地 */
@@ -300,7 +325,11 @@ void* proxy( void *arg )
 						{
 							if ( tempinfo1->isconnectlocal == 0 )
 							{
-								readlen = ssl_read( &sslinfo1->ssl, buf, MAXBUF );
+							    #if OPENSSL
+                                readlen = SSL_read( sslinfo1->ssl, buf, MAXBUF );
+                                #else
+                                readlen = ssl_read( &sslinfo1->ssl, buf, MAXBUF );
+                                #endif
 								if ( readlen < 1 )
 								{
 									clearsock( it1->first, tempinfo1 );
@@ -385,7 +414,13 @@ void* proxy( void *arg )
 									}
 								}
 							}else  {
-								readlen = ssl_read( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+
+                                #if OPENSSL
+                                readlen = SSL_read( sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+                                #else
+                                readlen = ssl_read( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+                                #endif
+
 								if ( readlen < 1 )
 								{
 									/* close to sock */
@@ -414,7 +449,14 @@ void* proxy( void *arg )
 							if ( readlen > 0 )
 							{
 								setnonblocking( tempinfo1->tosock, 0 );
-								ssl_write( &sslinfo1->ssl, buf, readlen );
+								#if OPENSSL
+                                SSL_write( sslinfo1->ssl, buf, readlen );
+                                #else
+                                ssl_write( &sslinfo1->ssl, buf, readlen );
+                                #endif
+
+
+
 								setnonblocking( tempinfo1->tosock, 1 );
 							}else  {
 								shutdown( tempinfo1->tosock, 2 );
@@ -443,22 +485,50 @@ void* proxy( void *arg )
 						/* 为远程连接 */
 						if ( tempinfo->istype == 1 )
 						{
-							ssl_info *sslinfo;
-							sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
-							if ( ssl_init_info( (int *) &it1->first, sslinfo ) != -1 )
-							{
-								tempinfo->sslinfo = sslinfo;
-								SendRegProxy( &sslinfo->ssl, ClientId );
-								pthread_mutex_lock( &mutex );
-								it1->second = tempinfo;
-								pthread_mutex_unlock( &mutex );
-							}else  {
-								printf( "getsockoptclose sock:%d\r\n", it1->first );
-								/* ssl 初始化失败，移除连接 */
-								clearsock( it1->first, tempinfo );
-								clearsocklist.push_back( it1->first );
-								continue;
-							}
+                            #if OPENSSL
+                                openssl_info *sslinfo;
+                                sslinfo = (openssl_info *) malloc( sizeof(openssl_info) );
+                                setnonblocking(it1->first,0);
+								if ( openssl_init_info(it1->first, sslinfo ) != -1 )
+                                {
+                                    setnonblocking(it1->first,1);
+                                    tempinfo->sslinfo = sslinfo;
+                                    SendRegProxy(sslinfo->ssl, ClientId);
+                                    pthread_mutex_lock( &mutex );
+                                    it1->second = tempinfo;
+                                    pthread_mutex_unlock( &mutex );
+                                }
+                                else
+                                {
+                                    setnonblocking(it1->first,1);
+                                    printf( "getsockoptclose sock:%d\r\n", it1->first );
+                                    /* ssl 初始化失败，移除连接 */
+                                    clearsock( it1->first, tempinfo );
+                                    clearsocklist.push_back( it1->first );
+                                    continue;
+                                }
+                            #else
+                                ssl_info *sslinfo;
+                                sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+                                if (ssl_init_info( (int *) &it1->first, sslinfo ) != -1 )
+                                {
+                                    tempinfo->sslinfo = sslinfo;
+                                    SendRegProxy( &sslinfo->ssl, ClientId );
+                                    pthread_mutex_lock( &mutex );
+                                    it1->second = tempinfo;
+                                    pthread_mutex_unlock( &mutex );
+                                }
+                                else
+                                {
+                                    printf( "getsockoptclose sock:%d\r\n", it1->first );
+                                    /* ssl 初始化失败，移除连接 */
+                                    clearsock( it1->first, tempinfo );
+                                    clearsocklist.push_back( it1->first );
+                                    continue;
+                                }
+                            #endif
+
+
 						}else  {
 							pthread_mutex_lock( &mutex );
 							it1->second = tempinfo;
@@ -500,27 +570,42 @@ void* sockmain( void *arg )
 	//TunnelInfo	*tunnelinfo;
 
 	mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
-
-    mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
-
 	if ( connect( mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
         printf( "connect failed!\r\n" );
 		goto exit;
 	}
 
-	if(ssl_init_info((int*)&mainsock, mainsslinfo ) == -1 )
+     #if OPENSSL
+    mainsslinfo = (openssl_info *) malloc( sizeof(openssl_info) );
+    if(openssl_init_info(mainsock, mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
 		goto exit;
 	}
-	SendAuth( &mainsslinfo->ssl, ClientId, "1zW3MqEwX4iHmbtSAk3t" );
+		SendAuth( mainsslinfo->ssl, ClientId, "1zW3MqEwX4iHmbtSAk3t" );
+    #else
+     mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+     if(ssl_init_info((int*)&mainsock, mainsslinfo ) == -1 )
+	{
+		printf( "ssl init failed!\r\n" );
+		goto exit;
+	}
+		SendAuth( &mainsslinfo->ssl, ClientId, "1zW3MqEwX4iHmbtSAk3t" );
+    #endif
+
+
+
 	while ( mainrun )
 	{
 		recvlen = 0;
 		packlen = 0;
 		memset( tempjson, 0, MAXBUF + 1 );
+		#if OPENSSL
+		recvlen = readlen( mainsslinfo->ssl, buffer, 8, MAXBUF );
+		#else
 		recvlen = readlen( &mainsslinfo->ssl, buffer, 8, MAXBUF );
+		#endif
 		if ( recvlen == 8 )
 		{
 			memcpy( &packlen, buffer, 8 );
@@ -528,7 +613,12 @@ void* sockmain( void *arg )
 			{
 				packlen = Swap64( packlen );
 			}
-			recvlen = readlen( &mainsslinfo->ssl, buffer, (int) packlen, MAXBUF );
+
+			#if OPENSSL
+            recvlen = readlen( mainsslinfo->ssl, buffer, (int) packlen, MAXBUF );
+            #else
+            recvlen = readlen( &mainsslinfo->ssl, buffer, (int) packlen, MAXBUF );
+            #endif
 			if ( recvlen == packlen )
 			{
 				memcpy( tempjson, buffer, packlen );
@@ -559,7 +649,11 @@ void* sockmain( void *arg )
 					if(strcmp(error,"")==0)
                     {
                         ClientId = string( cid );
+                        #if OPENSSL
+                        SendPing( mainsslinfo->ssl );
+                        #else
                         SendPing( &mainsslinfo->ssl );
+                        #endif
                         isauth=1;
                     }
                     else
@@ -572,7 +666,12 @@ void* sockmain( void *arg )
 
 				if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
-					SendPong( &mainsslinfo->ssl );
+
+					#if OPENSSL
+                    SendPong( mainsslinfo->ssl );
+                    #else
+                    SendPong( &mainsslinfo->ssl );
+                    #endif
 				}
 				if ( strcmp( Type->valuestring, "Pong" ) == 0 )
 				{
@@ -605,14 +704,20 @@ void* sockmain( void *arg )
 			break;
 		}
 	}
-	ssl_close_notify( &mainsslinfo->ssl );
+	#if OPENSSL
+
+    #else
+    ssl_close_notify( &mainsslinfo->ssl );
+    #endif
+
 exit:
 	printf( "main thread close \r\n" );
 	isauth=0;
 	tunneloklist.clear();
 	mainrun = 0;
-	if ( mainsock != -1 )
-		net_close( mainsock );
+	//if ( mainsock != -1 )
+		//net_close( mainsock );
+
 	ClientId = "";
 	free( mainsslinfo );
 	return(0);

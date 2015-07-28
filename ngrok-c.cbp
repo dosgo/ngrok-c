@@ -16,8 +16,10 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
-					<Add library="C:\TDM-GCC-32\lib\libws2_32.a" />
+					<Add library="G:\ngrok-c\libpolarssl-win32.a" />
+					<Add library="G:\ngrok-c\openssl\libssl.dll.a" />
+					<Add library="G:\ngrok-c\openssl\libcrypto.dll.a" />
+					<Add library="C:\Program Files (x86)\CodeBlocks\MinGW\lib\libws2_32.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -45,6 +47,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cJSON.h" />
+		<Unit filename="config.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="nonblocking.cpp" />
 		<Unit filename="nonblocking.h" />

@@ -1,5 +1,31 @@
+#include "config.h"
 #include "sslbio.h"
+#if OPENSSL
+int openssl_init_info(int server_fd,openssl_info *sslinfo)
+{
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+    SSLeay_add_ssl_algorithms();
+    SSL_load_error_strings();
+    ERR_load_ERR_strings();
 
+    sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
+    sslinfo->ssl = SSL_new(sslinfo->ctx);
+    SSL_set_fd(sslinfo->ssl,server_fd);
+    SSL_connect(sslinfo->ssl);
+    return 0;
+}
+
+
+
+int openssl_free_info(openssl_info *sslinfo)
+{
+    SSL_shutdown( sslinfo->ssl );
+    SSL_free( sslinfo->ssl );
+    SSL_CTX_free( sslinfo->ctx  );
+    return 0;
+}
+#else
 int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 {
     int ret;
@@ -38,7 +64,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 
-    if( ( ret = ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
+    if((ret = ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
     {
        // printf( "Verifying peer X.509 certificate...failed \r\n" );
     }
@@ -51,11 +77,11 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 
-int ssl_free_info(ssl_info *sslinfo)
-{
+int ssl_free_info(ssl_info *sslinfo){
     x509_crt_free(&sslinfo->cacert );
     ssl_free(&sslinfo->ssl);
     ctr_drbg_free(&sslinfo->ctr_drbg );
     entropy_free(&sslinfo->entropy );
     return 0;
 }
+#endif // OPENSSL

@@ -1,5 +1,12 @@
+#include "config.h"
 #include <string>
+#if OPENSSL
+#include "openssl/ssl.h"
+#else
 #include "polarssl/ssl.h"
+#endif
+
+
 #if WIN32
 #include <windows.h>
 #else
@@ -85,6 +92,88 @@ char *random_uuid( char buf[37] )
     return buf;
 }
 
+#if OPENSSL
+
+int SendAuth(SSL *ssl,string ClientId,string user)
+{
+    string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
+   // printf( "SendAuthstr:%s\r\n",str.c_str());
+    unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write(ssl, buffer, sendlen);
+    return len;
+}
+
+int SendRegProxy(SSL *ssl,string ClientId)
+{
+    string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
+    //printf( "SendRegProxystr:%s\r\n",str.c_str());
+    unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write( ssl, buffer, sendlen);
+    return len;
+}
+
+int SendPing(SSL *ssl)
+{
+   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write(ssl,buffer,sendlen);
+    return len;
+}
+
+int SendReqTunnel(SSL *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
+{
+    char RemotePortStr[10];
+    sprintf(RemotePortStr,"%d",RemotePort);
+    char guid[37];
+    random_uuid(guid);
+    guid[9]='\0';
+    string guid_str=string(guid);
+    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
+    //printf("SendReqTunnelstr:%s\r\n",str.c_str());
+    unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write(ssl, buffer,sendlen);
+    return len;
+}
+
+
+int SendPong(SSL *ssl)
+{
+   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write( ssl, buffer, sendlen);
+    return len;
+}
+
+
+
+int readlen(SSL *ssl,unsigned char *buffer, int readlen,int bufferlen)
+{
+    int recvlen = 0;
+    int len;
+    memset( buffer, 0, bufferlen);
+    while ( 1 )
+    {
+        if ( (readlen - recvlen) < 1 )
+        {
+            break;
+        }
+        len = SSL_read( ssl, buffer+recvlen, (readlen - recvlen) );
+        if ( len > 0 )
+        {
+            recvlen = recvlen + len;
+        }else    {
+            break;
+        }
+        sleeps(1);
+    }
+    return recvlen;
+}
+#else
 int SendAuth(ssl_context *ssl,string ClientId,string user)
 {
     string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
@@ -140,22 +229,6 @@ int SendPong(ssl_context *ssl)
     return len;
 }
 
-int pack(unsigned char * buffer,string msgstr)
-{
-    #if WIN32
-    unsigned __int64 packlen;
-    #else
-    unsigned long long packlen;
-    #endif
-    packlen=msgstr.length();
-    if(BigEndianTest()==BigEndian)
-    {
-        packlen=LittleEndian_64(packlen);
-    }
-    memcpy(buffer,&packlen,8);
-    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
-    return  8+msgstr.length();
-}
 
 
 int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
@@ -180,6 +253,25 @@ int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
     }
     return recvlen;
 }
+#endif
+
+int pack(unsigned char * buffer,string msgstr)
+{
+    #if WIN32
+    unsigned __int64 packlen;
+    #else
+    unsigned long long packlen;
+    #endif
+    packlen=msgstr.length();
+    if(BigEndianTest()==BigEndian)
+    {
+        packlen=LittleEndian_64(packlen);
+    }
+    memcpy(buffer,&packlen,8);
+    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
+    return  8+msgstr.length();
+}
+
 
 int get_curr_unixtime()
 {

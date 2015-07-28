@@ -17,7 +17,7 @@ $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
 $CC $YH -c $1 main.cpp -o $DIR/main.o
 $CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
 $CC $YH -c $1 sslbio.cpp  -o $DIR/sslbio.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o libpolarssl-mips.a -o $DIR/ngrokc   -lpthread 
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o  $DIR/sslbio.o libpolarssl-mips.a -o $DIR/ngrokc   -lpthread
 
 #buill openssl
 #CC=mips-openwrt-linux-gcc

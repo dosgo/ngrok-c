@@ -1,5 +1,6 @@
 #ifndef NONBLOCKING_H_INCLUDED
 #define NONBLOCKING_H_INCLUDED
+#include "config.h"
 #if  WIN32
 #include <windows.h>
 #else
@@ -11,9 +12,24 @@
 #endif
 #include <list>
 
-
 #include "sslbio.h"
 using namespace std;
+
+
+#if OPENSSL
+struct sockinfo
+{
+    openssl_info *sslinfo;
+    int isssl;
+    int isconnect;
+    int linkunixtime;
+    int istype; //1=remote 2=local
+    int tosock;
+    char *packbuf;
+    int packbuflen;
+    int isconnectlocal;
+};
+#else
 struct sockinfo
 {
     ssl_info *sslinfo;
@@ -26,6 +42,8 @@ struct sockinfo
     int packbuflen;
     int isconnectlocal;
 };
+#endif
+
 int setnonblocking(int sServer,int _nMode);
 int clearlist(list<int> *clearsocklist,map<int, sockinfo*>	*socklist,pthread_mutex_t *mutex);
 int clensocklist(list<int> *clearsocklist,map<int, sockinfo*>	*socklist,pthread_mutex_t *mutex,int iserr );
