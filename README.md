@@ -64,4 +64,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 
-
+##2015/7/28更新
+- 增加openssl支持，
+- 如果编译openssl版本，修改config.h文件把define OPENSSL 改为1,
+- 如果编译polarssl版本，修改config.h文件把define OPENSSL 改为0,
+- openssl版本 内存占用稍大，而且有点内存泄漏，openwrt谨慎使用，我测试跑了6小时，内存从14%，到16%。。。
