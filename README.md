@@ -2,7 +2,7 @@
 
 - ngrok client for c language.  
 - Before compiling you need to generate libpolarssl.a static library Reference polarssl official website.  
-- No copyright, piracy welcome, any questions contact email dosgo@qq.com.
+- contact email dosgo@qq.com.
 
 
 
