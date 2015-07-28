@@ -3,12 +3,6 @@
 #if OPENSSL
 int openssl_init_info(int server_fd,openssl_info *sslinfo)
 {
-    SSL_library_init();
-    OpenSSL_add_all_algorithms();
-    SSLeay_add_ssl_algorithms();
-    SSL_load_error_strings();
-    ERR_load_ERR_strings();
-
     sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
     sslinfo->ssl = SSL_new(sslinfo->ctx);
     SSL_set_fd(sslinfo->ssl,server_fd);
