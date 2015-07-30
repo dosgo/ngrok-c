@@ -289,8 +289,6 @@ int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockadd
 	if ( tunnellist->count( string( Protocol ) ) > 0 )
 	{
 		TunnelInfo	*tunnelinfo	= (*tunnellist)[string( Protocol )];
-
-
 		int		l1		= inet_addr( tunnelinfo->localhost );
 		printf( "tunnelinfo->localhost %s\r\n", tunnelinfo->localhost );
 		printf( "tunnelinfo->localhost \r\n" );
@@ -323,7 +321,6 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 		int	pos	= 0;
 		char *argvstr;
 		int	xpos;
-		int	ypos;
 		int	run = 1;
 		for ( int i = 1; i < argc; i++ )
 		{
@@ -349,38 +346,12 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 						}else  {
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
-
-
-						if ( strncmp( jsonstr, "Shost", 5 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memset( s_name, 0, strlen( s_name ) );
-								memcpy( s_name, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
+						getvalue(jsonstr,"Shost",s_name);
+						if(getvalue(jsonstr,"Sport",temp)==0)
+                        {
+                            *s_port = atoi(temp);
 						}
-
-						if ( strncmp( jsonstr, "Sport", 5 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memset( temp, 0, strlen( temp ) );
-								memcpy( temp, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-								*s_port = atoi( temp );
-							}
-						}
-
-						if ( strncmp( jsonstr, "Atoken", 6 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memset( authtoken, 0, strlen( authtoken ) );
-								memcpy( authtoken, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
-						}
+						getvalue(jsonstr,"Atoken",authtoken);
 						pos = pos + xpos + 1;
 					}
 				}
@@ -406,63 +377,20 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
 
-
-						if ( strncmp( jsonstr, "Type", 4 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memcpy( Type, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
-						}
-
-						if ( strncmp( jsonstr, "Lhost", 5 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memcpy( tunnelinfo->localhost, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
-						}
-						if ( strncmp( jsonstr, "Lport", 5 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memset( temp, 0, strlen( temp ) );
-								memcpy( temp, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-								tunnelinfo->localport = atoi( temp );
-							}
-						}
-
-						if ( strncmp( jsonstr, "Rport", 5 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memset( temp, 0, strlen( temp ) );
-								memcpy( temp, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-								tunnelinfo->remoteport = atoi( temp );
-							}
-						}
-
-						if ( strncmp( jsonstr, "Sdname", 6 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memcpy( tunnelinfo->subdomain, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
-						}
-						if ( strncmp( jsonstr, "Hostname", 8 ) == 0 )
-						{
-							ypos = strpos( jsonstr, ':' );
-							if ( ypos != -1 )
-							{
-								memcpy( tunnelinfo->hostname, jsonstr + ypos + 1, strlen( jsonstr + ypos ) );
-							}
-						}
-
+						getvalue(jsonstr,"Type",Type);
+                        getvalue(jsonstr,"Lhost",tunnelinfo->localhost);
+                        memset( temp, 0, strlen( temp ) );
+                        if(getvalue(jsonstr,"Lport",temp)==0)
+                        {
+                            tunnelinfo->localport = atoi( temp );
+                        }
+                        memset( temp,0,strlen(temp));
+                        if(getvalue(jsonstr,"Rport",temp)==0)
+                        {
+                            tunnelinfo->remoteport = atoi( temp );
+                        }
+                        getvalue(jsonstr,"Sdname",tunnelinfo->subdomain);
+                        getvalue(jsonstr,"Hostname",tunnelinfo->hostname);
 						pos = pos + xpos + 1;
 					}
 
@@ -470,10 +398,8 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 
                     int		l1		= inet_addr( tunnelinfo->localhost );
                     (&tunnelinfo->local_addr)->sin_family	= AF_INET;
-
                      (&tunnelinfo->local_addr)->sin_port	= htons(tunnelinfo->localport );
                      memcpy(&(&tunnelinfo->local_addr)->sin_addr, &l1, 4 );
-                   //  printf("sdfsd\r\n");
 					(*tunnellist)[string( Type )] = tunnelinfo;
 				}
 			}
@@ -488,3 +414,17 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 	return 0;
 }
 
+int getvalue(char * str,char *key,char * value){
+    int ypos=0;
+    if ( strncmp(str,key,strlen(key)) == 0 )
+    {
+        ypos = strpos( str, ':' );
+        if ( ypos != -1 )
+        {
+
+            memcpy(value, str + ypos + 1, strlen( str + ypos ));
+            return 0;
+        }
+    }
+    return -1;
+}

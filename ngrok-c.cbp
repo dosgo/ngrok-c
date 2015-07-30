@@ -16,10 +16,9 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="G:\ngrok-c\libpolarssl-win32.a" />
-					<Add library="G:\ngrok-c\openssl\libssl.dll.a" />
-					<Add library="G:\ngrok-c\openssl\libcrypto.dll.a" />
 					<Add library="C:\Program Files (x86)\CodeBlocks\MinGW\lib\libws2_32.a" />
+					<Add library="D:\c\ngrok-c\openssl\libcrypto.dll.a" />
+					<Add library="D:\c\ngrok-c\openssl\libssl.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">

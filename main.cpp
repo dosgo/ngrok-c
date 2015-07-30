@@ -212,10 +212,7 @@ int main( int argc, char **argv )
 
 #if OPENSSL
 SSL_library_init();
-OpenSSL_add_all_algorithms();
-SSLeay_add_ssl_algorithms();
 SSL_load_error_strings();
-ERR_load_ERR_strings();
 #endif // OPENSSL
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
