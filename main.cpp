@@ -544,6 +544,8 @@ void* proxy( void *arg )
 			/* 循环外移除 */
 			clearlist(&clearsocklist,&socklist,&mutex);
 		}
+		//睡1豪秒，避免CPU过高
+		sleeps(1);
 	}
 	/* 退出 */
 	proxyrun = 0;
