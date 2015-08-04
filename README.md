@@ -68,3 +68,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 增加openssl支持，
 - 如果编译openssl版本，修改config.h文件把define OPENSSL 改为1,
 - 如果编译polarssl版本，修改config.h文件把define OPENSSL 改为0,
+
+##2015/8/4
+- make -f Makefile.openssl编译openssl版本
+- make -f Makefile.polarssl编译polarssl版本
