@@ -1,7 +1,7 @@
 CC?=gcc
 CXX?=g++
-CFLAGS+=-fexceptions
-CXXFLAGS+=-fexceptions
+CFLAGS+=-fexceptions -DOPENSSL=0
+CXXFLAGS=-fexceptions -DOPENSSL=0
 LIBS=sendmsg.o cJSON.o nonblocking.o sslbio.o main.o
 all:: ngrokc $(LIBS)
 ngrokc: $(LIBS)
