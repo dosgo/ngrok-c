@@ -131,17 +131,22 @@ void* regkey( void *arg )
 
 int CheckStatus()
 {
+    pthread_attr_t attr;
+    pthread_attr_init( &attr );
+    pthread_attr_setdetachstate(&attr,1); //set detach
+    pthread_attr_setstacksize(&attr,2048*1024); //set stacksize 2M
+
     TunnelInfo	*tunnelinfo;
 	if ( proxyrun == 0 )
 	{
 		proxyrun = 1;
 		pthread_t tproxy;
-		pthread_create(&tproxy,NULL,&proxy,NULL);
+		pthread_create(&tproxy,&attr,&proxy,NULL);
 	}
 	if ( mainrun == 0 )
 	{
 		pthread_t tmain;
-		pthread_create(&tmain,NULL,&sockmain,NULL);
+		pthread_create(&tmain,&attr,&sockmain,NULL);
 	}else  {
 	    #if OPENSSL
 		int sendlen = SendPing( mainsslinfo->ssl );

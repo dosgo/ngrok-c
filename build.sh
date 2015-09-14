@@ -17,4 +17,4 @@ $CC -c nonblocking.cpp -o $DIR/nonblocking.o
 $CC -c sslbio.cpp -o $DIR/sslbio.o
 
 
-$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/sslbio.o  -o $DIR/ngrokc -lssl -lcrypto -lpthread
+$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/sslbio.o  -o $DIR/ngrokc -lssl -lcrypto -lpthread libpolarssl-linux.a
