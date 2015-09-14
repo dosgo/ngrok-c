@@ -72,3 +72,4 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##2015/8/4
 - make -f Makefile.openssl编译openssl版本
 - make -f Makefile.polarssl编译polarssl版本
+- openssl版本有bug，运行久了会崩溃...慎用。。
