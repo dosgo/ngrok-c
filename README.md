@@ -76,4 +76,5 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 
-###注意如果要编译polarssl版本，请使用polarssl 1.3.10版本编译，其它版本可能会出现兼容问题，下载地址:https://tls.mbed.org/download-archive
+###注意如果编译polarssl版本
+如果你使用的PolarSSL 版本是v2.0.0及其以上的版本编译，请把config.h文件的define ISMBEDTLS 改为1
