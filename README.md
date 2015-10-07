@@ -74,7 +74,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - make -f Makefile.polarssl编译polarssl版本
 - openssl版本有bug，运行久了会崩溃...慎用。。
 
-
+##2015/10/7
+- 增加PolarSSL v2.0.0版本兼容
 
 ###注意如果编译polarssl版本
 如果你使用的PolarSSL 版本是v2.0.0及其以上的版本编译，请把config.h文件的define ISMBEDTLS 改为1
