@@ -668,7 +668,7 @@
 
 1438050022 d:\c\ngrok-c\config.h
 
-1437468350 source:g:\ngrok-c\cjson.c
+1444176728 source:g:\ngrok-c\cjson.c
 	<string.h>
 	<stdio.h>
 	<math.h>
@@ -678,9 +678,9 @@
 	<ctype.h>
 	"cJSON.h"
 
-1437468350 g:\ngrok-c\cjson.h
+1444176728 g:\ngrok-c\cjson.h
 
-1438010696 source:g:\ngrok-c\main.cpp
+1444180053 source:g:\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -695,6 +695,13 @@
 	<openssl/ssl.h>
 	<openssl/bio.h>
 	<openssl/err.h>
+	<mbedtls/ssl.h>
+	<mbedtls/net.h>
+	<mbedtls/debug.h>
+	<mbedtls/entropy.h>
+	<mbedtls/ctr_drbg.h>
+	<mbedtls/error.h>
+	<mbedtls/certs.h>
 	<polarssl/net.h>
 	<polarssl/debug.h>
 	<polarssl/ssl.h>
@@ -718,15 +725,22 @@
 	"bytestool.h"
 	"nonblocking.h"
 
-1438010969 g:\ngrok-c\config.h
+1444188314 g:\ngrok-c\config.h
 
-1437991163 g:\ngrok-c\sslbio.h
+1444182244 g:\ngrok-c\sslbio.h
 	"config.h"
 	<malloc.h>
 	"sendmsg.h"
 	<openssl/ssl.h>
 	<openssl/bio.h>
 	<openssl/err.h>
+	<mbedtls/ssl.h>
+	<mbedtls/net.h>
+	<mbedtls/debug.h>
+	<mbedtls/entropy.h>
+	<mbedtls/ctr_drbg.h>
+	<mbedtls/error.h>
+	<mbedtls/certs.h>
 	<polarssl/net.h>
 	<polarssl/debug.h>
 	<polarssl/ssl.h>
@@ -735,21 +749,23 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1437990829 g:\ngrok-c\sendmsg.h
+1444179119 g:\ngrok-c\sendmsg.h
 	"config.h"
 	<string>
 	<map>
 	"openssl/ssl.h"
+	<mbedtls/ssl.h>
 	"polarssl/ssl.h"
 	<windows.h>
 	<netinet/in.h>
 	<string.h>
 	<sys/select.h>
 
-1437468350 g:\ngrok-c\bytestool.h
+1444176728 g:\ngrok-c\bytestool.h
 
-1438010711 g:\ngrok-c\nonblocking.h
+1444185185 g:\ngrok-c\nonblocking.h
 	"config.h"
+	<pthread.h>
 	<windows.h>
 	<fcntl.h>
 	<netinet/in.h>
@@ -759,14 +775,12 @@
 	<list>
 	"sslbio.h"
 
-1437987077 source:g:\ngrok-c\nonblocking.cpp
+1444180524 source:g:\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
 
-1437991227 source:g:\ngrok-c\sendmsg.cpp
+1444180789 source:g:\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
-	"openssl/ssl.h"
-	"polarssl/ssl.h"
 	<windows.h>
 	<arpa/inet.h>
 	<errno.h>
@@ -774,7 +788,7 @@
 	"sendmsg.h"
 	<stdlib.h>
 
-1437991081 source:g:\ngrok-c\sslbio.cpp
+1444188245 source:g:\ngrok-c\sslbio.cpp
 	"config.h"
 	"sslbio.h"
 

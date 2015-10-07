@@ -6,7 +6,13 @@
 #if OPENSSL
 #include "openssl/ssl.h"
 #else
+#if ISMBEDTLS
+#include <mbedtls/ssl.h>
+typedef mbedtls_ssl_context ssl_context;
+
+#else
 #include "polarssl/ssl.h"
+#endif // ISMBEDTLS
 #endif
 
 #if WIN32

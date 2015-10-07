@@ -1,6 +1,7 @@
 #ifndef NONBLOCKING_H_INCLUDED
 #define NONBLOCKING_H_INCLUDED
 #include "config.h"
+#include <pthread.h>
 #if  WIN32
 #include <windows.h>
 #else

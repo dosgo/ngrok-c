@@ -63,13 +63,25 @@ void clearsock(int sock,sockinfo * sock_info)
           if(sock_info->sslinfo!=NULL)
           {
             //linux error
-              ssl_close_notify(&sock_info->sslinfo->ssl);
+                #if ISMBEDTLS
+                 mbedtls_ssl_close_notify(&sock_info->sslinfo->ssl);
+                #else
+                 ssl_close_notify(&sock_info->sslinfo->ssl);
+                #endif // ISMBEDTLS
+
               ssl_free_info(sock_info->sslinfo);
               free(sock_info->sslinfo);
               sock_info->sslinfo=NULL;
           }
       }
+
+      #if ISMBEDTLS
+      //shutdown(sock);
+      closesocket(sock);
+      #else
       net_close(sock);
+      #endif
+
       //ÊÍ·ÅÄÚ´æ
       if(sock_info!=NULL)
       {

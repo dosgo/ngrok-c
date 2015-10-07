@@ -9,10 +9,24 @@
 #include <iomanip>
 #include <signal.h>
 #include "sslbio.h"
+
+
+
 #if OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
+#else
+
+#if ISMBEDTLS
+#include <mbedtls/ssl.h>
+#include <mbedtls/net.h>
+#include <mbedtls/debug.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/error.h>
+#include <mbedtls/certs.h>
+//typedef mbedtls_ssl_read ssl_read;
 #else
 #include <polarssl/net.h>
 #include <polarssl/debug.h>
@@ -21,7 +35,10 @@
 #include <polarssl/ctr_drbg.h>
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
+#endif // ISMBEDTLS
+
 #endif
+
 
 #if  WIN32
 #include <windows.h>
@@ -337,8 +354,12 @@ void* proxy( void *arg )
 							    #if OPENSSL
                                 readlen = SSL_read( sslinfo1->ssl, buf, MAXBUF );
                                 #else
-                                readlen = ssl_read( &sslinfo1->ssl, buf, MAXBUF );
-                                #endif
+                                  #if ISMBEDTLS
+                                  readlen = mbedtls_ssl_read( &sslinfo1->ssl, buf, MAXBUF );
+                                  #else
+                                  readlen = ssl_read( &sslinfo1->ssl, buf, MAXBUF );
+                                  #endif  // ISMBEDTLS
+                                #endif // OPENSSL
 								if ( readlen < 1 )
 								{
 									clearsock( it1->first, tempinfo1 );
@@ -427,7 +448,11 @@ void* proxy( void *arg )
                                 #if OPENSSL
                                 readlen = SSL_read( sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
                                 #else
-                                readlen = ssl_read( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+                                    #if ISMBEDTLS
+                                     readlen = mbedtls_ssl_read( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+                                    #else
+                                    readlen = ssl_read( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
+                                    #endif // ISMBEDTLS
                                 #endif
 
 								if ( readlen < 1 )
@@ -461,7 +486,11 @@ void* proxy( void *arg )
 								#if OPENSSL
                                 SSL_write( sslinfo1->ssl, buf, readlen );
                                 #else
+                                #if ISMBEDTLS
+                                mbedtls_ssl_write( &sslinfo1->ssl, buf, readlen );
+                                #else
                                 ssl_write( &sslinfo1->ssl, buf, readlen );
+                                #endif // ISMBEDTLS
                                 #endif
 
 
@@ -718,7 +747,11 @@ void* sockmain( void *arg )
 	#if OPENSSL
 
     #else
+    #if ISMBEDTLS
+     mbedtls_ssl_close_notify( &mainsslinfo->ssl );
+    #else
     ssl_close_notify( &mainsslinfo->ssl );
+    #endif // ISMBEDTLS
     #endif
 
 exit:

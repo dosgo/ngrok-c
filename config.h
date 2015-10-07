@@ -3,4 +3,5 @@
 #ifndef OPENSSL
 #define OPENSSL 0
 #endif
+#define ISMBEDTLS 0
 #endif

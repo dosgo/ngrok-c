@@ -1,11 +1,5 @@
 #include "config.h"
 #include <string>
-#if OPENSSL
-#include "openssl/ssl.h"
-#else
-#include "polarssl/ssl.h"
-#endif
-
 
 #if WIN32
 #include <windows.h>
@@ -180,7 +174,11 @@ int SendAuth(ssl_context *ssl,string ClientId,string user)
    // printf( "SendAuthstr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
+    #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
     int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
     return len;
 }
 
@@ -190,7 +188,11 @@ int SendRegProxy(ssl_context *ssl,string ClientId)
     //printf( "SendRegProxystr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
-    int len=ssl_write( ssl, buffer, sendlen);
+    #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
     return len;
 }
 
@@ -199,7 +201,11 @@ int SendPing(ssl_context *ssl)
    	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
    	unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
-    int len=ssl_write(ssl,buffer,sendlen);
+     #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
     return len;
 }
 
@@ -215,7 +221,11 @@ int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdom
     //printf("SendReqTunnelstr:%s\r\n",str.c_str());
     unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
-    int len=ssl_write(ssl, buffer,sendlen);
+     #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
     return len;
 }
 
@@ -225,7 +235,11 @@ int SendPong(ssl_context *ssl)
    	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
    	unsigned char buffer[str.length()+9];
     int sendlen=pack(buffer,str);
-    int len=ssl_write( ssl, buffer, sendlen);
+     #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
     return len;
 }
 
@@ -242,7 +256,12 @@ int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
         {
             break;
         }
+
+        #if ISMBEDTLS
+        len = mbedtls_ssl_read( ssl, buffer+recvlen, (readlen - recvlen) );
+        #else
         len = ssl_read( ssl, buffer+recvlen, (readlen - recvlen) );
+        #endif // ISMBEDTLS
         if ( len > 0 )
         {
             recvlen = recvlen + len;
