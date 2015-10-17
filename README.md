@@ -113,6 +113,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 还有，最后一行的libpolarssl-mips.a改成libssl.a,libcrypto.a.
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
+
+
 - 2.openssl版本
       - 把下载的polarssl里面的include/polarssl，或者include/mbedtls 文件夹复制到，你SDK里面的staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include里面，（可能根据SDK路径有所不同）。
       - 然后把第二步生成的，2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）放到ngrok-c目录。
