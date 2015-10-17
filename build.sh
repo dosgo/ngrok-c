@@ -15,6 +15,7 @@ $CC -c cJSON.c -o $DIR/cJSON.o
 $CC -c main.cpp -o $DIR/main.o
 $CC -c nonblocking.cpp -o $DIR/nonblocking.o
 $CC -c sslbio.cpp -o $DIR/sslbio.o
+$CC -c $1 ngrok.cpp  -o $DIR/ngrok.o
 
 
-$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/sslbio.o  -o $DIR/ngrokc -lssl -lcrypto -lpthread libpolarssl-linux.a
+$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/sslbio.o  $DIR/ngrok.o -o $DIR/ngrokc -lssl -lcrypto -lpthread libpolarssl-linux.a
