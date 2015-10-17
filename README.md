@@ -102,7 +102,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
     - 然后执行，buildlib.sh
     - 如果一切顺利的话，就会在当前目录下生成，libssl.a,libcrypto.a
     - 这就编译好了openssl库库。
- ##三。编译ngrokc
+##三。编译ngrokc
  - 1.openssl版本
       - 把下载的openssl里面的include/openssl，文件夹复制到，你SDK里面的staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include里面，（可能根据SDK路径有所不同）。
       - 然后把第二步生成的，libssl.a,libcrypto.a,放到ngrok-c目录。
