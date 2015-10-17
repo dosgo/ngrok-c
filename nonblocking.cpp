@@ -71,8 +71,9 @@ void clearsock(int sock,sockinfo * sock_info)
       }
 
       #if ISMBEDTLS
-      //shutdown(sock);
-      closesocket(sock);
+      shutdown(sock,2);
+      //closesocket(sock);
+
       #else
       net_close(sock);
       #endif
