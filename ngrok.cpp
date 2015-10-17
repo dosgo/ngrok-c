@@ -98,7 +98,7 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     #if WIN32
     readlen = recv( (*it1)->first, (char *) buf, maxbuf, 0 );
     #else
-    readlen = recv( it1->first, buf, maxbuf, 0 );
+    readlen = recv( (*it1)->first, buf, maxbuf, 0 );
     #endif
     if ( readlen > 0 )
     {
