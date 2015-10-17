@@ -18,7 +18,13 @@ $CC $YH -c $1 main.cpp -o $DIR/main.o
 $CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
 $CC $YH -c $1 sslbio.cpp  -o $DIR/sslbio.o
 $CC $YH -c $1 ngrok.cpp  -o $DIR/ngrok.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/sslbio.o libpolarssl-mips.a -o $DIR/ngrokc   -lpthread
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/sslbio.o libpolarssl-mips.a -libmbedtls.a -libmbedcrypto.a -libmbedx509.a -o $DIR/ngrokc   -lpthread
 
-
-
+#buill openssl
+#CC=mips-openwrt-linux-gcc
+#CXX=mips-openwrt-linux-g++
+#AR=mips-openwrt-linux-ar
+#RANLIB=mips-openwrt-linux-ranlib 
+#./Configure no-asm shared --prefix=`pwd`/../out/openssl linux-mips32
+#make
+#make install
