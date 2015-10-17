@@ -319,7 +319,7 @@ void* proxy( void *arg )
         ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
 		if ( ret == -1 && maxfd != 0 )
 		{
-		    printf("err:%d\r\n",WSAGetLastError());
+		    //printf("err:%d\r\n",WSAGetLastError());
 			continue;
 		}
 		/*  printf("ret:%d\r\n",ret); */
