@@ -81,6 +81,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 如果你使用的PolarSSL 版本是v2.0.0及其以上的版本编译，请把config.h文件的define ISMBEDTLS 改为1
 
 
+##2015/10/17
+ - 修复内存泄漏
+ - 增加编译详细说明
 
 
 ###关于编译对应路由的版本的ngrokc。
