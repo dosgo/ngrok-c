@@ -90,12 +90,12 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
 - 1.编译polarssl库
-    去https://tls.mbed.org/download-archive下载，polarssl版本，然后解压
-    再把buildlib.sh复制进去，并且修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK，所在的目录，注意是staging_dir目录对应STAGING_DIR，bin目录对应PATH。
-    还得修改CC=mips-openwrt-linux-gcc CXX=mips-openwrt-linux-g++ AR=mips-openwrt-linux-ar RANLIB=mips-openwrt-linux-ranlib,把这些参数分别对应你的，编译器。名称。。
-    然后执行，buildlib.sh
-    如果一切顺利的话，就会在library目录下生成，2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）
-    这就编译好了polarssl库。
+    - 去https://tls.mbed.org/download-archive下载，polarssl版本，然后解压
+    - 再把buildlib.sh复制进去，并且修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK，所在的目录，注意是staging_dir目录对应STAGING_DIR，bin目录对应PATH。
+    - 还得修改CC=mips-openwrt-linux-gcc CXX=mips-openwrt-linux-g++ AR=mips-openwrt-linux-ar RANLIB=mips-openwrt-linux-ranlib,把这些参数分别对应你的，编译器。名称。。
+    - 然后执行，buildlib.sh
+    - 如果一切顺利的话，就会在library目录下生成，2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）
+    - 这就编译好了polarssl库。
 - 2.编译 openssl库
     去https://www.openssl.org/source/ 下载openssl，然后解压。
     再把buildlib.sh复制进去，并且修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK，所在的目录，注意是staging_dir目录对应STAGING_DIR，bin目录对应PATH。
