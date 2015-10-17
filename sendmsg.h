@@ -44,7 +44,7 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 int GetProtocol(char *url,char *Protocol);
 int strpos( char *str, char c );
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
-int getvalue(char * str,char *key,char * value);
+int getvalue(char * str,const char *key,char * value);
 int pack(unsigned char * buffer,string msgstr);
 #if OPENSSL
 int SendAuth(SSL* ssl,string ClientId,string user);

@@ -433,7 +433,7 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 	return 0;
 }
 
-int getvalue(char * str,char *key,char * value){
+int getvalue(char * str,const char *key,char * value){
     int ypos=0;
     if ( strncmp(str,key,strlen(key)) == 0 )
     {

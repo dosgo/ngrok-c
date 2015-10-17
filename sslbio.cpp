@@ -6,7 +6,23 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo)
     sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
     sslinfo->ssl = SSL_new(sslinfo->ctx);
     SSL_set_fd(sslinfo->ssl,server_fd);
-    SSL_connect(sslinfo->ssl);
+    //·Ç×èÈû
+    SSL_set_connect_state (sslinfo->ssl);
+    //SSL_connect(sslinfo->ssl);
+    int r=0;
+    //·Ç×èÈûÎÕÊÖ
+    while ((r = SSL_do_handshake(sslinfo->ssl)) != 1) {
+        int err = SSL_get_error(sslinfo->ssl, r);
+        if (err == SSL_ERROR_WANT_WRITE) {
+
+        } else if (err == SSL_ERROR_WANT_READ) {
+
+        } else {
+            return -1;
+        }
+        //CPU sleep
+        sleeps(1);
+    }
     return 0;
 }
 
@@ -17,6 +33,8 @@ int openssl_free_info(openssl_info *sslinfo)
     SSL_shutdown( sslinfo->ssl );
     SSL_free( sslinfo->ssl );
     SSL_CTX_free( sslinfo->ctx  );
+   //CRYPTO_cleanup_all_ex_data();
+    //ERR_remove_state();
     return 0;
 }
 #else
@@ -150,10 +168,28 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 int ssl_free_info(ssl_info *sslinfo){
-    x509_crt_free(&sslinfo->cacert );
+    /*
+    if(&sslinfo->cacert!=NULL)
+    {
+        x509_crt_free(&sslinfo->cacert);
+    }
+    if(&sslinfo->ssl!=NULL)
+    {
+        ssl_free(&sslinfo->ssl);
+    }
+    if(&sslinfo->ctr_drbg!=NULL)
+    {
+        ctr_drbg_free(&sslinfo->ctr_drbg);
+    }
+    if(&sslinfo->entropy!=NULL)
+    {
+        entropy_free(&sslinfo->entropy);
+    }
+    */
+    x509_crt_free(&sslinfo->cacert);
     ssl_free(&sslinfo->ssl);
-    ctr_drbg_free(&sslinfo->ctr_drbg );
-    entropy_free(&sslinfo->entropy );
+    ctr_drbg_free(&sslinfo->ctr_drbg);
+    entropy_free(&sslinfo->entropy);
     return 0;
 }
 #endif // ISMBEDTLS

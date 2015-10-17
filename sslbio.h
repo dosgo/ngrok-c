@@ -16,6 +16,7 @@ struct openssl_info
 };
 int openssl_init_info(int server_fd,openssl_info *sslinfo);
 int openssl_free_info(openssl_info *sslinfo);
+typedef openssl_info ssl_info;
 #else
 
 #if ISMBEDTLS

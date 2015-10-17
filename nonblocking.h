@@ -46,8 +46,6 @@ struct sockinfo
 #endif
 
 int setnonblocking(int sServer,int _nMode);
-int clearlist(list<int> *clearsocklist,map<int, sockinfo*>	*socklist,pthread_mutex_t *mutex);
-int clensocklist(list<int> *clearsocklist,map<int, sockinfo*>	*socklist,pthread_mutex_t *mutex,int iserr );
 int net_dns( struct sockaddr_in *server_addr, const char *host, int port );
 int check_sock(int sock);
 void clearsock(int sock,sockinfo * sock_info);
