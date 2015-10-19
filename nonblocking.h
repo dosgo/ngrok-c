@@ -24,11 +24,13 @@ struct sockinfo
     int isssl;
     int isconnect;
     int linkunixtime;
-    int istype; //1=remote 2=local
+    int istype; //1=remote 2=local,3=cmd
     int tosock;
     char *packbuf;
     int packbuflen;
     int isconnectlocal;
+    int isauth;
+    int pongtime;
 };
 #else
 struct sockinfo
@@ -42,6 +44,8 @@ struct sockinfo
     char *packbuf;
     int packbuflen;
     int isconnectlocal;
+    int isauth;
+    int pongtime;
 };
 #endif
 
