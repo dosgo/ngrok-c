@@ -304,10 +304,9 @@ void* proxy( void *arg )
 			{
 				FD_SET( it->first, &writeSet );
 			}
-
-			FD_SET( it->first, &readSet );
-
-
+			else{
+				FD_SET( it->first, &readSet );
+			}
 			maxfdp = it->first > maxfdp ? it->first : maxfdp;
 			maxfd++;
 			//继续遍历
@@ -324,11 +323,11 @@ void* proxy( void *arg )
 		}
 
 		/*  printf("add ok \r\n"); */
-        ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
+       		ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
 		if ( ret == -1 && maxfd != 0 )
 		{
 		    //printf("err:%d\r\n",WSAGetLastError());
-            printf("select error\r\n");
+            			printf("select error\r\n");
 			continue;
 		}
 		//  printf("ret:%d\r\n",ret);
@@ -411,7 +410,7 @@ void* proxy( void *arg )
 			}
 		}
 		//睡1豪秒，避免CPU过高
-		sleeps(1);
+		sleeps(2);
 	}
 	/* 退出 */
 	proxyrun = 0;
