@@ -70,7 +70,9 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string C
         printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
+        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
+        pthread_mutex_unlock( &mutex );
         return -1;
     }
     #else
@@ -86,14 +88,16 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string C
         printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
+        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
+        pthread_mutex_unlock( &mutex );
         return -1;
     }
     #endif
     return 0;
 }
 
-int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist){
+int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex){
     int readlen;
     #if WIN32
     readlen = recv( (*it1)->first, (char *) buf, maxbuf, 0 );
@@ -116,13 +120,15 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     }else  {
         shutdown( tempinfo1->tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
+        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
+        pthread_mutex_unlock( &mutex );
         return -1;
     }
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
+int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex){
    int readlen;
    #if OPENSSL
    readlen = SSL_read( sslinfo1->ssl, (unsigned char *) buf, maxbuf );
@@ -139,7 +145,9 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
         /* close to sock */
         shutdown( tempinfo1->tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
+        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
+        pthread_mutex_unlock( &mutex );
         return -1;
     }
     else
@@ -171,7 +179,9 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
     if ( readlen < 1 )
     {
         clearsock( (*it1)->first, tempinfo1 );
+         pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
+         pthread_mutex_unlock( &mutex );
         return -1;
     }
 

@@ -267,8 +267,6 @@ void* proxy( void *arg )
 	TunnelInfo	*tunnelinfo	= NULL;
 	int		maxfdp		= 0;
 	int ret=0;
-	sockinfo *addtempinfo;
-	sockinfo *tempinfo1;
 	ssl_info *sslinfo1;
 	sockinfo *tempinfo ;
 	map<int, sockinfo*>::iterator it;
@@ -287,20 +285,22 @@ void* proxy( void *arg )
 		//map<int, sockinfo*>::iterator it;
 		for ( it = socklist.begin(); it != socklist.end();  )
 		{
-			addtempinfo = it->second;
+			tempinfo = it->second;
 			/* 清理超时的错误的链接 */
-			if ( addtempinfo->istype == 1 )
+			if ( tempinfo->istype == 1 )
 			{
-				if ( (addtempinfo->linkunixtime + linktime) < cunixtime && addtempinfo->isconnectlocal == 0 )
+				if ( (tempinfo->linkunixtime + linktime) < cunixtime && tempinfo->isconnectlocal == 0 )
 				{
 					clearsock( it->first, it->second );
+					pthread_mutex_lock( &mutex );
 					socklist.erase(it++);
+					pthread_mutex_unlock( &mutex );
 					continue;
 				}
 			}
 
 			/* 如果未连接才添加，写入监听 */
-			if ( addtempinfo->isconnect == 0 )
+			if ( tempinfo->isconnect == 0 )
 			{
 				FD_SET( it->first, &writeSet );
 			}
@@ -324,11 +324,11 @@ void* proxy( void *arg )
 		}
 
 		/*  printf("add ok \r\n"); */
-        		ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
+        ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
 		if ( ret == -1 && maxfd != 0 )
 		{
 		    //printf("err:%d\r\n",WSAGetLastError());
-		             printf("select error\r\n");
+            printf("select error\r\n");
 			continue;
 		}
 		//  printf("ret:%d\r\n",ret);
@@ -337,51 +337,53 @@ void* proxy( void *arg )
 		{
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
-				if ( FD_ISSET( it1->first, &readSet ) )
+			    tempinfo = it1->second;
+			    /*等于1才是添加到 readSet的*/
+				if (FD_ISSET( it1->first, &readSet )&&tempinfo->isconnect==1 )
 				{
-					tempinfo1 = it1->second;
-					 sslinfo1 = tempinfo1->sslinfo;
-					if ( tempinfo1->isconnect == 1 )
-					{
-						/* 远程的转发给本地 */
-						if ( tempinfo1->istype == 1 )
-						{
-							if ( tempinfo1->isconnectlocal == 0 )
-							{
-					                                backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo1,&socklist,mutex,tempjson,&tunnellist,tunnelinfo);
-					                                if(backcode==-1)
-					                                {
-					                                  continue;
-					                                }
-							}else {
-					                                backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo1,&it1,&socklist);
-					                                if(backcode==-1)
-					                                {
-					                                  continue;
-					                                }
-							}
-						}
-						/* 本地的转发给远程 */
-						else{
-							backcode=LocalToRemote(&it1,(char*)buf,MAXBUF,tempinfo1,sslinfo1,&socklist);
-					                            if(backcode==-1)
-					                            {
-					                              continue;
-					                            }
-						}
-					}
+
+                    sslinfo1 = tempinfo->sslinfo;
+                    /* 远程的转发给本地 */
+                    if ( tempinfo->istype == 1 )
+                    {
+                        if ( tempinfo->isconnectlocal == 0 )
+                        {
+                                                backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,mutex,tempjson,&tunnellist,tunnelinfo);
+                                                if(backcode==-1)
+                                                {
+                                                  continue;
+                                                }
+                        }else {
+                                                backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo,&it1,&socklist,mutex);
+                                                if(backcode==-1)
+                                                {
+                                                  continue;
+                                                }
+                        }
+                    }
+                    /* 本地的转发给远程 */
+                    else{
+                        backcode=LocalToRemote(&it1,(char*)buf,MAXBUF,tempinfo,sslinfo1,&socklist,mutex);
+                                            if(backcode==-1)
+                                            {
+                                              continue;
+                                            }
+                    }
+
 				}
 				//可写，表示连接上了
-				if ( FD_ISSET( it1->first, &writeSet ) )
+				if ( FD_ISSET( it1->first, &writeSet )&&tempinfo->isconnect==0 )
 				{
-					 tempinfo = it1->second;
+
 					if ( tempinfo->isconnect == 0 )
 					{
 					    //检测连接是否可用
 						if (check_sock(it1->first)!= 0 )
 						{
 							clearsock( it1->first, tempinfo );
+							pthread_mutex_lock( &mutex );
 							socklist.erase(it1++);
+							pthread_mutex_unlock( &mutex );
 							continue;
 						}
 
@@ -391,12 +393,12 @@ void* proxy( void *arg )
 						/* 为远程连接 */
 						if ( tempinfo->istype == 1 )
 						{
-					                            //初始化远程连接
-					                            backcode=RemoteSslInit(&it1,tempinfo,ClientId,mutex,&socklist);
-					                            if(backcode==-1)
-					                            {
-					                              continue;
-					                            }
+						    //初始化远程连接
+                            backcode=RemoteSslInit(&it1,tempinfo,ClientId,mutex,&socklist);
+                            if(backcode==-1)
+                            {
+                              continue;
+                            }
 						}else  {
 							pthread_mutex_lock( &mutex );
 							it1->second = tempinfo;
