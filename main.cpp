@@ -340,6 +340,7 @@ void* proxy( void *arg )
 							pthread_mutex_unlock( &mutex );
 							mainsock=0;
 							tunneloklist.clear();
+							printf("main sock exit\r\n");
                             continue;
                          }
                     }

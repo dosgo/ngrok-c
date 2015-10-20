@@ -283,7 +283,7 @@ int CmdSock(int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,
     }
     memcpy( tempinfo->packbuf + tempinfo->packbuflen, buf, readlen );
     tempinfo->packbuflen = tempinfo->packbuflen + readlen;
-      if ( tempinfo->packbuflen > 8 )
+    if ( tempinfo->packbuflen > 8 )
     {
         memcpy( &packlen, tempinfo->packbuf, 8 );
         if ( BigEndianTest() == BigEndian )
@@ -365,6 +365,7 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     if(openssl_init_info(*mainsock, *mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
+		free(*mainsslinfo);
 		return -1;
 	}
 	SendAuth((*mainsslinfo)->ssl, *ClientId, authtoken);
@@ -372,7 +373,7 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
-		free(mainsslinfo);
+		free(*mainsslinfo);
 		return -1;
 	}
 	SendAuth( &(*mainsslinfo)->ssl, *ClientId, authtoken );
