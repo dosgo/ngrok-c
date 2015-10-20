@@ -71,7 +71,7 @@ char authtoken[255]="1zW3MqEwX4iHmbtSAk3t";
 string ClientId = "";
 int		proxyrun	= 0;
 int		pingtime	= 0;
-int		ping		= 25;
+int		ping		= 15;
 int		linktime	= 45;
 int		mainsock;
 int		lastdnstime;
@@ -113,24 +113,44 @@ int CheckStatus()
 		pthread_t tproxy;
 		pthread_create(&tproxy,&attr,&proxy,NULL);
 	}
-
-
     //判断是否存在
-	if (socklist.count(mainsock)==0)
+	if (socklist.count(mainsock)==0||mainsock==0)
 	{
 	    //连接失败
-		if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,mutex,&socklist,authtoken)==-1)
+        if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,mutex,&socklist,authtoken)==-1)
         {
             return -1;
         }
-	}else  {
+	    sleeps(3000);
+	    tempinfo=socklist[mainsock];
+		//检查是否
+		if(socklist.count(mainsock)>0&&tempinfo!=NULL&&tempinfo->isauth==1)
+	    {
+              /* 遍历添加 */
+              map<string, TunnelInfo*>::iterator it;
+              for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
+              {
+                  if(tunneloklist.count(it->first)==0)
+                  {
+                    tunnelinfo = it->second;
+                    #if OPENSSL
+                    SendReqTunnel(mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                    #else
+                    SendReqTunnel(&mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                    #endif
+
+                  }
+              }
+	    }
+	}
+	else
+    {
 	    tempinfo=socklist[mainsock];
 	    #if OPENSSL
 		int sendlen = SendPing( mainsslinfo->ssl );
 		#else
 		int sendlen = SendPing( &mainsslinfo->ssl );
 		#endif
-
 		if ( sendlen < 1 || (tempinfo->pongtime < (pingtime - 35) && pingtime != 0) )
 		{
 			shutdown( mainsock, 2 );
@@ -138,28 +158,6 @@ int CheckStatus()
 		}
 		pingtime = get_curr_unixtime();
 	}
-	//sleep 3ms
-    sleeps(3000);
-    tempinfo=socklist[mainsock];
-	//检查是否
-	if(socklist.count(mainsock)>0&&tempinfo->isauth==1)
-    {
-          /* 遍历添加 */
-          map<string, TunnelInfo*>::iterator it;
-          for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
-          {
-              if(tunneloklist.count(it->first)==0)
-              {
-                tunnelinfo = it->second;
-                #if OPENSSL
-                SendReqTunnel(mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
-                #else
-                SendReqTunnel(&mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
-                #endif
-
-              }
-          }
-    }
 	return(0);
 }
 
@@ -331,16 +329,16 @@ void* proxy( void *arg )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(MAXBUF,(char *)buf,tempinfo,&socklist,mutex,tempjson,server_addr,&ClientId,&tunneloklist);
+                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,mutex,tempjson,server_addr,&ClientId,&tunneloklist);
                          if(backcode==-1)
                          {
+
                             clearsock( it1->first, tempinfo );
                             pthread_mutex_lock( &mutex );
 							socklist.erase(it1++);
 							pthread_mutex_unlock( &mutex );
 							mainsock=0;
 							tunneloklist.clear();
-							printf("main sock exit\r\n");
                             continue;
                          }
                     }

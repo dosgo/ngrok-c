@@ -46,6 +46,7 @@ int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
     else
     {
         printf("Add tunnel failed,%s\r\n",error);
+        return -1;
     }
     return 0;
 }
@@ -258,8 +259,14 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
 }
 
 
-int CmdSock(int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,pthread_mutex_t mutex,char *tempjson,struct sockaddr_in server_addr,string *ClientId,map<string,int>*tunneloklist){
-    ssl_info *sslinfo=tempinfo->sslinfo;
+int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,pthread_mutex_t mutex,char *tempjson,struct sockaddr_in server_addr,string *ClientId,map<string,int>*tunneloklist){
+   //¼ì²âÊÇ·ñ¶Ï¿ª
+   if(check_sock(*mainsock)!= 0)
+   {
+        return -1;
+   }
+
+   ssl_info *sslinfo=tempinfo->sslinfo;
     int readlen;
     __int64		packlen;
     #if OPENSSL
@@ -271,7 +278,7 @@ int CmdSock(int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,
     readlen = ssl_read( &sslinfo->ssl,(unsigned char *) buf, maxbuf );
     #endif  // ISMBEDTLS
     #endif // OPENSSL
-    if ( readlen < 1 )
+    if ( readlen < 1)
     {
         return -1;
     }
@@ -344,7 +351,10 @@ int CmdSock(int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,
 				}
 				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
-				    NewTunnel(json,tunneloklist);
+				    if(NewTunnel(json,tunneloklist)==-1)
+                                                        {
+                                                            return -1;
+                                                        }
 				}
 				cJSON_Delete( json );
 			}
