@@ -86,6 +86,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
  - 增加编译详细说明
  - 发现bug，路由上CPU偶尔9%,暂未修复。
 
+##2015/10/20
+ - 大幅减少内存占用
+ - 没bug，不更新了。。
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
