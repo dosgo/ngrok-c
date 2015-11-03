@@ -130,3 +130,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 编译就这样了，以后请不要邮件问我怎么编译了，有bug可以联系。
+
+
+
+
+
+现在tunnel.mobi不能用了。。，哪里还有国内的服务器的。。
