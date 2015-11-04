@@ -71,10 +71,10 @@ char authtoken[255]="1zW3MqEwX4iHmbtSAk3t";
 string ClientId = "";
 int		proxyrun	= 0;
 int		pingtime	= 0;
-int		ping		= 15;
+int		ping		= 55;
 int		linktime	= 45;
 int		mainsock;
-int		lastdnstime;
+int		lastdnstime=0;
 int		lastdnsback;
 ssl_info *mainsslinfo=NULL;
 void* sockmain( void *arg );
@@ -101,24 +101,30 @@ void cs( int n )
 
 int CheckStatus()
 {
-    pthread_attr_t attr;
-    pthread_attr_init( &attr );
-    pthread_attr_setdetachstate(&attr,1); //set detach
-    pthread_attr_setstacksize(&attr,2048*1024); //set stacksize 2M
     sockinfo *tempinfo;
     TunnelInfo	*tunnelinfo;
 	if ( proxyrun == 0 )
 	{
 		proxyrun = 1;
 		pthread_t tproxy;
+        pthread_attr_t attr;
+        pthread_attr_init( &attr );
+        pthread_attr_setdetachstate(&attr,1); //set detach
+        pthread_attr_setstacksize(&attr,2048*1024); //set stacksize 2M
 		pthread_create(&tproxy,&attr,&proxy,NULL);
 	}
     //判断是否存在
 	if (socklist.count(mainsock)==0||mainsock==0)
 	{
+	    if(lastdnsback==-1)
+        {
+            printf("link err......\r\n");
+            return -1;
+        }
 	    //连接失败
         if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,mutex,&socklist,authtoken)==-1)
         {
+            printf("link err\r\n");
             return -1;
         }
 	    sleeps(3000);
@@ -199,7 +205,7 @@ OpenSSL_add_all_algorithms();
 
 	while ( true )
 	{
-		if ( lastdnsback == -1 || (lastdnstime + 600) < get_curr_unixtime() )
+		if ( lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
 		{
 			lastdnsback	= net_dns( &server_addr, s_name, s_port );
 			lastdnstime	= get_curr_unixtime();

@@ -352,9 +352,9 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
 				    if(NewTunnel(json,tunneloklist)==-1)
-                                                        {
-                                                            return -1;
-                                                        }
+                    {
+                        return -1;
+                    }
 				}
 				cJSON_Delete( json );
 			}
@@ -367,7 +367,12 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
 	if(connect( *mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
-        printf("connect failed!\r\n");
+        printf("connect failed...!\r\n");
+        #if WIN32
+        closesocket(*mainsock);
+        #else
+        close(*mainsock);
+        #endif
         return -1;
 	}
     *mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
@@ -375,6 +380,11 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     if(openssl_init_info(*mainsock, *mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
+        #if WIN32
+        closesocket(*mainsock);
+        #else
+        close(*mainsock);
+        #endif
 		free(*mainsslinfo);
 		return -1;
 	}
@@ -383,6 +393,11 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
 	{
 		printf( "ssl init failed!\r\n" );
+        #if WIN32
+        closesocket(*mainsock);
+        #else
+        close(*mainsock);
+        #endif
 		free(*mainsslinfo);
 		return -1;
 	}

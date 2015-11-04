@@ -37,6 +37,14 @@ void clearsock(int sock,sockinfo * sock_info)
           }
       }
    //   net_close(sock);
+
+      shutdown(sock,2);
+      //closesocket(sock);
+      #if WIN32
+      closesocket(sock);
+      #else
+      close(sock);
+      #endif
       //ÊÍ·ÅÄÚ´æ
       if(sock_info!=NULL)
       {
@@ -73,6 +81,11 @@ void clearsock(int sock,sockinfo * sock_info)
       #if ISMBEDTLS
       shutdown(sock,2);
       //closesocket(sock);
+      #if WIN32
+      closesocket(sock);
+      #else
+      close(sock);
+      #endif
 
       #else
       net_close(sock);
