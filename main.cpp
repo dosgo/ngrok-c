@@ -64,6 +64,7 @@
 
 using namespace std;
 #define MAXBUF 2048
+string VER = "1.0-(2015/11/5)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -170,7 +171,7 @@ int CheckStatus()
 
 int main( int argc, char **argv )
 {
-
+    printf("ngrokc v%s \r\n",VER.c_str());
 	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
 #if WIN32
 	signal( SIGINT, cs );
