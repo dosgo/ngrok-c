@@ -263,6 +263,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
    //¼ì²âÊÇ·ñ¶Ï¿ª
    if(check_sock(*mainsock)!= 0)
    {
+       printf("duan kai \r\n");
         return -1;
    }
 

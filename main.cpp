@@ -64,7 +64,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.0-(2015/11/5)";
+string VER = "1.01-(2015/11/5)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -72,7 +72,7 @@ char authtoken[255]="1zW3MqEwX4iHmbtSAk3t";
 string ClientId = "";
 int		proxyrun	= 0;
 int		pingtime	= 0;
-int		ping		= 55;
+int		ping		= 28; //不能大于30
 int		linktime	= 45;
 int		mainsock;
 int		lastdnstime=0;
@@ -139,6 +139,7 @@ int CheckStatus()
               {
                   if(tunneloklist.count(it->first)==0)
                   {
+                    //  printf("it->first:%s\r\n",it->first.c_str());
                     tunnelinfo = it->second;
                     #if OPENSSL
                     SendReqTunnel(mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
@@ -158,8 +159,9 @@ int CheckStatus()
 		#else
 		int sendlen = SendPing( &mainsslinfo->ssl );
 		#endif
-		if ( sendlen < 1 || (tempinfo->pongtime < (pingtime - 35) && pingtime != 0) )
+		if ( sendlen < 1 || (tempinfo->pongtime < (pingtime-ping-10) && pingtime != 0) )
 		{
+		    printf("link dk ?\r\n");
 			shutdown( mainsock, 2 );
 			mainsock = 0;
 		}
@@ -345,6 +347,7 @@ void* proxy( void *arg )
 							socklist.erase(it1++);
 							pthread_mutex_unlock( &mutex );
 							mainsock=0;
+							printf("sdfdsfr\r\n");
 							tunneloklist.clear();
                             continue;
                          }
