@@ -4,6 +4,7 @@
 #if WIN32
 #include <windows.h>
 #else
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <errno.h>
 typedef long long __int64;
