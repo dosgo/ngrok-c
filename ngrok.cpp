@@ -62,9 +62,6 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string C
       //  setnonblocking((*it1)->first,1);
         //tempinfo->sslinfo = sslinfo;
         SendRegProxy(sslinfo->ssl, ClientId);
-        pthread_mutex_lock( &mutex );
-        (*it1)->second = tempinfo;
-        pthread_mutex_unlock( &mutex );
     }
     else
     {
@@ -80,10 +77,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string C
     #else
     if (ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
     {
-        SendRegProxy( &sslinfo->ssl, ClientId );
-        pthread_mutex_lock( &mutex );
-        (*it1)->second = tempinfo;
-        pthread_mutex_unlock( &mutex );
+          SendRegProxy( &sslinfo->ssl, ClientId );
     }
     else
     {
@@ -195,13 +189,7 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
     memcpy( tempinfo1->packbuf + tempinfo1->packbuflen, buf, readlen );
     tempinfo1->packbuflen = tempinfo1->packbuflen + readlen;
 
-    /*
-     * 放到数组里面去
-     * EnterCriticalSection(&g_cs);
-     */
-    pthread_mutex_lock( &mutex );
-    (*it1)->second = tempinfo1;
-    pthread_mutex_unlock( &mutex );
+
 
     if ( tempinfo1->packbuflen > 8 )
     {
@@ -248,9 +236,6 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
                     /* 远程的带上本地链接 */
                     tempinfo1->tosock		= tcp;
                     tempinfo1->isconnectlocal	= 1;
-                    pthread_mutex_lock( &mutex );
-                    (*it1)->second = tempinfo1;
-                    pthread_mutex_unlock( &mutex );
 
                 }
             }

@@ -64,7 +64,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.01-(2015/11/5)";
+string VER = "1.02-(2015/11/6)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -384,11 +384,7 @@ void* proxy( void *arg )
                             }
 						}
 						//本地连接
-						else if(tempinfo->istype == 2) {
-							pthread_mutex_lock( &mutex );
-							it1->second = tempinfo;
-							pthread_mutex_unlock( &mutex );
-						}
+
 					}
 				}
 				//继续遍历
@@ -402,4 +398,3 @@ void* proxy( void *arg )
 	proxyrun = 0;
 	return(0);
 }
-
