@@ -695,7 +695,7 @@
 
 1444176728 g:\ngrok-c\cjson.h
 
-1444180053 source:g:\ngrok-c\main.cpp
+1449387857 source:g:\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -739,10 +739,11 @@
 	"cJSON.h"
 	"bytestool.h"
 	"nonblocking.h"
+	"ngrok.h"
 
-1444188314 g:\ngrok-c\config.h
+1449387857 g:\ngrok-c\config.h
 
-1444182244 g:\ngrok-c\sslbio.h
+1449387857 g:\ngrok-c\sslbio.h
 	"config.h"
 	<malloc.h>
 	"sendmsg.h"
@@ -764,7 +765,7 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1444179119 g:\ngrok-c\sendmsg.h
+1449418788 g:\ngrok-c\sendmsg.h
 	"config.h"
 	<string>
 	<map>
@@ -778,7 +779,7 @@
 
 1444176728 g:\ngrok-c\bytestool.h
 
-1444185185 g:\ngrok-c\nonblocking.h
+1449387857 g:\ngrok-c\nonblocking.h
 	"config.h"
 	<pthread.h>
 	<windows.h>
@@ -790,10 +791,10 @@
 	<list>
 	"sslbio.h"
 
-1444180524 source:g:\ngrok-c\nonblocking.cpp
+1449387857 source:g:\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
 
-1444180789 source:g:\ngrok-c\sendmsg.cpp
+1449418434 source:g:\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -803,7 +804,7 @@
 	"sendmsg.h"
 	<stdlib.h>
 
-1444188245 source:g:\ngrok-c\sslbio.cpp
+1449387857 source:g:\ngrok-c\sslbio.cpp
 	"config.h"
 	"sslbio.h"
 
@@ -974,4 +975,26 @@
 1445056093 source:c:\users\hp\desktop\ngrok-cnew\ngrok-c\sslbio.cpp
 	"config.h"
 	"sslbio.h"
+
+1449387857 g:\ngrok-c\ngrok.h
+	"config.h"
+	<string>
+	<map>
+	"nonblocking.h"
+	"sendmsg.h"
+	"cJSON.h"
+	"openssl/ssl.h"
+	<mbedtls/ssl.h>
+	"polarssl/ssl.h"
+
+1449387857 source:g:\ngrok-c\ngrok.cpp
+	"config.h"
+	<string>
+	<windows.h>
+	<unistd.h>
+	<arpa/inet.h>
+	<errno.h>
+	"bytestool.h"
+	"ngrok.h"
+	<stdlib.h>
 

@@ -52,7 +52,7 @@ int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
     return 0;
 }
 
-int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist){
+int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
    #if OPENSSL

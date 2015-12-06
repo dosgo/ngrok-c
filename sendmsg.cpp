@@ -98,7 +98,7 @@ int SendAuth(SSL *ssl,string ClientId,string user)
     return len;
 }
 
-int SendRegProxy(SSL *ssl,string ClientId)
+int SendRegProxy(SSL *ssl,string &ClientId)
 {
     string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
     //printf( "SendRegProxystr:%s\r\n",str.c_str());
@@ -182,7 +182,7 @@ int SendAuth(ssl_context *ssl,string ClientId,string user)
     return len;
 }
 
-int SendRegProxy(ssl_context *ssl,string ClientId)
+int SendRegProxy(ssl_context *ssl,string &ClientId)
 {
     string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
     //printf( "SendRegProxystr:%s\r\n",str.c_str());
@@ -274,7 +274,7 @@ int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
 }
 #endif
 
-int pack(unsigned char * buffer,string msgstr)
+int pack(unsigned char * buffer,const string & msgstr)
 {
     #if WIN32
     unsigned __int64 packlen;

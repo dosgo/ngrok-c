@@ -23,7 +23,7 @@ int ReqProxy(pthread_mutex_t mutex,struct sockaddr_in server_addr,map<int,sockin
 
 int NewTunnel(cJSON	*json,map<string,int>*tunneloklist);
 
-int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist);
+int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist);
 
 int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex);
 
