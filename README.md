@@ -95,6 +95,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 修复没网导致的内存泄漏问题。会导致路由不断重启
 - 增加版本号。
 
+##2015/12/8
+- 做些小优化，避免嵌入式设备，栈溢出，主要是嵌入式设备栈内存太小。。多个连接就会导致崩溃。
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
