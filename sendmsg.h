@@ -69,8 +69,7 @@ inline void sleeps(int ti)
 inline int get_curr_unixtime()
 {
     time_t now;
-    int unixtime = time(&now);
-    return unixtime;
+    return time(&now);
 }
 
 int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
