@@ -97,6 +97,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 ##2015/12/8
 - 做些小优化，避免嵌入式设备，栈溢出，主要是嵌入式设备栈内存太小。。多个连接就会导致崩溃。
+- 对了，记得编译的时候用-O2参数，不然这些，优化完全无效。。电脑可以忽略，但是嵌入式设备，记得用，我的8M，20个连接就溢出了。优化以后没测试，感觉没那么脆弱了。。
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
