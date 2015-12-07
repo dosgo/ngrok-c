@@ -17,7 +17,7 @@ void swapByteOrder(unsigned long long& ull)
           (ull << 56);
 }
 */
-/*mingw 4.3 add LL*/
+/*mingw 4.3 add LL*//*
 static void swapByteOrder(unsigned long long& ull)
 {
     ull = (ull >> 56) |
@@ -28,7 +28,7 @@ static void swapByteOrder(unsigned long long& ull)
           ((ull>>24) & 0x0000000000FF0000LL) |
           ((ull>>40) & 0x000000000000FF00LL) |
           (ull << 56);
-}
+}*/
 
 inline bool BigEndianTest()
 {

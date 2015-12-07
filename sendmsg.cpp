@@ -14,13 +14,6 @@ using namespace std;
 
 
 
-int strpos( char *str, char c )
-{
-	char *sc = strchr( str, c );
-	if ( sc == NULL )
-		return(-1);
-	return(sc - str);
-}
 
 
 
@@ -251,12 +244,6 @@ int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
 
 
 
-int get_curr_unixtime()
-{
-    time_t now;
-    int unixtime = time(&now);
-    return unixtime;
-}
 
 
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr )
@@ -278,16 +265,6 @@ int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockadd
 	return -1;
 }
 
-int GetProtocol(char *url,char *Protocol)
-{
-	int	plen= strpos( url, ':' );
-	if(plen>0)
-    {
-        memcpy( Protocol, url, plen );
-        return 0;
-    }
-	return -1;
-}
 
 
 int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken)

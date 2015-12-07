@@ -66,10 +66,36 @@ inline void sleeps(int ti)
     #endif
 }
 
-int get_curr_unixtime() ;
+inline int get_curr_unixtime()
+{
+    time_t now;
+    int unixtime = time(&now);
+    return unixtime;
+}
+
 int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
-int GetProtocol(char *url,char *Protocol);
-int strpos( char *str, char c );
+
+inline int strpos( char *str, char c )
+{
+	char *sc = strchr( str, c );
+	if ( sc == NULL )
+		return(-1);
+	return(sc - str);
+}
+
+
+inline int GetProtocol(char *url,char *Protocol)
+{
+	int	plen= strpos( url, ':' );
+	if(plen>0)
+    {
+        memcpy( Protocol, url, plen );
+        return 0;
+    }
+	return -1;
+}
+
+
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
 int getvalue(char * str,const char *key,char * value);
 inline int pack(unsigned char * buffer,const string & msgstr)
