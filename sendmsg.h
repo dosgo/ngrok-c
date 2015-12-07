@@ -18,9 +18,9 @@ typedef mbedtls_ssl_context ssl_context;
 #if WIN32
 #include <windows.h>
 #else
+#include <errno.h>
 #include <netinet/in.h>
  typedef long long __int64;
- void milliseconds_sleep( unsigned long mSec);
  #include <string.h>
  #ifndef __UCLIBC__
  #include <sys/select.h>
