@@ -1,3 +1,6 @@
+#ifndef BYTESTOOL_H_INCLUDED
+
+#define BYTESTOOL_H_INCLUDED
 #define BigEndian 1
 #define LittleEndian 0
 
@@ -27,19 +30,15 @@ static void swapByteOrder(unsigned long long& ull)
           (ull << 56);
 }
 
-static bool BigEndianTest()
+inline bool BigEndianTest()
 {
     unsigned int usData = 0x12345678;
     unsigned char *pucData = (unsigned char*)&usData;
-    if(*pucData == 0x78)
-    {
-        return LittleEndian;
-    }
-    else
-    {
-        return BigEndian;
-    }
+    return *pucData == 0x78?LittleEndian:BigEndian;
 }
+
+//#define BigEndianTest()(   usData = 0x12345678;unsigned char *pucData = (unsigned char*)&usData;return *pucData == 0x78?LittleEndian:BigEndian;)
+
 
 #define Swap16(s) ((((s) & 0xff) << 8) | (((s) >> 8) & 0xff))
 #define Swap32(l) (((l) >> 24) |(((l) &0x00ff0000) >> 8)|(((l) &0x0000ff00) << 8) |((l) << 24))
@@ -52,3 +51,6 @@ static bool BigEndianTest()
 #define LittleEndian_32(l) BigEndianTest() ? Swap32(l) : l
 #define BigEndian_64(ll) BigEndianTest() ? ll : Swap64(ll)
 #define LittleEndian_64(ll) BigEndianTest() ? Swap64(ll) : ll
+
+#endif // SSLBIO_H_INCLUDED
+

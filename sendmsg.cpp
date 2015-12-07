@@ -8,28 +8,11 @@
 #include <errno.h>
 typedef long long __int64;
 #endif
-#include "bytestool.h"
 #include "sendmsg.h"
 #include<stdlib.h>
 using namespace std;
 
 
-#if WIN32
-
-#else
-void milliseconds_sleep( unsigned long mSec )
-{
-    struct timeval tv;
-    tv.tv_sec   = mSec / 1000;
-    tv.tv_usec  = (mSec % 1000) * 1000;
-    int err;
-    do
-    {
-        err = select( 0, NULL, NULL, NULL, &tv );
-    }
-    while ( err < 0 && errno == EINTR );
-}
-#endif
 
 int strpos( char *str, char c )
 {
@@ -39,15 +22,7 @@ int strpos( char *str, char c )
 	return(sc - str);
 }
 
-void sleeps(int ti)
-{
-    #if WIN32
-        Sleep( ti);
-#else
-        milliseconds_sleep( ti);
-#endif
 
-}
 
 char *random_uuid( char buf[37] )
 {
@@ -274,22 +249,6 @@ int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
 }
 #endif
 
-int pack(unsigned char * buffer,const string & msgstr)
-{
-    #if WIN32
-    unsigned __int64 packlen;
-    #else
-    unsigned long long packlen;
-    #endif
-    packlen=msgstr.length();
-    if(BigEndianTest()==BigEndian)
-    {
-        packlen=LittleEndian_64(packlen);
-    }
-    memcpy(buffer,&packlen,8);
-    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
-    return  8+msgstr.length();
-}
 
 
 int get_curr_unixtime()

@@ -26,6 +26,7 @@ typedef mbedtls_ssl_context ssl_context;
  #include <sys/select.h>
  #endif
 #endif
+#include "bytestool.h"
 using namespace std;
 struct TunnelInfo
 {
@@ -38,14 +39,52 @@ struct TunnelInfo
     int remoteport;
 };
 
-void sleeps(int ti);
+
+#if WIN32
+
+#else
+inline void milliseconds_sleep( unsigned long mSec )
+{
+    struct timeval tv;
+    tv.tv_sec   = mSec / 1000;
+    tv.tv_usec  = (mSec % 1000) * 1000;
+    int err;
+    do
+    {
+        err = select( 0, NULL, NULL, NULL, &tv );
+    }
+    while ( err < 0 && errno == EINTR );
+}
+#endif
+
+inline void sleeps(int ti)
+{
+    #if WIN32
+        Sleep( ti);
+    #else
+        milliseconds_sleep( ti);
+    #endif
+}
+
 int get_curr_unixtime() ;
 int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
 int GetProtocol(char *url,char *Protocol);
 int strpos( char *str, char c );
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
 int getvalue(char * str,const char *key,char * value);
-int pack(unsigned char * buffer,const string & msgstr);
+inline int pack(unsigned char * buffer,const string & msgstr)
+{
+    #if WIN32
+    unsigned __int64 packlen;
+    #else
+    unsigned long long packlen;
+    #endif
+    packlen=msgstr.length();
+    packlen=LittleEndian_64(packlen);
+    memcpy(buffer,&packlen,8);
+    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
+    return  8+msgstr.length();
+}
 #if OPENSSL
 int SendAuth(SSL* ssl,string ClientId,string user);
 int SendRegProxy(SSL* ssl,string &ClientId);
@@ -62,7 +101,7 @@ int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdom
 int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen);
 #endif
 
-int IsLittleEndian();
+
 __int64 ntoh64(__int64 val );
 __int64 hton64(__int64 val );
 #endif

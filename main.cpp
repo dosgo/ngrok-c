@@ -237,8 +237,10 @@ void* proxy( void *arg )
 	int ret=0;
 	ssl_info *sslinfo1;
 	sockinfo *tempinfo ;
+	sockinfo *tempinfo1 ;
 	map<int, sockinfo*>::iterator it;
 	map<int, sockinfo*>::iterator it1;
+	map<int, sockinfo*>::iterator it2;
 	int backcode=0;
 	while ( proxyrun )
 	{
@@ -257,7 +259,7 @@ void* proxy( void *arg )
 			/* 清理超时的错误的链接 */
 			if ( tempinfo->istype == 1 )
 			{
-				if ( (tempinfo->linkunixtime + linktime) < cunixtime && tempinfo->isconnectlocal == 0 )
+				if ( (tempinfo->linkunixtime + linktime) < cunixtime && tempinfo->isconnectlocal != 2)
 				{
 					clearsock( it->first, it->second );
 					pthread_mutex_lock( &mutex );
@@ -319,7 +321,8 @@ void* proxy( void *arg )
                               continue;
                             }
                         }
-                        else
+
+                        if( tempinfo->isconnectlocal == 2||tempinfo->isconnectlocal == 1  )
                         {
                             backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo,&it1,&socklist,mutex);
                             if(backcode==-1)
@@ -383,8 +386,31 @@ void* proxy( void *arg )
                               continue;
                             }
 						}
-						//本地连接
 
+						//本地连接
+                        if ( tempinfo->istype == 2 )
+						{
+                            it2 = socklist.find(tempinfo->tosock);
+                            if(it2 != socklist.end())
+                            {
+                                tempinfo1 = it2->second;
+                                tempinfo1->isconnectlocal=2;
+                                /* copy到临时缓存区 */
+                                if ( tempinfo1->packbuflen > 0 )
+                                {
+                                    setnonblocking( it1->first, 0 );
+                                    #if WIN32
+                                    send(it1->first,tempinfo1->packbuf,tempinfo1->packbuflen, 0 );
+                                    #else
+                                    send( it1->first, tempinfo1->packbuf, tempinfo1->packbuflen, 0 );
+                                    #endif
+                                    setnonblocking(it1->first, 1 );
+                                    free( tempinfo1->packbuf );
+                                    tempinfo1->packbuf	= NULL;
+                                    tempinfo1->packbuflen	= 0;
+                                }
+                            }
+						}
 					}
 				}
 				//继续遍历
