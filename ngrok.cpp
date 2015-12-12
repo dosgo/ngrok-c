@@ -206,17 +206,25 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
                     tunnelinfo = (*tunnellist)[string( Protocol )];
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
                   //  setnonblocking( tcp, 1 );
-                    connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr));
-                    setnonblocking( tcp, 1 );
-                    sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
-                    sinfo->istype		= 2;
-                    sinfo->isconnect	= 1;
-                    sinfo->sslinfo		= sslinfo1;
-                    sinfo->tosock		= (*it1)->first;
-                    (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
-                    /* 远程的带上本地链接 */
-                    tempinfo1->tosock = tcp;
-                    tempinfo1->isconnectlocal= 1;
+                    if(connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr))==0)
+                    {
+                        setnonblocking( tcp, 1 );
+                        sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
+                        sinfo->istype		= 2;
+                        sinfo->isconnect	= 1;
+                        sinfo->sslinfo		= sslinfo1;
+                        sinfo->tosock		= (*it1)->first;
+                        (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
+                        /* 远程的带上本地链接 */
+                        tempinfo1->tosock = tcp;
+                        tempinfo1->isconnectlocal= 1;
+                    }
+                    else
+                    {
+                         clearsock( (*it1)->first, tempinfo1 );
+                        (*socklist).erase((*it1)++);
+                        return -1;
+                    }
 
                 }
             }
