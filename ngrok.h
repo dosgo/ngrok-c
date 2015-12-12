@@ -6,6 +6,7 @@
 #include "nonblocking.h"
 #include "sendmsg.h"
 #include "cJSON.h"
+#include "sslbio.h"
 #if OPENSSL
 #include "openssl/ssl.h"
 #else

@@ -11,7 +11,7 @@ typedef long long __int64;
 #endif
 #include "bytestool.h"
 #include "ngrok.h"
-
+#include "sslbio.h"
 #include<stdlib.h>
 using namespace std;
 
@@ -67,9 +67,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
         printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
-        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
-        pthread_mutex_unlock( &mutex );
         return -1;
     }
     #else
@@ -239,8 +237,8 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
         return -1;
    }
 
-   ssl_info *sslinfo=tempinfo->sslinfo;
-      TunnelInfo	*tunnelinfo;
+    ssl_info *sslinfo=tempinfo->sslinfo;
+    TunnelInfo	*tunnelinfo;
     int readlen;
     __int64		packlen;
     #if OPENSSL
@@ -307,7 +305,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                         {
                             tunnelinfo = it->second;
                             #if OPENSSL
-                            SendReqTunnel(&sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            SendReqTunnel(sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
                             #else
                             SendReqTunnel(&sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
                             #endif

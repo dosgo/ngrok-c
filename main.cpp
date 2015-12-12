@@ -228,7 +228,7 @@ void* proxy( void *arg )
             //发送失败断开连接
             if(sendlen==-1)
             {
-                shutdown( mainsock, 2 );
+                shutdown( mainsock,2);
                 mainsock = 0;
             }
             pingtime = get_curr_unixtime();
