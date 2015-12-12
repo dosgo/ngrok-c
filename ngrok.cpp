@@ -18,7 +18,7 @@ using namespace std;
 
 
 
-int ReqProxy(pthread_mutex_t mutex,struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
+int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     int proxy_fd = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
     setnonblocking( proxy_fd, 1 );
     connect( proxy_fd, (struct sockaddr *) &server_addr, sizeof(server_addr) );
@@ -29,9 +29,7 @@ int ReqProxy(pthread_mutex_t mutex,struct sockaddr_in server_addr,map<int,sockin
     sinfo->sslinfo		= NULL;
     sinfo->linkunixtime	= get_curr_unixtime();
     sinfo->isconnectlocal	= 0;
-    pthread_mutex_lock( &mutex );
     (*socklist).insert( map<int, sockinfo*> :: value_type( proxy_fd, sinfo ) );
-    pthread_mutex_unlock( &mutex );
     return 0;
 }
 int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
@@ -52,7 +50,7 @@ int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
     return 0;
 }
 
-int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist){
+int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,map<int,sockinfo*>*socklist){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
    #if OPENSSL
@@ -84,16 +82,14 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
         printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
-        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
-        pthread_mutex_unlock( &mutex );
         return -1;
     }
     #endif
     return 0;
 }
 
-int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex){
+int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist){
     int readlen;
     #if WIN32
     readlen = recv( (*it1)->first, (char *) buf, maxbuf, 0 );
@@ -116,15 +112,13 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     }else  {
         shutdown( tempinfo1->tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
-        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
-        pthread_mutex_unlock( &mutex );
         return -1;
     }
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex){
+int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen;
    #if OPENSSL
    readlen = SSL_read( sslinfo1->ssl, (unsigned char *) buf, maxbuf );
@@ -141,9 +135,7 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
         /* close to sock */
         shutdown( tempinfo1->tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
-        pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
-        pthread_mutex_unlock( &mutex );
         return -1;
     }
     else
@@ -159,7 +151,7 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,pthread_mutex_t mutex,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
+int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
     int readlen;
     __int64		packlen;
     char Protocol[10]={0};
@@ -175,9 +167,7 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
     if ( readlen < 1 )
     {
         clearsock( (*it1)->first, tempinfo1 );
-         pthread_mutex_lock( &mutex );
         (*socklist).erase((*it1)++);
-         pthread_mutex_unlock( &mutex );
         return -1;
     }
 
@@ -228,11 +218,7 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
                     sinfo->isconnect	= 0;
                     sinfo->sslinfo		= sslinfo1;
                     sinfo->tosock		= (*it1)->first;
-                    pthread_mutex_lock( &mutex );
                     (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
-                    pthread_mutex_unlock( &mutex );
-
-
                     /* 远程的带上本地链接 */
                     tempinfo1->tosock		= tcp;
                     tempinfo1->isconnectlocal	= 1;
@@ -245,7 +231,7 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
 }
 
 
-int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,pthread_mutex_t mutex,char *tempjson,struct sockaddr_in server_addr,string *ClientId,map<string,int>*tunneloklist){
+int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,map<string,int>*tunneloklist,map<string,TunnelInfo*>*tunnellist){
    //检测是否断开
    if(check_sock(*mainsock)!= 0)
    {
@@ -254,6 +240,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
    }
 
    ssl_info *sslinfo=tempinfo->sslinfo;
+      TunnelInfo	*tunnelinfo;
     int readlen;
     __int64		packlen;
     #if OPENSSL
@@ -296,7 +283,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				cJSON *Type = cJSON_GetObjectItem( json, "Type" );
 				if ( strcmp( Type->valuestring, "ReqProxy" ) == 0 )
 				{
-					ReqProxy(mutex,server_addr,socklist);
+					ReqProxy(server_addr,socklist);
 				}
 				if ( strcmp( Type->valuestring, "AuthResp" ) == 0 )
 				{
@@ -313,6 +300,18 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                         SendPing( &sslinfo->ssl );
                         #endif
                         tempinfo->isauth=1;
+
+                        /*认证成功，注册通道*/
+                        map<string, TunnelInfo*>::iterator it;
+                        for ( it = (*tunnellist).begin(); it != (*tunnellist).end(); ++it )
+                        {
+                            tunnelinfo = it->second;
+                            #if OPENSSL
+                            SendReqTunnel(&sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            #else
+                            SendReqTunnel(&sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            #endif
+                        }
                     }
                     else
                     {
@@ -325,7 +324,6 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 
 				if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
-
 					#if OPENSSL
                     SendPong( sslinfo->ssl );
                     #else
@@ -349,7 +347,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     return 0;
 }
 
-int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,pthread_mutex_t mutex,map<int,sockinfo*>*socklist,char *authtoken)
+int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken)
 {
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
 	if(connect( *mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
@@ -396,8 +394,7 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     sinfo->isconnect	= 1;
     sinfo->packbuflen	= 0;
     sinfo->sslinfo		= *mainsslinfo;
-    pthread_mutex_lock( &mutex );
+
     (*socklist).insert( map<int, sockinfo*> :: value_type( *mainsock, sinfo ) );
-    pthread_mutex_unlock( &mutex );
     return 0;
 }

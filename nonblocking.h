@@ -49,8 +49,47 @@ struct sockinfo
 };
 #endif
 
-int setnonblocking(int sServer,int _nMode);
-int net_dns( struct sockaddr_in *server_addr, const char *host, int port );
-int check_sock(int sock);
+inline int setnonblocking(int sServer,int _nMode)
+{
+    #if WIN32
+    DWORD nMode = _nMode;
+    return ioctlsocket( sServer, FIONBIO,&nMode);
+    #else
+    if(_nMode==1)
+    {
+       return fcntl(sServer,F_SETFL,O_NONBLOCK);
+    }
+    else
+    {
+      return fcntl(sServer,F_SETFL, _nMode);
+    }
+    #endif
+}
+inline int net_dns( struct sockaddr_in *server_addr, const char *host, int port )
+{
+    struct hostent *server_host;
+    if((server_host = gethostbyname(host)) == NULL )
+    {
+        return -1;
+    }
+    memcpy((void*)&server_addr->sin_addr,(void*)server_host->h_addr,server_host->h_length);
+    server_addr->sin_family = AF_INET;
+    server_addr->sin_port   = htons( port );
+    return 0;
+}
+
+inline int check_sock(int sock)
+{
+    int error=-1;
+    #if WIN32
+    int len ;
+    #else
+    socklen_t len;
+    #endif
+    len = sizeof(error);
+    getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&error, &len);
+    return error;
+}
+
 void clearsock(int sock,sockinfo * sock_info);
 #endif // NONBLOCKING_H_INCLUDED

@@ -96,7 +96,19 @@ inline int GetProtocol(char *url,char *Protocol)
 
 
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
-int getvalue(char * str,const char *key,char * value);
+inline int getvalue(char * str,const char *key,char * value){
+    int ypos=0;
+    if ( strncmp(str,key,strlen(key)) == 0 )
+    {
+        ypos = strpos( str, ':' );
+        if ( ypos != -1 )
+        {
+            memcpy(value, str + ypos + 1, strlen( str + ypos ));
+            return 0;
+        }
+    }
+    return -1;
+}
 inline int pack(unsigned char * buffer,const string & msgstr)
 {
     #if WIN32
@@ -113,17 +125,54 @@ inline int pack(unsigned char * buffer,const string & msgstr)
 #if OPENSSL
 int SendAuth(SSL* ssl,string ClientId,string user);
 int SendRegProxy(SSL* ssl,string &ClientId);
-int SendPing(SSL* ssl);
-int SendPong(SSL* ssl);
+inline int SendPing(SSL *ssl)
+{
+   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write(ssl,buffer,sendlen);
+    return len;
+}
+inline int SendPong(SSL *ssl)
+{
+   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    int len=SSL_write( ssl, buffer, sendlen);
+    return len;
+}
+
 int SendReqTunnel(SSL* ssl,string protocol,string HostName,string Subdomain,int RemotePort);
-int readlen(SSL* ssl,unsigned char *buffer, int readlen,int bufferlen);
 #else
 int SendAuth(ssl_context *ssl,string ClientId,string user);
 int SendRegProxy(ssl_context *ssl,string &ClientId);
-int SendPing(ssl_context *ssl);
-int SendPong(ssl_context *ssl);
+inline int SendPing(ssl_context *ssl)
+{
+   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+    #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
+    return len;
+}
+inline int SendPong(ssl_context *ssl)
+{
+   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
+   	unsigned char buffer[str.length()+9];
+    int sendlen=pack(buffer,str);
+     #if ISMBEDTLS
+    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    #else
+    int len=ssl_write(ssl, buffer, sendlen);
+    #endif // ISMBEDTLS
+    return len;
+}
+
+
 int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort);
-int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen);
 #endif
 
 

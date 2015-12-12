@@ -76,14 +76,7 @@ int SendRegProxy(SSL *ssl,string &ClientId)
     return len;
 }
 
-int SendPing(SSL *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl,buffer,sendlen);
-    return len;
-}
+
 
 int SendReqTunnel(SSL *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
 {
@@ -102,39 +95,10 @@ int SendReqTunnel(SSL *ssl,string protocol,string HostName,string Subdomain,int 
 }
 
 
-int SendPong(SSL *ssl)
-{
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write( ssl, buffer, sendlen);
-    return len;
-}
 
 
 
-int readlen(SSL *ssl,unsigned char *buffer, int readlen,int bufferlen)
-{
-    int recvlen = 0;
-    int len;
-    memset( buffer, 0, bufferlen);
-    while ( 1 )
-    {
-        if ( (readlen - recvlen) < 1 )
-        {
-            break;
-        }
-        len = SSL_read( ssl, buffer+recvlen, (readlen - recvlen) );
-        if ( len > 0 )
-        {
-            recvlen = recvlen + len;
-        }else    {
-            break;
-        }
-        sleeps(1);
-    }
-    return recvlen;
-}
+
 #else
 int SendAuth(ssl_context *ssl,string ClientId,string user)
 {
@@ -164,18 +128,7 @@ int SendRegProxy(ssl_context *ssl,string &ClientId)
     return len;
 }
 
-int SendPing(ssl_context *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-     #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
-}
+
 
 int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
 {
@@ -198,48 +151,9 @@ int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdom
 }
 
 
-int SendPong(ssl_context *ssl)
-{
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-     #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
-}
 
 
 
-int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
-{
-    int recvlen = 0;
-    int len;
-    memset( buffer, 0, bufferlen);
-    while ( 1 )
-    {
-        if ( (readlen - recvlen) < 1 )
-        {
-            break;
-        }
-
-        #if ISMBEDTLS
-        len = mbedtls_ssl_read( ssl, buffer+recvlen, (readlen - recvlen) );
-        #else
-        len = ssl_read( ssl, buffer+recvlen, (readlen - recvlen) );
-        #endif // ISMBEDTLS
-        if ( len > 0 )
-        {
-            recvlen = recvlen + len;
-        }else    {
-            break;
-        }
-        sleeps(1);
-    }
-    return recvlen;
-}
 #endif
 
 
@@ -369,17 +283,4 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 	return 0;
 }
 
-int getvalue(char * str,const char *key,char * value){
-    int ypos=0;
-    if ( strncmp(str,key,strlen(key)) == 0 )
-    {
-        ypos = strpos( str, ':' );
-        if ( ypos != -1 )
-        {
 
-            memcpy(value, str + ypos + 1, strlen( str + ypos ));
-            return 0;
-        }
-    }
-    return -1;
-}

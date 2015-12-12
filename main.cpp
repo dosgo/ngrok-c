@@ -74,7 +74,7 @@ int		proxyrun	= 0;
 int		pingtime	= 0;
 int		ping		= 28; //不能大于30
 int		linktime	= 45;
-int		mainsock;
+int		mainsock=0;
 int		lastdnstime=0;
 int		lastdnsback;
 ssl_info *mainsslinfo=NULL;
@@ -82,7 +82,7 @@ void* sockmain( void *arg );
 void* proxy( void *arg );
 
 struct sockaddr_in server_addr = { 0 };
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 map<int,sockinfo*>socklist;
 map<string,TunnelInfo*>tunnellist;
@@ -103,7 +103,6 @@ void cs( int n )
 int CheckStatus()
 {
     sockinfo *tempinfo;
-    TunnelInfo	*tunnelinfo;
 	if ( proxyrun == 0 )
 	{
 		proxyrun = 1;
@@ -117,55 +116,22 @@ int CheckStatus()
     //判断是否存在
 	if (socklist.count(mainsock)==0||mainsock==0)
 	{
-	    if(lastdnsback==-1)
-        {
-            printf("link err......\r\n");
-            return -1;
-        }
 	    //连接失败
-        if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,mutex,&socklist,authtoken)==-1)
+        if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
         {
             printf("link err\r\n");
             return -1;
         }
-	    sleeps(3000);
-	    tempinfo=socklist[mainsock];
-		//检查是否
-		if(socklist.count(mainsock)>0&&tempinfo!=NULL&&tempinfo->isauth==1)
-	    {
-              /* 遍历添加 */
-              map<string, TunnelInfo*>::iterator it;
-              for ( it = tunnellist.begin(); it != tunnellist.end(); ++it )
-              {
-                  if(tunneloklist.count(it->first)==0)
-                  {
-                    //  printf("it->first:%s\r\n",it->first.c_str());
-                    tunnelinfo = it->second;
-                    #if OPENSSL
-                    SendReqTunnel(mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
-                    #else
-                    SendReqTunnel(&mainsslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
-                    #endif
 
-                  }
-              }
-	    }
 	}
 	else
-    {
+    {   //检测心跳时间
 	    tempinfo=socklist[mainsock];
-	    #if OPENSSL
-		int sendlen = SendPing( mainsslinfo->ssl );
-		#else
-		int sendlen = SendPing( &mainsslinfo->ssl );
-		#endif
-		if ( sendlen < 1 || (tempinfo->pongtime < (pingtime-ping-10) && pingtime != 0) )
+		if ((tempinfo->pongtime < (pingtime-ping-10) && pingtime != 0) )
 		{
-		    printf("link dk ?\r\n");
 			shutdown( mainsock, 2 );
 			mainsock = 0;
 		}
-		pingtime = get_curr_unixtime();
 	}
 	return(0);
 }
@@ -208,13 +174,18 @@ OpenSSL_add_all_algorithms();
 
 	while ( true )
 	{
+
 		if ( lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
 		{
 			lastdnsback	= net_dns( &server_addr, s_name, s_port );
 			lastdnstime	= get_curr_unixtime();
 			printf( "update dns\r\n" );
 		}
-		CheckStatus();
+		//dns解析失败
+        if (lastdnsback != -1)
+        {
+            CheckStatus();
+        }
 		sleeps(ping * 1000);
 	}
 	return(0);
@@ -244,6 +215,25 @@ void* proxy( void *arg )
 	int backcode=0;
 	while ( proxyrun )
 	{
+
+	    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
+        {
+            setnonblocking(mainsock, 0 );
+            #if OPENSSL
+            int sendlen = SendPing( mainsslinfo->ssl );
+            #else
+            int sendlen = SendPing( &mainsslinfo->ssl );
+            #endif
+            setnonblocking(mainsock,1 );
+            //发送失败断开连接
+            if(sendlen==-1)
+            {
+                shutdown( mainsock, 2 );
+                mainsock = 0;
+            }
+            pingtime = get_curr_unixtime();
+	    }
+
 		timeout.tv_sec	= 0;
 		timeout.tv_usec = 5000;
 		FD_ZERO( &readSet );
@@ -262,9 +252,7 @@ void* proxy( void *arg )
 				if ( (tempinfo->linkunixtime + linktime) < cunixtime && tempinfo->isconnectlocal != 2)
 				{
 					clearsock( it->first, it->second );
-					pthread_mutex_lock( &mutex );
 					socklist.erase(it++);
-					pthread_mutex_unlock( &mutex );
 					continue;
 				}
 			}
@@ -315,7 +303,7 @@ void* proxy( void *arg )
                     {
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,mutex,tempjson,&tunnellist,tunnelinfo);
+                            backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,tempjson,&tunnellist,tunnelinfo);
                             if(backcode==-1)
                             {
                               continue;
@@ -324,7 +312,7 @@ void* proxy( void *arg )
 
                         if( tempinfo->isconnectlocal == 2||tempinfo->isconnectlocal == 1  )
                         {
-                            backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo,&it1,&socklist,mutex);
+                            backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo,&it1,&socklist);
                             if(backcode==-1)
                             {
                               continue;
@@ -333,7 +321,7 @@ void* proxy( void *arg )
                     }
                     /* 本地的转发给远程 */
                     else if(tempinfo->istype == 2){
-                        backcode=LocalToRemote(&it1,(char*)buf,MAXBUF,tempinfo,sslinfo1,&socklist,mutex);
+                        backcode=LocalToRemote(&it1,(char*)buf,MAXBUF,tempinfo,sslinfo1,&socklist);
                         if(backcode==-1)
                         {
                           continue;
@@ -341,16 +329,13 @@ void* proxy( void *arg )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,mutex,tempjson,server_addr,&ClientId,&tunneloklist);
+                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,&tunneloklist,&tunnellist);
                          if(backcode==-1)
                          {
 
                             clearsock( it1->first, tempinfo );
-                            pthread_mutex_lock( &mutex );
 							socklist.erase(it1++);
-							pthread_mutex_unlock( &mutex );
 							mainsock=0;
-							printf("sdfdsfr\r\n");
 							tunneloklist.clear();
                             continue;
                          }
@@ -367,9 +352,7 @@ void* proxy( void *arg )
 						if (check_sock(it1->first)!= 0 )
 						{
 							clearsock( it1->first, tempinfo );
-							pthread_mutex_lock( &mutex );
 							socklist.erase(it1++);
-							pthread_mutex_unlock( &mutex );
 							continue;
 						}
 
@@ -380,7 +363,7 @@ void* proxy( void *arg )
 						if ( tempinfo->istype == 1 )
 						{
 						    //初始化远程连接
-                            backcode=RemoteSslInit(&it1,tempinfo,ClientId,mutex,&socklist);
+                            backcode=RemoteSslInit(&it1,tempinfo,ClientId,&socklist);
                             if(backcode==-1)
                             {
                               continue;
