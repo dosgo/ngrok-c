@@ -1,10 +1,12 @@
 #ifndef __SENDMSG_H__
 #define __SENDMSG_H__
 #include "config.h"
+#include "nonblocking.h"
 #include <string>
 #include <map>
 #if OPENSSL
 #include "openssl/ssl.h"
+typedef SSL ssl_context;
 #else
 #if ISMBEDTLS
 #include <mbedtls/ssl.h>
@@ -40,31 +42,7 @@ struct TunnelInfo
 };
 
 
-#if WIN32
 
-#else
-inline void milliseconds_sleep( unsigned long mSec )
-{
-    struct timeval tv;
-    tv.tv_sec   = mSec / 1000;
-    tv.tv_usec  = (mSec % 1000) * 1000;
-    int err;
-    do
-    {
-        err = select( 0, NULL, NULL, NULL, &tv );
-    }
-    while ( err < 0 && errno == EINTR );
-}
-#endif
-
-inline void sleeps(int ti)
-{
-    #if WIN32
-        Sleep( ti);
-    #else
-        milliseconds_sleep( ti);
-    #endif
-}
 
 inline int get_curr_unixtime()
 {
@@ -109,71 +87,76 @@ inline int getvalue(char * str,const char *key,char * value){
     }
     return -1;
 }
-inline int pack(unsigned char * buffer,const string & msgstr)
+
+
+
+
+inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
 {
+    unsigned char buffer[255];
+    memset(buffer,0,255);
     #if WIN32
     unsigned __int64 packlen;
     #else
     unsigned long long packlen;
     #endif
-    packlen=msgstr.length();
+    packlen=strlen(msgstr);
     packlen=LittleEndian_64(packlen);
     memcpy(buffer,&packlen,8);
-    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
-    return  8+msgstr.length();
-}
-#if OPENSSL
-int SendAuth(SSL* ssl,string ClientId,string user);
-int SendRegProxy(SSL* ssl,string &ClientId);
-inline int SendPing(SSL *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl,buffer,sendlen);
-    return len;
-}
-inline int SendPong(SSL *ssl)
-{
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write( ssl, buffer, sendlen);
-    return len;
-}
-
-int SendReqTunnel(SSL* ssl,string protocol,string HostName,string Subdomain,int RemotePort);
-#else
-int SendAuth(ssl_context *ssl,string ClientId,string user);
-int SendRegProxy(ssl_context *ssl,string &ClientId);
-inline int SendPing(ssl_context *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
+    memcpy(buffer+8,msgstr,strlen(msgstr));
+    if(isblock)
+    {
+        setnonblocking(sock,0);
+    }
+    #if OPENSSL
+        int len=SSL_write( ssl, buffer, 8+strlen(msgstr));
     #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
+        #if ISMBEDTLS
+            int len=mbedtls_ssl_write(ssl, buffer, 8+msgstr.length());
+        #else
+            int len=ssl_write(ssl, buffer, 8+strlen(msgstr));
+        #endif // ISM
+    #endif // ISM
+    if(isblock)
+    {
+        setnonblocking(sock,1);
+    }
+    return  len;
 }
-inline int SendPong(ssl_context *ssl)
+
+inline int SendAuth(int sock,ssl_context *ssl,string ClientId,string user)
 {
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-     #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
+   // string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
+    char str[255];
+    memset(str,0,255);
+    sprintf(str,"{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\"%s\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\"%s\"}}",user.c_str(),ClientId.c_str());
+
+    return sendpack(sock,ssl,str,1);
 }
 
 
-int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort);
-#endif
+inline int SendRegProxy(int sock,ssl_context *ssl,string &ClientId)
+{
+    char str[255];
+    memset(str,0,255);
+    sprintf(str,"{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\"%s\"}}",ClientId.c_str());
+    return sendpack(sock,ssl,str,1);
+}
+
+
+inline int SendPing(int sock,ssl_context *ssl)
+{
+    return sendpack(sock,ssl,"{\"Type\":\"Ping\",\"Payload\":{}}",1);
+
+}
+inline int SendPong(int sock,ssl_context *ssl)
+{
+    return sendpack(sock,ssl,"{\"Type\":\"Pong\",\"Payload\":{}}",1);
+}
+
+
+int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort);
+//#endif
 
 
 __int64 ntoh64(__int64 val );

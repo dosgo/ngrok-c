@@ -2,7 +2,6 @@
 #define SSLBIO_H_INCLUDED
 #include "config.h"
 #include<malloc.h>
-#include "sendmsg.h"
 
 #if OPENSSL
 #include<openssl/ssl.h>
@@ -52,6 +51,9 @@ struct ssl_info
 #include <polarssl/ctr_drbg.h>
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
+
+
+
 struct ssl_info
 {
     entropy_context entropy;

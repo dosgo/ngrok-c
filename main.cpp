@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <signal.h>
-#include "sslbio.h"
+
 
 
 
@@ -55,16 +55,16 @@
 #include <stdlib.h>
 #endif
 
-#include "sendmsg.h"
 #include "cJSON.h"
+#include "mytime.h"
 #include "bytestool.h"
-#include "nonblocking.h"
 #include "ngrok.h"
-
+#include "sslbio.h"
+#include "nonblocking.h"
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.02-(2015/11/6)";
+string VER = "1.03-(2015/12/13)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -197,12 +197,10 @@ void* proxy( void *arg )
 	pthread_detach( pthread_self() );
 	fd_set	writeSet;
 	fd_set	readSet;
-
 	int		maxfd = 0;
 	unsigned char	buf[MAXBUF];
 	char		tempjson[MAXBUF + 1];
 	struct timeval	timeout;
-	int		cunixtime;
 	TunnelInfo	*tunnelinfo	= NULL;
 	int		maxfdp		= 0;
 	int ret=0;
@@ -218,18 +216,18 @@ void* proxy( void *arg )
 
 	    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
         {
-            setnonblocking(mainsock, 0 );
+
             #if OPENSSL
-            int sendlen = SendPing( mainsslinfo->ssl );
+            int sendlen = SendPing(mainsock, mainsslinfo->ssl );
             #else
-            int sendlen = SendPing( &mainsslinfo->ssl );
+            int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
             #endif
-            setnonblocking(mainsock,1 );
             //发送失败断开连接
             if(sendlen==-1)
             {
                 shutdown( mainsock,2);
                 mainsock = 0;
+                proxyrun=0;
             }
             pingtime = get_curr_unixtime();
 	    }
@@ -240,23 +238,12 @@ void* proxy( void *arg )
 		maxfd	= 0;
 		maxfdp	= 0;
 		FD_ZERO( &writeSet );
-		cunixtime = get_curr_unixtime();
+
 		/* 遍历添加 */
 		//map<int, sockinfo*>::iterator it;
 		for ( it = socklist.begin(); it != socklist.end();  )
 		{
 			tempinfo = it->second;
-			/* 清理超时的错误的链接 */
-			if ( tempinfo->istype == 1 )
-			{
-				if ( (tempinfo->linkunixtime + linktime) < cunixtime && tempinfo->isconnectlocal != 2)
-				{
-					clearsock( it->first, it->second );
-					socklist.erase(it++);
-					continue;
-				}
-			}
-
 			/* 如果未连接才添加，写入监听 */
 			if ( tempinfo->isconnect == 0 )
 			{
@@ -351,8 +338,13 @@ void* proxy( void *arg )
 					    //检测连接是否可用
 						if (check_sock(it1->first)!= 0 )
 						{
-							clearsock( it1->first, tempinfo );
+							clearsock(it1->first,tempinfo);
 							socklist.erase(it1++);
+							//关闭远程连接
+							if(tempinfo->istype==2){
+                                printf("连接本地失败");
+							    shutdown( tempinfo->tosock, 2 );
+							}
 							continue;
 						}
 

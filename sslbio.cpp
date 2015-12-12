@@ -1,4 +1,6 @@
 #include "config.h"
+#include <string.h>
+#include "mytime.h"
 #include "sslbio.h"
 #if OPENSSL
 int openssl_init_info(int server_fd,openssl_info *sslinfo)

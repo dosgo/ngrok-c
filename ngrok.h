@@ -3,11 +3,11 @@
 #include "config.h"
 #include <string>
 #include <map>
-#include "nonblocking.h"
 #include "sendmsg.h"
+#include "nonblocking.h"
 #include "cJSON.h"
-#include "sslbio.h"
 #if OPENSSL
+typedef SSL ssl_context;
 #include "openssl/ssl.h"
 #else
 #if ISMBEDTLS

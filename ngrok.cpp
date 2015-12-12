@@ -54,17 +54,14 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
    #if OPENSSL
-   // setnonblocking((*it1)->first,0);
+
     if ( openssl_init_info((*it1)->first, sslinfo ) != -1 )
     {
-      //  setnonblocking((*it1)->first,1);
-        //tempinfo->sslinfo = sslinfo;
-        SendRegProxy(sslinfo->ssl, ClientId);
+        SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
     }
     else
     {
         setnonblocking((*it1)->first,1);
-        printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
         (*socklist).erase((*it1)++);
@@ -73,7 +70,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     #else
     if (ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
     {
-          SendRegProxy( &sslinfo->ssl, ClientId );
+          SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId );
     }
     else
     {
@@ -208,18 +205,18 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
                 {
                     tunnelinfo = (*tunnellist)[string( Protocol )];
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
-                    setnonblocking( tcp, 1 );
+                  //  setnonblocking( tcp, 1 );
                     connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr));
-
+                    setnonblocking( tcp, 1 );
                     sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
                     sinfo->istype		= 2;
-                    sinfo->isconnect	= 0;
+                    sinfo->isconnect	= 1;
                     sinfo->sslinfo		= sslinfo1;
                     sinfo->tosock		= (*it1)->first;
                     (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
                     /* 远程的带上本地链接 */
-                    tempinfo1->tosock		= tcp;
-                    tempinfo1->isconnectlocal	= 1;
+                    tempinfo1->tosock = tcp;
+                    tempinfo1->isconnectlocal= 1;
 
                 }
             }
@@ -233,7 +230,6 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
    //检测是否断开
    if(check_sock(*mainsock)!= 0)
    {
-       printf("duan kai \r\n");
         return -1;
    }
 
@@ -293,9 +289,9 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                     {
                         *ClientId = string( cid );
                         #if OPENSSL
-                        SendPing( sslinfo->ssl );
+                        SendPing( *mainsock,sslinfo->ssl );
                         #else
-                        SendPing( &sslinfo->ssl );
+                        SendPing(*mainsock, &sslinfo->ssl );
                         #endif
                         tempinfo->isauth=1;
 
@@ -305,9 +301,9 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                         {
                             tunnelinfo = it->second;
                             #if OPENSSL
-                            SendReqTunnel(sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            SendReqTunnel(*mainsock,sslinfo->ssl, it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
                             #else
-                            SendReqTunnel(&sslinfo->ssl, it->first,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            SendReqTunnel(*mainsock,&sslinfo->ssl,it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
                             #endif
                         }
                     }
@@ -323,9 +319,9 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
 					#if OPENSSL
-                    SendPong( sslinfo->ssl );
+                    SendPong( *mainsock,sslinfo->ssl );
                     #else
-                    SendPong( &sslinfo->ssl );
+                    SendPong( *mainsock,&sslinfo->ssl );
                     #endif
 				}
 				if ( strcmp( Type->valuestring, "Pong" ) == 0 )
@@ -359,21 +355,13 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
         return -1;
 	}
     *mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+
     #if OPENSSL
     if(openssl_init_info(*mainsock, *mainsslinfo ) == -1 )
-	{
-		printf( "ssl init failed!\r\n" );
-        #if WIN32
-        closesocket(*mainsock);
-        #else
-        close(*mainsock);
-        #endif
-		free(*mainsslinfo);
-		return -1;
-	}
-	SendAuth((*mainsslinfo)->ssl, *ClientId, authtoken);
     #else
     if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
+    #endif
+
 	{
 		printf( "ssl init failed!\r\n" );
         #if WIN32
@@ -384,15 +372,19 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
 		free(*mainsslinfo);
 		return -1;
 	}
-	SendAuth( &(*mainsslinfo)->ssl, *ClientId, authtoken );
+
+    #if OPENSSL
+	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken);
+    #else
+	SendAuth(*mainsock, &(*mainsslinfo)->ssl, *ClientId, authtoken );
     #endif
+
     setnonblocking( *mainsock,1);
     sockinfo * sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
     sinfo->istype		= 3;
     sinfo->isconnect	= 1;
     sinfo->packbuflen	= 0;
     sinfo->sslinfo		= *mainsslinfo;
-
     (*socklist).insert( map<int, sockinfo*> :: value_type( *mainsock, sinfo ) );
     return 0;
 }

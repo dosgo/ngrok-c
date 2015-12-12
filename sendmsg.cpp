@@ -14,149 +14,26 @@ using namespace std;
 
 
 
-
-
-
-char *random_uuid( char buf[37] )
+char *rand_str(char *str,const int len)
 {
-    srand((unsigned) time(NULL));
-    const char *c = "89ab";
-    char *p = buf;
-    int n;
-    for( n = 0; n < 16; ++n )
-    {
-        int b = rand()%255;
-        switch( n )
-        {
-            case 6:
-                sprintf(p, "4%x", b%15 );
-            break;
-            case 8:
-                sprintf(p, "%c%x", c[rand()%strlen(c)], b%15 );
-            break;
-            default:
-                sprintf(p, "%02x", b);
-            break;
-        }
-
-        p += 2;
-
-        switch( n )
-        {
-            case 3:
-            case 5:
-            case 7:
-            case 9:
-                break;
-        }
-    }
-    *p = 0;
-    return buf;
-}
-
-#if OPENSSL
-
-int SendAuth(SSL *ssl,string ClientId,string user)
-{
-    string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
-   // printf( "SendAuthstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl, buffer, sendlen);
-    return len;
-}
-
-int SendRegProxy(SSL *ssl,string &ClientId)
-{
-    string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
-    //printf( "SendRegProxystr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write( ssl, buffer, sendlen);
-    return len;
+    int i;
+    for(i=0;i<len;++i)
+        str[i]='A'+rand()%26;
+    str[++i]='\0';
+    return str;
 }
 
 
 
-int SendReqTunnel(SSL *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
+int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort)
 {
-    char RemotePortStr[10];
-    sprintf(RemotePortStr,"%d",RemotePort);
     char guid[37];
-    random_uuid(guid);
-    guid[9]='\0';
-    string guid_str=string(guid);
-    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
-    //printf("SendReqTunnelstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl, buffer,sendlen);
-    return len;
+    rand_str(guid,5);
+    char str[1024];
+    memset(str,0,1024);
+    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d}}",protocol,guid,HostName,Subdomain,RemotePort);
+    return sendpack(sock,ssl,str,1);
 }
-
-
-
-
-
-
-#else
-int SendAuth(ssl_context *ssl,string ClientId,string user)
-{
-    string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
-   // printf( "SendAuthstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
-}
-
-int SendRegProxy(ssl_context *ssl,string &ClientId)
-{
-    string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
-    //printf( "SendRegProxystr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
-}
-
-
-
-int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
-{
-    char RemotePortStr[10];
-    sprintf(RemotePortStr,"%d",RemotePort);
-    char guid[37];
-    random_uuid(guid);
-    guid[9]='\0';
-    string guid_str=string(guid);
-    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
-    //printf("SendReqTunnelstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-     #if ISMBEDTLS
-    int len=mbedtls_ssl_write(ssl, buffer, sendlen);
-    #else
-    int len=ssl_write(ssl, buffer, sendlen);
-    #endif // ISMBEDTLS
-    return len;
-}
-
-
-
-
-
-#endif
-
-
 
 
 
