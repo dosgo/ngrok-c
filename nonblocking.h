@@ -2,6 +2,7 @@
 #define NONBLOCKING_H_INCLUDED
 #include "config.h"
 #include <pthread.h>
+#include <string.h>
 #if  WIN32
 #include <windows.h>
 #else
@@ -10,6 +11,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #endif
 #include <list>
 

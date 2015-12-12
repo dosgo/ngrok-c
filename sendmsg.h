@@ -112,7 +112,7 @@ inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
         int len=SSL_write( ssl, buffer, 8+strlen(msgstr));
     #else
         #if ISMBEDTLS
-            int len=mbedtls_ssl_write(ssl, buffer, 8+msgstr.length());
+            int len=mbedtls_ssl_write(ssl, buffer, 8+strlen(msgstr));
         #else
             int len=ssl_write(ssl, buffer, 8+strlen(msgstr));
         #endif // ISM
