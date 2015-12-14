@@ -125,7 +125,7 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
      #endif // ISMBEDTLS
    #endif
 
-    if ( readlen < 1 )
+    if ( readlen ==0 )
     {
         /* close to sock */
         shutdown( tempinfo1->tosock, 2 );
@@ -133,7 +133,7 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
         (*socklist).erase((*it1)++);
         return -1;
     }
-    else
+    else if(readlen >0)
     {
         setnonblocking( tempinfo1->tosock, 0 );
         #if WIN32

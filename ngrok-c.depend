@@ -741,7 +741,7 @@
 	"sslbio.h"
 	"nonblocking.h"
 
-1449942247 g:\ngrok-c\config.h
+1449916791 g:\ngrok-c\config.h
 
 1449938628 g:\ngrok-c\sslbio.h
 	"config.h"
@@ -764,7 +764,7 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1449941924 g:\ngrok-c\sendmsg.h
+1450108779 g:\ngrok-c\sendmsg.h
 	"config.h"
 	"nonblocking.h"
 	<string>
@@ -781,15 +781,17 @@
 
 1449891970 g:\ngrok-c\bytestool.h
 
-1449938341 g:\ngrok-c\nonblocking.h
+1449916791 g:\ngrok-c\nonblocking.h
 	"config.h"
 	<pthread.h>
+	<string.h>
 	<windows.h>
 	<fcntl.h>
 	<netinet/in.h>
 	<netdb.h>
 	<sys/types.h>
 	<sys/socket.h>
+	<unistd.h>
 	<list>
 	"sslbio.h"
 
@@ -979,7 +981,7 @@
 	"config.h"
 	"sslbio.h"
 
-1449943276 source:g:\ngrok-c\ngrok.cpp
+1450107883 source:g:\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -991,7 +993,7 @@
 	"sslbio.h"
 	<stdlib.h>
 
-1449942102 g:\ngrok-c\ngrok.h
+1450107523 g:\ngrok-c\ngrok.h
 	"config.h"
 	<string>
 	<map>
@@ -1002,6 +1004,8 @@
 	<mbedtls/ssl.h>
 	"polarssl/ssl.h"
 
-1449939355 g:\ngrok-c\mytime.h
+1449916791 g:\ngrok-c\mytime.h
 	<windows.h>
+	<errno.h>
+	<netinet/in.h>
 
