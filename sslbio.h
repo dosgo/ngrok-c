@@ -16,6 +16,24 @@ struct openssl_info
 int openssl_init_info(int server_fd,openssl_info *sslinfo);
 int openssl_free_info(openssl_info *sslinfo);
 typedef openssl_info ssl_info;
+
+
+inline int SslRecv(SSL* ssl, char* buffer, int ilen)
+{
+  int  r=SSL_read(ssl,buffer,ilen);
+  switch(SSL_get_error(ssl,r)){
+    case SSL_ERROR_NONE:
+      return r;
+    case SSL_ERROR_ZERO_RETURN:
+      return 0;
+    case SSL_ERROR_WANT_READ:
+      return -1;
+    case SSL_ERROR_WANT_WRITE:
+      return -1;
+  }
+  return -2;
+}
+
 #else
 
 #if ISMBEDTLS
@@ -43,6 +61,29 @@ struct ssl_info
     x509_crt cacert;
 };
 
+inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
+{
+    int ret = mbedtls_ssl_read(ssl, buffer, ilen );
+    if( ret == MBEDTLS_ERR_SSL_WANT_READ ||ret == MBEDTLS_ERR_SSL_WANT_WRITE )
+    {
+       return -1;
+    }
+
+    if( ret <= 0 )
+    {
+        switch( ret )
+        {
+        case MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY:
+           return -2;
+        case MBEDTLS_ERR_NET_CONN_RESET:
+           return -2;
+        }
+
+    }
+    return ret;
+}
+
+
 #else
 #include <polarssl/net.h>
 #include <polarssl/debug.h>
@@ -52,6 +93,23 @@ struct ssl_info
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
 
+
+inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
+{
+    int ret = ssl_read(ssl, buffer, ilen );
+    if( ret <= 0 )
+    {
+        switch( ret )
+        {
+        case POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY:
+           return -2;
+        case POLARSSL_ERR_NET_CONN_RESET:
+           return -2;
+        }
+
+    }
+    return ret;
+}
 
 
 struct ssl_info

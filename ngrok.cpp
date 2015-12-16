@@ -116,16 +116,14 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
 int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen;
    #if OPENSSL
-   readlen = SSL_read( sslinfo1->ssl, (unsigned char *) buf, maxbuf );
+    readlen =  SslRecv(sslinfo1->ssl,buf,maxbuf);
    #else
-     #if ISMBEDTLS
-      readlen = mbedtls_ssl_read( &sslinfo1->ssl, (unsigned char *) buf, maxbuf );
-     #else
-     readlen = ssl_read( &sslinfo1->ssl, (unsigned char *) buf, maxbuf );
-     #endif // ISMBEDTLS
+    readlen =  SslRecv( &sslinfo1->ssl, (unsigned char *) buf, maxbuf );
    #endif
 
-    if ( readlen ==0 )
+
+
+    if ( readlen ==0||readlen ==-2)
     {
         /* close to sock */
         shutdown( tempinfo1->tosock, 2 );
@@ -146,25 +144,28 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
+int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
     int readlen;
     __int64		packlen;
     char Protocol[10]={0};
     #if OPENSSL
-    readlen = SSL_read( sslinfo1->ssl, buf, maxbuf );
+    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf);
     #else
-    #if ISMBEDTLS
-    readlen = mbedtls_ssl_read( &sslinfo1->ssl,(unsigned char *) buf, maxbuf );
-    #else
-    readlen = ssl_read( &sslinfo1->ssl,(unsigned char *) buf, maxbuf );
-    #endif  // ISMBEDTLS
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf);
     #endif // OPENSSL
-    if ( readlen < 1 )
+
+    if ( readlen ==0||readlen ==-2)
     {
         clearsock( (*it1)->first, tempinfo1 );
         (*socklist).erase((*it1)++);
         return -1;
     }
+
+    if ( readlen ==-1)
+    {
+        return -1;
+    }
+
 
     /* copy到临时缓存区 */
     if ( tempinfo1->packbuflen == 0 )
@@ -212,7 +213,7 @@ int ConnectLocal(ssl_info *sslinfo1,char *buf,int maxbuf,map<int, sockinfo*>::it
                         sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
                         sinfo->istype		= 2;
                         sinfo->isconnect	= 1;
-                        sinfo->sslinfo		= sslinfo1;
+                        sinfo->sslinfo		= sslinfo;
                         sinfo->tosock		= (*it1)->first;
                         (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
                         /* 远程的带上本地链接 */
@@ -246,18 +247,22 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     int readlen;
     __int64		packlen;
     #if OPENSSL
-    readlen = SSL_read( sslinfo->ssl, buf, maxbuf );
+    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf);
     #else
-    #if ISMBEDTLS
-    readlen = mbedtls_ssl_read( &sslinfo->ssl,(unsigned char *) buf, maxbuf );
-    #else
-    readlen = ssl_read( &sslinfo->ssl,(unsigned char *) buf, maxbuf );
-    #endif  // ISMBEDTLS
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf);
     #endif // OPENSSL
-    if ( readlen < 1)
+
+    if ( readlen ==0||readlen ==-2)
     {
         return -1;
     }
+
+    if ( readlen ==-1)
+    {
+        return 0;
+    }
+
+
 
     /* copy到临时缓存区 */
     if ( tempinfo->packbuflen == 0 )

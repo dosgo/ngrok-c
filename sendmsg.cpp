@@ -28,6 +28,7 @@ char *rand_str(char *str,const int len)
 int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort)
 {
     char guid[37];
+    memset(guid,0,37);
     rand_str(guid,5);
     char str[1024];
     memset(str,0,1024);
@@ -72,6 +73,7 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 		{
 			argvstr = argv[i];
 			memset( jsonstr, 0, 1024 );
+			memset( temp, 0, 255 );
 			pos = strpos( argvstr, '[' );
 			if ( pos == -1 )
 			{

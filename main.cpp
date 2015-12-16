@@ -64,7 +64,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.03-(2015/12/13)";
+string VER = "1.04-(2015/12/16)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -283,7 +283,8 @@ void* proxy( void *arg )
 			    /*等于1才是添加到 readSet的*/
 				if (FD_ISSET( it1->first, &readSet )&&tempinfo->isconnect==1 )
 				{
-
+                    //先清空
+                    memset((char *)buf,0,MAXBUF);
                     sslinfo1 = tempinfo->sslinfo;
                     /* 远程的转发给本地 */
                     if ( tempinfo->istype == 1 )
@@ -327,6 +328,7 @@ void* proxy( void *arg )
                             continue;
                          }
                     }
+
 
 				}
 				//可写，表示连接上了

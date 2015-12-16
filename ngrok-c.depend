@@ -464,7 +464,7 @@
 
 1444787606 d:\c\ngrok-c\cjson.h
 
-1446788648 source:d:\c\ngrok-c\main.cpp
+1450240770 source:d:\c\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -475,7 +475,6 @@
 	<iostream>
 	<iomanip>
 	<signal.h>
-	"sslbio.h"
 	<openssl/ssl.h>
 	<openssl/bio.h>
 	<openssl/err.h>
@@ -504,29 +503,31 @@
 	<netdb.h>
 	<arpa/inet.h>
 	<stdlib.h>
-	"sendmsg.h"
 	"cJSON.h"
+	"mytime.h"
 	"bytestool.h"
-	"nonblocking.h"
 	"ngrok.h"
+	"sslbio.h"
+	"nonblocking.h"
 
-1449458756 d:\c\ngrok-c\sendmsg.h
+1450229947 d:\c\ngrok-c\sendmsg.h
 	"config.h"
+	"nonblocking.h"
 	<string>
 	<map>
 	"openssl/ssl.h"
 	<mbedtls/ssl.h>
 	"polarssl/ssl.h"
 	<windows.h>
+	<errno.h>
 	<netinet/in.h>
 	<string.h>
 	<sys/select.h>
 	"bytestool.h"
 
-1445056093 d:\c\ngrok-c\sslbio.h
+1450238074 d:\c\ngrok-c\sslbio.h
 	"config.h"
 	<malloc.h>
-	"sendmsg.h"
 	<openssl/ssl.h>
 	<openssl/bio.h>
 	<openssl/err.h>
@@ -547,22 +548,24 @@
 
 1449458069 d:\c\ngrok-c\bytestool.h
 
-1446782217 d:\c\ngrok-c\nonblocking.h
+1450229947 d:\c\ngrok-c\nonblocking.h
 	"config.h"
 	<pthread.h>
+	<string.h>
 	<windows.h>
 	<fcntl.h>
 	<netinet/in.h>
 	<netdb.h>
 	<sys/types.h>
 	<sys/socket.h>
+	<unistd.h>
 	<list>
 	"sslbio.h"
 
-1446688584 source:d:\c\ngrok-c\nonblocking.cpp
+1450229947 source:d:\c\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
 
-1449457850 source:d:\c\ngrok-c\sendmsg.cpp
+1450229947 source:d:\c\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -575,8 +578,10 @@
 	<iostream>
 	<vector>
 
-1445056093 source:d:\c\ngrok-c\sslbio.cpp
+1450229947 source:d:\c\ngrok-c\sslbio.cpp
 	"config.h"
+	<string.h>
+	"mytime.h"
 	"sslbio.h"
 
 1425470806 source:f:\ngrok-c\cjson.c
@@ -681,7 +686,7 @@
 	<openssl/err.h>
 	"sendmsg.h"
 
-1446782330 d:\c\ngrok-c\config.h
+1450244507 d:\c\ngrok-c\config.h
 
 1444176728 source:g:\ngrok-c\cjson.c
 	<string.h>
@@ -813,7 +818,7 @@
 	"mytime.h"
 	"sslbio.h"
 
-1449451845 source:d:\c\ngrok-c\ngrok.cpp
+1450237993 source:d:\c\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -822,14 +827,15 @@
 	<errno.h>
 	"bytestool.h"
 	"ngrok.h"
+	"sslbio.h"
 	<stdlib.h>
 
-1449451845 d:\c\ngrok-c\ngrok.h
+1450229947 d:\c\ngrok-c\ngrok.h
 	"config.h"
 	<string>
 	<map>
-	"nonblocking.h"
 	"sendmsg.h"
+	"nonblocking.h"
 	"cJSON.h"
 	"openssl/ssl.h"
 	<mbedtls/ssl.h>
@@ -1005,6 +1011,11 @@
 	"polarssl/ssl.h"
 
 1449916791 g:\ngrok-c\mytime.h
+	<windows.h>
+	<errno.h>
+	<netinet/in.h>
+
+1450229947 d:\c\ngrok-c\mytime.h
 	<windows.h>
 	<errno.h>
 	<netinet/in.h>
