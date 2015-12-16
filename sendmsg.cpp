@@ -1,11 +1,5 @@
 #include "config.h"
 #include <string>
-#if OPENSSL
-#include "openssl/ssl.h"
-#else
-#include "polarssl/ssl.h"
-#endif
-
 
 #if WIN32
 #include <windows.h>
@@ -14,271 +8,33 @@
 #include <errno.h>
 typedef long long __int64;
 #endif
-#include "bytestool.h"
 #include "sendmsg.h"
 #include<stdlib.h>
 using namespace std;
 
 
-#if WIN32
 
-#else
-void milliseconds_sleep( unsigned long mSec )
+char *rand_str(char *str,const int len)
 {
-    struct timeval tv;
-    tv.tv_sec   = mSec / 1000;
-    tv.tv_usec  = (mSec % 1000) * 1000;
-    int err;
-    do
-    {
-        err = select( 0, NULL, NULL, NULL, &tv );
-    }
-    while ( err < 0 && errno == EINTR );
-}
-#endif
-
-int strpos( char *str, char c )
-{
-	char *sc = strchr( str, c );
-	if ( sc == NULL )
-		return(-1);
-	return(sc - str);
+    int i;
+    for(i=0;i<len;++i)
+        str[i]='A'+rand()%26;
+    str[++i]='\0';
+    return str;
 }
 
-void sleeps(int ti)
+
+
+int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort)
 {
-    #if WIN32
-        Sleep( ti);
-#else
-        milliseconds_sleep( ti);
-#endif
-
-}
-
-char *random_uuid( char buf[37] )
-{
-    srand((unsigned) time(NULL));
-    const char *c = "89ab";
-    char *p = buf;
-    int n;
-    for( n = 0; n < 16; ++n )
-    {
-        int b = rand()%255;
-        switch( n )
-        {
-            case 6:
-                sprintf(p, "4%x", b%15 );
-            break;
-            case 8:
-                sprintf(p, "%c%x", c[rand()%strlen(c)], b%15 );
-            break;
-            default:
-                sprintf(p, "%02x", b);
-            break;
-        }
-
-        p += 2;
-
-        switch( n )
-        {
-            case 3:
-            case 5:
-            case 7:
-            case 9:
-                break;
-        }
-    }
-    *p = 0;
-    return buf;
-}
-
-#if OPENSSL
-
-int SendAuth(SSL *ssl,string ClientId,string user)
-{
-    string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
-   // printf( "SendAuthstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl, buffer, sendlen);
-    return len;
-}
-
-int SendRegProxy(SSL *ssl,string ClientId)
-{
-    string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
-    //printf( "SendRegProxystr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write( ssl, buffer, sendlen);
-    return len;
-}
-
-int SendPing(SSL *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl,buffer,sendlen);
-    return len;
-}
-
-int SendReqTunnel(SSL *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
-{
-    char RemotePortStr[10];
-    sprintf(RemotePortStr,"%d",RemotePort);
     char guid[37];
-    random_uuid(guid);
-    guid[9]='\0';
-    string guid_str=string(guid);
-    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
-    //printf("SendReqTunnelstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write(ssl, buffer,sendlen);
-    return len;
+    rand_str(guid,5);
+    char str[1024];
+    memset(str,0,1024);
+    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d}}",protocol,guid,HostName,Subdomain,RemotePort);
+    return sendpack(sock,ssl,str,1);
 }
 
-
-int SendPong(SSL *ssl)
-{
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=SSL_write( ssl, buffer, sendlen);
-    return len;
-}
-
-
-
-int readlen(SSL *ssl,unsigned char *buffer, int readlen,int bufferlen)
-{
-    int recvlen = 0;
-    int len;
-    memset( buffer, 0, bufferlen);
-    while ( 1 )
-    {
-        if ( (readlen - recvlen) < 1 )
-        {
-            break;
-        }
-        len = SSL_read( ssl, buffer+recvlen, (readlen - recvlen) );
-        if ( len > 0 )
-        {
-            recvlen = recvlen + len;
-        }else    {
-            break;
-        }
-        sleeps(1);
-    }
-    return recvlen;
-}
-#else
-int SendAuth(ssl_context *ssl,string ClientId,string user)
-{
-    string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
-   // printf( "SendAuthstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=ssl_write(ssl, buffer, sendlen);
-    return len;
-}
-
-int SendRegProxy(ssl_context *ssl,string ClientId)
-{
-    string str="{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\""+ClientId+"\"}}";
-    //printf( "SendRegProxystr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=ssl_write( ssl, buffer, sendlen);
-    return len;
-}
-
-int SendPing(ssl_context *ssl)
-{
-   	string str="{\"Type\":\"Ping\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=ssl_write(ssl,buffer,sendlen);
-    return len;
-}
-
-int SendReqTunnel(ssl_context *ssl,string protocol,string HostName,string Subdomain,int RemotePort)
-{
-    char RemotePortStr[10];
-    sprintf(RemotePortStr,"%d",RemotePort);
-    char guid[37];
-    random_uuid(guid);
-    guid[9]='\0';
-    string guid_str=string(guid);
-    string str="{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\""+protocol+"\",\"ReqId\":\""+guid_str+"\",\"Hostname\": \""+HostName+"\",\"Subdomain\":\""+Subdomain+"\",\"HttpAuth\":\"\",\"RemotePort\":"+string(RemotePortStr)+"}}";
-    //printf("SendReqTunnelstr:%s\r\n",str.c_str());
-    unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=ssl_write(ssl, buffer,sendlen);
-    return len;
-}
-
-
-int SendPong(ssl_context *ssl)
-{
-   	string str="{\"Type\":\"Pong\",\"Payload\":{}}";
-   	unsigned char buffer[str.length()+9];
-    int sendlen=pack(buffer,str);
-    int len=ssl_write( ssl, buffer, sendlen);
-    return len;
-}
-
-
-
-int readlen(ssl_context *ssl,unsigned char *buffer, int readlen,int bufferlen)
-{
-    int recvlen = 0;
-    int len;
-    memset( buffer, 0, bufferlen);
-    while ( 1 )
-    {
-        if ( (readlen - recvlen) < 1 )
-        {
-            break;
-        }
-        len = ssl_read( ssl, buffer+recvlen, (readlen - recvlen) );
-        if ( len > 0 )
-        {
-            recvlen = recvlen + len;
-        }else    {
-            break;
-        }
-        sleeps(1);
-    }
-    return recvlen;
-}
-#endif
-
-int pack(unsigned char * buffer,string msgstr)
-{
-    #if WIN32
-    unsigned __int64 packlen;
-    #else
-    unsigned long long packlen;
-    #endif
-    packlen=msgstr.length();
-    if(BigEndianTest()==BigEndian)
-    {
-        packlen=LittleEndian_64(packlen);
-    }
-    memcpy(buffer,&packlen,8);
-    memcpy(buffer+8,msgstr.c_str(), msgstr.length());
-    return  8+msgstr.length();
-}
-
-
-int get_curr_unixtime()
-{
-    time_t now;
-    int unixtime = time(&now);
-    return unixtime;
-}
 
 
 int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr )
@@ -300,16 +56,6 @@ int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockadd
 	return -1;
 }
 
-int GetProtocol(char *url,char *Protocol)
-{
-	int	plen= strpos( url, ':' );
-	if(plen>0)
-    {
-        memcpy( Protocol, url, plen );
-        return 0;
-    }
-	return -1;
-}
 
 
 int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken)
@@ -414,17 +160,4 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 	return 0;
 }
 
-int getvalue(char * str,char *key,char * value){
-    int ypos=0;
-    if ( strncmp(str,key,strlen(key)) == 0 )
-    {
-        ypos = strpos( str, ':' );
-        if ( ypos != -1 )
-        {
 
-            memcpy(value, str + ypos + 1, strlen( str + ypos ));
-            return 0;
-        }
-    }
-    return -1;
-}
