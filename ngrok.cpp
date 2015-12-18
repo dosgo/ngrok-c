@@ -189,6 +189,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
             memset( tempjson, 0, 1025 );
             memcpy( tempjson, tempinfo1->packbuf + 8, packlen );
             free( tempinfo1->packbuf );
+            echo("%s\r\n",tempjson);
             tempinfo1->packbuf	= NULL;
             tempinfo1->packbuflen	= 0;
             cJSON	*json	= cJSON_Parse( tempjson );

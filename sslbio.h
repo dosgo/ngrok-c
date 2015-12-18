@@ -84,6 +84,17 @@ inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 }
 
 
+inline int openssl_free_info(openssl_info *sslinfo)
+{
+    SSL_shutdown( sslinfo->ssl );
+    SSL_free( sslinfo->ssl );
+    SSL_CTX_free( sslinfo->ctx  );
+   //CRYPTO_cleanup_all_ex_data();
+    //ERR_remove_state();
+    return 0;
+}
+
+
 #else
 #include <polarssl/net.h>
 #include <polarssl/debug.h>
@@ -122,7 +133,24 @@ struct ssl_info
 };
 #endif // ISMBEDTLS
 int ssl_init_info(int *server_fd,ssl_info *sslinfo);
-int ssl_free_info(ssl_info *sslinfo);
+
+inline int ssl_free_info(ssl_info *sslinfo){
+
+    #if ISMBEDTLS
+    mbedtls_x509_crt_free(&sslinfo->cacert );
+    mbedtls_ssl_free(&sslinfo->ssl);
+    mbedtls_ssl_config_free( &sslinfo->conf );
+    mbedtls_ctr_drbg_free(&sslinfo->ctr_drbg );
+    mbedtls_entropy_free(&sslinfo->entropy );
+    #else
+
+    x509_crt_free(&sslinfo->cacert);
+    ssl_free(&sslinfo->ssl);
+    ctr_drbg_free(&sslinfo->ctr_drbg);
+    entropy_free(&sslinfo->entropy);
+    #endif // ISMBEDTLS
+    return 0;
+}
 #endif
 #endif // SSLBIO_H_INCLUDED
 

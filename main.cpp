@@ -64,7 +64,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.04-(2015/12/16)";
+string VER = "1.05-(2015/12/18)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;

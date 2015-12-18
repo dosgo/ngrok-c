@@ -30,15 +30,7 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo)
 
 
 
-int openssl_free_info(openssl_info *sslinfo)
-{
-    SSL_shutdown( sslinfo->ssl );
-    SSL_free( sslinfo->ssl );
-    SSL_CTX_free( sslinfo->ctx  );
-   //CRYPTO_cleanup_all_ex_data();
-    //ERR_remove_state();
-    return 0;
-}
+
 #else
 #if ISMBEDTLS
 int ssl_init_info(int *server_fd,ssl_info *sslinfo)
@@ -108,14 +100,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 
-int ssl_free_info(ssl_info *sslinfo){
-    mbedtls_x509_crt_free(&sslinfo->cacert );
-    mbedtls_ssl_free(&sslinfo->ssl);
-    mbedtls_ssl_config_free( &sslinfo->conf );
-    mbedtls_ctr_drbg_free(&sslinfo->ctr_drbg );
-    mbedtls_entropy_free(&sslinfo->entropy );
-    return 0;
-}
+
 
 #else
 int ssl_init_info(int *server_fd,ssl_info *sslinfo)
@@ -169,30 +154,5 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 
-int ssl_free_info(ssl_info *sslinfo){
-    /*
-    if(&sslinfo->cacert!=NULL)
-    {
-        x509_crt_free(&sslinfo->cacert);
-    }
-    if(&sslinfo->ssl!=NULL)
-    {
-        ssl_free(&sslinfo->ssl);
-    }
-    if(&sslinfo->ctr_drbg!=NULL)
-    {
-        ctr_drbg_free(&sslinfo->ctr_drbg);
-    }
-    if(&sslinfo->entropy!=NULL)
-    {
-        entropy_free(&sslinfo->entropy);
-    }
-    */
-    x509_crt_free(&sslinfo->cacert);
-    ssl_free(&sslinfo->ssl);
-    ctr_drbg_free(&sslinfo->ctr_drbg);
-    entropy_free(&sslinfo->entropy);
-    return 0;
-}
 #endif // ISMBEDTLS
 #endif // OPENSSL
