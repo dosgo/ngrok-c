@@ -34,6 +34,17 @@ inline int SslRecv(SSL* ssl, char* buffer, int ilen)
   return -2;
 }
 
+inline int openssl_free_info(openssl_info *sslinfo)
+{
+    SSL_shutdown( sslinfo->ssl );
+    SSL_free( sslinfo->ssl );
+    SSL_CTX_free( sslinfo->ctx  );
+   //CRYPTO_cleanup_all_ex_data();
+    //ERR_remove_state();
+    return 0;
+}
+
+
 #else
 
 #if ISMBEDTLS
@@ -83,16 +94,6 @@ inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
     return ret;
 }
 
-
-inline int openssl_free_info(openssl_info *sslinfo)
-{
-    SSL_shutdown( sslinfo->ssl );
-    SSL_free( sslinfo->ssl );
-    SSL_CTX_free( sslinfo->ctx  );
-   //CRYPTO_cleanup_all_ex_data();
-    //ERR_remove_state();
-    return 0;
-}
 
 
 #else
