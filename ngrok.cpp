@@ -232,6 +232,11 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
                     }
                     else
                     {
+                        #if WIN32
+                        echo("GetLastError:%d\r\n",GetLastError());
+                        #else
+                        echo("errno:%d\r\n",errno);
+                        #endif
                          clearsock( (*it1)->first, tempinfo1 );
                         (*socklist).erase((*it1)++);
                         return -1;
