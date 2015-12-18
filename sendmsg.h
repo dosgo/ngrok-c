@@ -93,8 +93,8 @@ inline int getvalue(char * str,const char *key,char * value){
 
 inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
 {
-    unsigned char buffer[255];
-    memset(buffer,0,255);
+    unsigned char buffer[strlen(msgstr)+9];
+    memset(buffer,0,strlen(msgstr)+9);
     #if WIN32
     unsigned __int64 packlen;
     #else

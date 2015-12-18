@@ -165,13 +165,22 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
     {
         return -1;
     }
-
+    //有时候readlen变成-76导致崩溃
+    if ( readlen <1)
+    {
+        clearsock( (*it1)->first, tempinfo1 );
+        (*socklist).erase((*it1)++);
+        return -1;
+    }
 
     /* copy到临时缓存区 */
     if ( tempinfo1->packbuflen == 0 )
     {
         tempinfo1->packbuf = (char *) malloc( maxbuf );
     }
+
+
+
     memcpy( tempinfo1->packbuf + tempinfo1->packbuflen, buf, readlen );
     tempinfo1->packbuflen = tempinfo1->packbuflen + readlen;
 
@@ -186,7 +195,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
         }
         if ( tempinfo1->packbuflen == packlen + 8 )
         {
-            memset( tempjson, 0, 1025 );
+            memset( tempjson, 0, maxbuf+1 );
             memcpy( tempjson, tempinfo1->packbuf + 8, packlen );
             free( tempinfo1->packbuf );
             echo("%s\r\n",tempjson);
@@ -281,7 +290,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
         }
         if ( tempinfo->packbuflen == packlen + 8 )
         {
-                memset( tempjson, 0, 1025 );
+                memset( tempjson, 0, maxbuf+1 );
                 memcpy( tempjson, tempinfo->packbuf + 8, packlen );
                 free( tempinfo->packbuf );
                 tempinfo->packbuf	= NULL;
