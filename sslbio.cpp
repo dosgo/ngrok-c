@@ -63,7 +63,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
                     MBEDTLS_SSL_TRANSPORT_STREAM,
                     MBEDTLS_SSL_PRESET_DEFAULT ) ) != 0 )
     {
-        printf( " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret );
+        echo( " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n", ret );
        return -1;
     }
 
@@ -76,7 +76,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
     if( ( ret = mbedtls_ssl_setup( &sslinfo->ssl, &sslinfo->conf ) ) != 0 )
     {
-        printf( " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret );
+        echo( " failed\n  ! mbedtls_ssl_setup returned %d\n\n", ret );
         return -1;
     }
 
@@ -86,7 +86,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     {
         if( ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE )
         {
-            printf( " failed\n  ! ssl_handshake returned -0x%x\n\n", -ret );
+            echo( " failed\n  ! ssl_handshake returned -0x%x\n\n", -ret );
             return -1;
         }
         //CPU sleep
@@ -97,11 +97,11 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
     if((ret = mbedtls_ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
     {
-       // printf( "Verifying peer X.509 certificate...failed \r\n" );
+       // echo( "Verifying peer X.509 certificate...failed \r\n" );
     }
     else
     {
-        printf( " ok\n" );
+        echo( " ok\n" );
     }
     return 0;
 }
@@ -133,7 +133,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     }
     if( ( ret = ssl_init( &sslinfo->ssl ) ) != 0 )
     {
-        printf( " failed\n  ! ssl_init returned %d\n\n", ret );
+        echo( " failed\n  ! ssl_init returned %d\n\n", ret );
         return -1;
     }
 
@@ -147,7 +147,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     {
         if( ret != POLARSSL_ERR_NET_WANT_READ && ret != POLARSSL_ERR_NET_WANT_WRITE )
         {
-            printf( " failed\n  ! ssl_handshake returned -0x%x\n\n", -ret );
+            echo( " failed\n  ! ssl_handshake returned -0x%x\n\n", -ret );
             return -1;
         }
         //CPU sleep
@@ -158,11 +158,11 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
     if((ret = ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
     {
-       // printf( "Verifying peer X.509 certificate...failed \r\n" );
+       // echo( "Verifying peer X.509 certificate...failed \r\n" );
     }
     else
     {
-        printf( " ok\n" );
+        echo( " ok\n" );
     }
     return 0;
 }

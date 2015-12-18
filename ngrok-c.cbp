@@ -31,7 +31,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-SER[Shost:proxy.qqbrowser.cc,Sport,Sport:4443] -AddTun[Type:tcp,Lhost:192.168.8.1,Lport:22,Rport:50223]" />
+				<Option parameters="-SER[Shost:proxy.qqbrowser.cc,Sport,Sport:4443] -AddTun[Type:http,Sdname:jobtest,Lhost:192.168.1.111,Lport:80]" />
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
@@ -40,8 +40,8 @@
 					<Add library="D:\c\ngrok-c\libmbedtls-win32.a" />
 					<Add library="D:\c\ngrok-c\libmbedx509-win32.a" />
 					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
-					<Add library="d:\TDM-GCC-32\lib\libpthreadGC2.dll.a" />
-					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
+					<Add library="C:\TDM-GCC-32\lib\libpthreadGC2.dll.a" />
+					<Add library="C:\TDM-GCC-32\lib\libws2_32.a" />
 					<Add library="D:\c\ngrok-c\libmbedcrypto-win32.a" />
 					<Add library="D:\c\ngrok-c\openssl\libcrypto.dll.a" />
 					<Add library="D:\c\ngrok-c\openssl\libssl.dll.a" />

@@ -153,10 +153,10 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 			}
 		}
 	}else  {
-		printf( "use " );
-        printf("%s",argv[0]);
-		printf( " -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xxxxxxx] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50199]" );
-		printf( "\r\n" );
+		echo( "use " );
+        echo("%s",argv[0]);
+		echo( " -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xxxxxxx] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50199]" );
+		echo( "\r\n" );
 		exit( 1 );
 	}
 	return 0;

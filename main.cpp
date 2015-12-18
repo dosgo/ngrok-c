@@ -271,7 +271,7 @@ void* proxy( void *arg )
         ret = select( maxfdp + 1, &readSet, &writeSet, NULL, &timeout ); /* 为等待时间传入NULL，则永久等待。传入0立即返回。不要勿用。 */
 		if ( ret == -1 && maxfd != 0 )
 		{
-            printf("select error\r\n");
+            echo("select error\r\n");
 			continue;
 		}
 
@@ -344,7 +344,7 @@ void* proxy( void *arg )
 							socklist.erase(it1++);
 							//关闭远程连接
 							if(tempinfo->istype==2){
-                                printf("连接本地失败");
+                                echo("连接本地失败");
 							    shutdown( tempinfo->tosock, 2 );
 							}
 							continue;

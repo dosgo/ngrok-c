@@ -40,11 +40,11 @@ int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
         char	*url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
         char	*protocol	= cJSON_GetObjectItem( Payload, "Protocol" )->valuestring;
         (*tunneloklist)[string(protocol)]=1;
-        printf("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
+        echo("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
     }
     else
     {
-        printf("Add tunnel failed,%s\r\n",error);
+        echo("Add tunnel failed,%s\r\n",error);
         return -1;
     }
     return 0;
@@ -74,7 +74,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     }
     else
     {
-        printf( "getsockoptclose sock:%d\r\n", (*it1)->first );
+        echo( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
         (*socklist).erase((*it1)++);
@@ -285,7 +285,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                 free( tempinfo->packbuf );
                 tempinfo->packbuf	= NULL;
                 tempinfo->packbuflen	= 0;
-                printf("%s\r\n",tempjson);
+                echo("%s\r\n",tempjson);
                 cJSON *json = cJSON_Parse( tempjson );
 				cJSON *Type = cJSON_GetObjectItem( json, "Type" );
 				if ( strcmp( Type->valuestring, "ReqProxy" ) == 0 )
@@ -323,7 +323,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                     else
                     {
                         cJSON_Delete( json );
-                        printf("Auth failed ,Please check authtoken. ");
+                        echo("Auth failed ,Please check authtoken. ");
                         return -1;
                     }
 
@@ -359,7 +359,7 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
 	if(connect( *mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
-        printf("connect failed...!\r\n");
+        echo("connect failed...!\r\n");
         #if WIN32
         closesocket(*mainsock);
         #else
@@ -376,7 +376,7 @@ int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info
     #endif
 
 	{
-		printf( "ssl init failed!\r\n" );
+		echo( "ssl init failed!\r\n" );
         #if WIN32
         closesocket(*mainsock);
         #else
