@@ -126,12 +126,13 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     if ( readlen ==0||readlen ==-2)
     {
         /* close to sock */
-        shutdown( tempinfo1->tosock, 2 );
+        int tosock=tempinfo1->tosock;
+        shutdown( tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
         (*socklist).erase((*it1)++);
-        if((*socklist).count(tempinfo1->tosock)==1)
+        if((*socklist).count(tosock)==1)
         {
-            (*socklist)[tempinfo1->tosock]->sslinfo=NULL;
+            (*socklist)[tosock]->sslinfo=NULL;
         }
         return -1;
     }
