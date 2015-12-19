@@ -131,7 +131,6 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
         (*socklist).erase((*it1)++);
         if((*socklist).count(tempinfo1->tosock)==1)
         {
-            printf("ddd\r\n")
             (*socklist)[tempinfo1->tosock]->sslinfo=NULL;
         }
         return -1;
