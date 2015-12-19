@@ -10,6 +10,8 @@
 #endif
 
 
+#define DEBUG 0
+
 #include <stdarg.h>
 #include <stdio.h>
 inline int echo(const char* format, ...)

@@ -43,6 +43,9 @@
 #if  WIN32
 #include <windows.h>
 #else
+#if DEBUG
+#include "segment.h"
+#endif
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -72,7 +75,7 @@ char authtoken[255]="1zW3MqEwX4iHmbtSAk3t";
 string ClientId = "";
 int		proxyrun	= 0;
 int		pingtime	= 0;
-int		ping		= 28; //不能大于30
+int		ping		= 25; //不能大于30
 int		linktime	= 45;
 int		mainsock=0;
 int		lastdnstime=0;
@@ -139,7 +142,16 @@ int CheckStatus()
 
 int main( int argc, char **argv )
 {
-    printf("ngrokc v%s \r\n",VER.c_str());
+	#if WIN32
+	#else
+		#if DEBUG
+		int pid = getpid();
+	 	printf("The pid is:%d\n", pid);
+	 	signal(SIGSEGV, OutputBacktrace); 
+		#endif
+	#endif
+	
+    	printf("ngrokc v%s \r\n",VER.c_str());
 	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
 #if WIN32
 	signal( SIGINT, cs );

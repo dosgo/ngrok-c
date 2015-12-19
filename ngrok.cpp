@@ -84,29 +84,29 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     return 0;
 }
 
-int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist){
+int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
     int readlen;
     #if WIN32
-    readlen = recv( (*it1)->first, (char *) buf, maxbuf, 0 );
+    readlen = recv( (*it1)->first, (char *) buf, maxbuf-1, 0 );
     #else
-    readlen = recv( (*it1)->first, buf, maxbuf, 0 );
+    readlen = recv( (*it1)->first, buf, maxbuf-1, 0 );
     #endif
-    if ( readlen > 0 )
+    if ( readlen > 0&&sslinfo!=NULL )
     {
-        setnonblocking( tempinfo1->tosock, 0 );
+        setnonblocking( tempinfo->tosock, 0 );
         #if OPENSSL
-        SSL_write( sslinfo1->ssl, buf, readlen );
+        SSL_write( sslinfo->ssl, buf, readlen );
         #else
         #if ISMBEDTLS
-        mbedtls_ssl_write( &sslinfo1->ssl, (unsigned char *)buf, readlen );
+        mbedtls_ssl_write( &sslinfo->ssl, (unsigned char *)buf, readlen );
         #else
-        ssl_write( &sslinfo1->ssl,(unsigned char *) buf, readlen );
+        ssl_write( &sslinfo->ssl,(unsigned char *) buf, readlen );
         #endif // ISMBEDTLS
         #endif
-        setnonblocking( tempinfo1->tosock, 1 );
+        setnonblocking( tempinfo->tosock, 1 );
     }else  {
-        shutdown( tempinfo1->tosock, 2 );
-        clearsock( (*it1)->first, tempinfo1 );
+        shutdown( tempinfo->tosock, 2 );
+        clearsock( (*it1)->first, tempinfo);
         (*socklist).erase((*it1)++);
         return -1;
     }
@@ -129,6 +129,11 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
         shutdown( tempinfo1->tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
         (*socklist).erase((*it1)++);
+        if((*socklist).count(tempinfo1->tosock)==1)
+        {
+            printf("ddd\r\n")
+            (*socklist)[tempinfo1->tosock]->sslinfo=NULL;
+        }
         return -1;
     }
     else if(readlen >0)
@@ -149,9 +154,9 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
     __int64		packlen;
     char Protocol[10]={0};
     #if OPENSSL
-    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf);
+    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf-1);
     #else
-    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf);
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf-1);
     #endif // OPENSSL
 
     if ( readlen ==0||readlen ==-2)
