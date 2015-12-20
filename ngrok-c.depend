@@ -702,7 +702,7 @@
 
 1444176728 g:\ngrok-c\cjson.h
 
-1450532971 source:g:\ngrok-c\main.cpp
+1450587348 source:g:\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -749,7 +749,7 @@
 	"sslbio.h"
 	"nonblocking.h"
 
-1450537686 g:\ngrok-c\config.h
+1450559290 g:\ngrok-c\config.h
 	<stdarg.h>
 	<stdio.h>
 
@@ -791,7 +791,7 @@
 
 1449891970 g:\ngrok-c\bytestool.h
 
-1450586790 g:\ngrok-c\nonblocking.h
+1450559290 g:\ngrok-c\nonblocking.h
 	"config.h"
 	<pthread.h>
 	<string.h>
@@ -804,6 +804,8 @@
 	<unistd.h>
 	<list>
 	"sslbio.h"
+	<netinet/in.h>
+	<netinet/tcp.h>
 
 1449925327 source:g:\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
