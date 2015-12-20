@@ -6,7 +6,7 @@
 #endif
 
 #ifndef ISMBEDTLS
-#define ISMBEDTLS 1
+#define ISMBEDTLS 0
 #endif
 
 

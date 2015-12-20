@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-SER[Shost:yuancheng.kos.org.cn,Sport:44433] -AddTun[Type:http,Lhost:192.168.8.1,Lport:80,Sdname:xxdosgobbbbbbbbbxxxxxxxxxxxxxxxx]" />
+				<Option parameters="-SER[Shost:,Sport:44433] -AddTun[Type:http,Lhost:192.168.8.1,Lport:80,Sdname:xxdosgobbbbbbbbbxxxxxxxxxxxxxxxx]" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
