@@ -69,7 +69,8 @@ inline int SetKeepAlive(int sock){
     return 0;
 }
 #else
-
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 inline int SetKeepAlive(int sock){
     /*有人说是秒单位。。有人说是毫秒单位*/
 int keepalive = 1; // 开启keepalive属性
