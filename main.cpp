@@ -352,13 +352,13 @@ void* proxy( void *arg )
 					    //检测连接是否可用
 						if (check_sock(it1->first)!= 0 )
 						{
-							clearsock(it1->first,tempinfo);
-							socklist.erase(it1++);
-							//关闭远程连接
+						    	//关闭远程连接
 							if(tempinfo->istype==2){
                                 echo("连接本地失败");
 							    shutdown( tempinfo->tosock, 2 );
 							}
+							clearsock(it1->first,tempinfo);
+							socklist.erase(it1++);
 							continue;
 						}
 

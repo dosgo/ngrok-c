@@ -73,6 +73,7 @@ void clearsock(int sock,sockinfo * sock_info)
       #endif
 
       #else
+      shutdown(sock,2);
       net_close(sock);
       #endif
 

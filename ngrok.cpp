@@ -117,7 +117,7 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
 }
 
 int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
-   int readlen;
+   int readlen,sendlen;
    #if OPENSSL
     readlen =  SslRecv(sslinfo1->ssl,buf,maxbuf);
    #else
@@ -143,11 +143,16 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     {
         setnonblocking( tempinfo1->tosock, 0 );
         #if WIN32
-        send( tempinfo1->tosock, (char *) buf, readlen, 0 );
+        sendlen=send( tempinfo1->tosock, (char *) buf, readlen, 0 );
         #else
-        send( tempinfo1->tosock, buf, readlen, 0 );
+        sendlen=send( tempinfo1->tosock, buf, readlen, 0 );
         #endif
         setnonblocking( tempinfo1->tosock, 1 );
+        if(sendlen<1)
+        {
+            shutdown((*it1)->first,2);
+            shutdown(tempinfo1->tosock,2);
+        }
     }
     return 0;
 }
