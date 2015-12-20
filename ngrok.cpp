@@ -21,6 +21,7 @@ using namespace std;
 int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     int proxy_fd = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
     setnonblocking( proxy_fd, 1 );
+    SetKeepAlive(proxy_fd);
     connect( proxy_fd, (struct sockaddr *) &server_addr, sizeof(server_addr) );
     sockinfo * sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
     sinfo->istype		= 1;
@@ -221,6 +222,8 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
                 {
                     tunnelinfo = (*tunnellist)[string( Protocol )];
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
+                    int flag = 1;
+                    setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag) );
                   //  setnonblocking( tcp, 1 );
                     if(connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr))==0)
                     {

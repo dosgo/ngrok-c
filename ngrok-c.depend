@@ -702,7 +702,7 @@
 
 1444176728 g:\ngrok-c\cjson.h
 
-1450449156 source:g:\ngrok-c\main.cpp
+1450532971 source:g:\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -731,6 +731,7 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 	<windows.h>
+	"segment.h"
 	<sys/select.h>
 	<sys/types.h>
 	<sys/stat.h>
@@ -748,7 +749,7 @@
 	"sslbio.h"
 	"nonblocking.h"
 
-1450532939 g:\ngrok-c\config.h
+1450537686 g:\ngrok-c\config.h
 	<stdarg.h>
 	<stdio.h>
 
@@ -790,7 +791,7 @@
 
 1449891970 g:\ngrok-c\bytestool.h
 
-1449916791 g:\ngrok-c\nonblocking.h
+1450586790 g:\ngrok-c\nonblocking.h
 	"config.h"
 	<pthread.h>
 	<string.h>
@@ -991,7 +992,7 @@
 	"config.h"
 	"sslbio.h"
 
-1450453992 source:g:\ngrok-c\ngrok.cpp
+1450586739 source:g:\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>

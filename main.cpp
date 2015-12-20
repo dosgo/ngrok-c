@@ -67,7 +67,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.06-(2015/12/19)";
+string VER = "1.07-(2015/12/20)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -147,10 +147,10 @@ int main( int argc, char **argv )
 		#if DEBUG
 		int pid = getpid();
 	 	printf("The pid is:%d\n", pid);
-	 	signal(SIGSEGV, OutputBacktrace); 
+	 	signal(SIGSEGV, OutputBacktrace);
 		#endif
 	#endif
-	
+
     	printf("ngrokc v%s \r\n",VER.c_str());
 	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
 #if WIN32
