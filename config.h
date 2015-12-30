@@ -40,6 +40,7 @@ inline int hex(char *xx,int len){
         }
     }
     printf("\r\n");
+    return 0;
 }
 
 #endif
