@@ -107,6 +107,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 打开tcp keeplive避免死链问题。
 - 这个版本相对完善，没啥，大问题了。。不更新了。
 
+##2015/12/30
+- 修复一个超长url在大端下,无法使用的bug。
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
