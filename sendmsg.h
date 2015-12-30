@@ -22,7 +22,7 @@ typedef mbedtls_ssl_context ssl_context;
 #else
 #include <errno.h>
 #include <netinet/in.h>
- typedef long long __int64;
+ //typedef unsigned long long __int64;
  #include <string.h>
  #ifndef __UCLIBC__
  #include <sys/select.h>
@@ -159,6 +159,5 @@ int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *Hos
 //#endif
 
 
-__int64 ntoh64(__int64 val );
-__int64 hton64(__int64 val );
+
 #endif

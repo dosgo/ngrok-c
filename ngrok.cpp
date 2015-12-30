@@ -159,7 +159,11 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
 
 int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
     int readlen;
-    __int64		packlen;
+    #if WIN32
+    unsigned __int64		packlen;
+    #else
+    unsigned long long packlen;
+    #endif
     char Protocol[10]={0};
     #if OPENSSL
     readlen =  SslRecv(sslinfo->ssl,buf,maxbuf-1);
@@ -189,7 +193,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
     /* copy到临时缓存区 */
     if ( tempinfo1->packbuflen == 0 )
     {
-        tempinfo1->packbuf = (char *) malloc( maxbuf );
+        tempinfo1->packbuf = (unsigned char *) malloc( maxbuf );
     }
 
 
@@ -276,7 +280,13 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     ssl_info *sslinfo=tempinfo->sslinfo;
     TunnelInfo	*tunnelinfo;
     int readlen;
-    __int64		packlen;
+
+    #if WIN32
+    unsigned __int64 packlen;
+    #else
+    unsigned long long packlen;
+    #endif
+
     #if OPENSSL
     readlen =  SslRecv(sslinfo->ssl,buf,maxbuf);
     #else
@@ -298,7 +308,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     /* copy到临时缓存区 */
     if ( tempinfo->packbuflen == 0 )
     {
-        tempinfo->packbuf = (char *) malloc( maxbuf );
+        tempinfo->packbuf = (unsigned char *) malloc( maxbuf );
     }
     memcpy( tempinfo->packbuf + tempinfo->packbuflen, buf, readlen );
     tempinfo->packbuflen = tempinfo->packbuflen + readlen;
@@ -381,6 +391,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				}
 				cJSON_Delete( json );
 			}
+
 		}
     return 0;
 }

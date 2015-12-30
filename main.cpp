@@ -389,7 +389,7 @@ void* proxy( void *arg )
                                 {
                                     setnonblocking( it1->first, 0 );
                                     #if WIN32
-                                    send(it1->first,tempinfo1->packbuf,tempinfo1->packbuflen, 0 );
+                                    send(it1->first,(char *)tempinfo1->packbuf,tempinfo1->packbuflen, 0 );
                                     #else
                                     send( it1->first, tempinfo1->packbuf, tempinfo1->packbuflen, 0 );
                                     #endif

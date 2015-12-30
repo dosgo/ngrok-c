@@ -96,8 +96,8 @@ struct sockinfo
     int linkunixtime;
     int istype; //1=remote 2=local,3=cmd
     int tosock;
-    char *packbuf;
-    int packbuflen;
+    unsigned char *packbuf;
+    unsigned long long packbuflen;
     int isconnectlocal;
     int isauth;
     int pongtime;
@@ -111,8 +111,8 @@ struct sockinfo
     int linkunixtime;
     int istype; //1=remote 2=local
     int tosock;
-    char *packbuf;
-    int packbuflen;
+    unsigned char *packbuf;
+     unsigned long long packbuflen;
     int isconnectlocal;
     int isauth;
     int pongtime;
