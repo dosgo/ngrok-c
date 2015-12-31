@@ -1,23 +1,23 @@
 ##ngrok-c
 
-- ngrok client for c language.  
-- Before compiling you need to generate libpolarssl.a static library Reference polarssl official website.  
-- contact email dosgo@qq.com.
+- the client of ngrok in language C
+- Before compiling, you need to generate the libpolarssl.a static library(via polarssl official website).
+- contact me via email: dosgo@qq.com
 
 
 
 
 ##build  
 
-ddns.cpp with https.cpp not used.
+ddns.cpp and https.cpp are abondoned 
 
 
 #windows
-Build.bat run in cmd.
+run Build.bat in CLI.
 
 
 #linux
-Because not use makefile, so write a script sh compile, run build.sh
+run build.sh instead of makefile
 
 
 #openwrt
