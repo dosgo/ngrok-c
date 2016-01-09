@@ -298,7 +298,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
         return -1;
     }
 
-    if ( readlen ==-1)
+    if ( readlen ==-1||readlen<1)
     {
         return 0;
     }
