@@ -336,11 +336,12 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				if ( strcmp( Type->valuestring, "AuthResp" ) == 0 )
 				{
 
-					cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
-					char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
+                    cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
 					char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
 					if(strcmp(error,"")==0)
                     {
+
+                        char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
                         *ClientId = string( cid );
                         #if OPENSSL
                         SendPing( *mainsock,sslinfo->ssl );
