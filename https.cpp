@@ -92,7 +92,7 @@ struct http_response* http_req(char *http_headers, struct parsed_url *purl)
 	int sock;
 	int tmpres;
 	char buf[BUFSIZ+1];
-	struct sockaddr_in *remote;
+	struct sockaddr_in remote;
 
 	/* Allocate memeory for htmlcontent */
 	struct http_response *hresp = (struct http_response*)malloc(sizeof(struct http_response));
@@ -111,33 +111,36 @@ struct http_response* http_req(char *http_headers, struct parsed_url *purl)
 	if((sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 	{
 	    printf("Can't create TCP socket");
+	    free(hresp);
 		return NULL;
 	}
 
 	/* Set remote->sin_addr.s_addr */
-	remote = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in *));
-	remote->sin_family = AF_INET;
+	remote.sin_family = AF_INET;
     #if WIN32
-    remote->sin_addr.s_addr= inet_addr(purl->ip);
+    remote.sin_addr.s_addr= inet_addr(purl->ip);
     #else
-  	tmpres = inet_pton(AF_INET, purl->ip, (void *)(&(remote->sin_addr.s_addr)));
+  	tmpres = inet_pton(AF_INET, purl->ip, (void *)(&(remote.sin_addr.s_addr)));
   	if( tmpres < 0)
   	{
     	printf("Can't set remote->sin_addr.s_addr");
+    	free(hresp);
     	return NULL;
   	}
 	else if(tmpres == 0)
   	{
 		printf("Not a valid IP");
+		free(hresp);
     	return NULL;
   	}
     #endif // WIN32
-	remote->sin_port = htons(atoi(purl->port));
+	remote.sin_port = htons(atoi(purl->port));
 
 	/* Connect */
-	if(connect(sock, (struct sockaddr *)remote, sizeof(struct sockaddr)) < 0)
+	if(connect(sock, (struct sockaddr *)&remote, sizeof(struct sockaddr)) < 0)
 	{
 	    printf("Could not connect");
+	    free(hresp);
 		return NULL;
 
 	}
@@ -150,6 +153,7 @@ struct http_response* http_req(char *http_headers, struct parsed_url *purl)
            {
                ssl_free_info(sslinfo);
                free(sslinfo);
+               free(hresp);
                return NULL;
            }
 
@@ -172,9 +176,10 @@ struct http_response* http_req(char *http_headers, struct parsed_url *purl)
 			printf("Can't send headers");
 			if ( strcmp(purl->scheme,"https")==0)
 			{
-			    ssl_free_info(sslinfo);
-			    free(sslinfo);
+				ssl_free_info(sslinfo);
+				free(sslinfo);
 			}
+			free(hresp);
 			return NULL;
 		}
 		sent += tmpres;
@@ -220,6 +225,8 @@ struct http_response* http_req(char *http_headers, struct parsed_url *purl)
 		    ssl_free_info(sslinfo);
 		    free(sslinfo);
         }
+        free(response);
+        free(hresp);
 		return NULL;
     }
 
