@@ -5,14 +5,19 @@
 #if OPENSSL
 int openssl_init_info(int server_fd,openssl_info *sslinfo)
 {
+
     sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
     sslinfo->ssl = SSL_new(sslinfo->ctx);
+
     SSL_set_fd(sslinfo->ssl,server_fd);
-    //������
+    //·Ç×èÈû
     SSL_set_connect_state (sslinfo->ssl);
     //SSL_connect(sslinfo->ssl);
     int r=0;
-    //����������
+
+
+
+    //·Ç×èÈûÎÕÊÖ
     while ((r = SSL_do_handshake(sslinfo->ssl)) != 1) {
         int err = SSL_get_error(sslinfo->ssl, r);
         if (err == SSL_ERROR_WANT_WRITE) {
@@ -25,6 +30,8 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo)
         //CPU sleep
         sleeps(1);
     }
+
+
     return 0;
 }
 
@@ -73,7 +80,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     }
 
     mbedtls_ssl_set_bio( &sslinfo->ssl, server_fd,mbedtls_net_send, mbedtls_net_recv,NULL );
-
+    mbedtls_ssl_set_session(&sslinfo->ssl, &ssn);
     while((ret = mbedtls_ssl_handshake(&sslinfo->ssl))!=0)
     {
         if( ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE )
@@ -94,6 +101,12 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     else
     {
         echo( " ok\n" );
+    }
+    //保存session
+    if( ( ret = mbedtls_ssl_get_session( &sslinfo->ssl, &ssn ) ) != 0 )
+    {
+        //失败初始化
+        memset(&ssn, 0, sizeof(mbedtls_ssl_session));
     }
     return 0;
 }
@@ -127,6 +140,9 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     ssl_set_ca_chain( &sslinfo->ssl, &sslinfo->cacert, NULL, "" );
     ssl_set_rng( &sslinfo->ssl, ctr_drbg_random, &sslinfo->ctr_drbg );
     ssl_set_bio( &sslinfo->ssl, net_recv, server_fd,net_send, server_fd );
+    ssl_set_session(&sslinfo->ssl, &ssn);
+
+
 
     while((ret = ssl_handshake(&sslinfo->ssl))!=0)
     {
@@ -139,8 +155,6 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
         sleeps(1);
     }
 
-
-
     if((ret = ssl_get_verify_result( &sslinfo->ssl ) ) != 0 )
     {
        // echo( "Verifying peer X.509 certificate...failed \r\n" );
@@ -148,6 +162,12 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
     else
     {
         echo( " ok\n" );
+    }
+    //保存session加快握手速度
+    if( ( ret = ssl_get_session( &sslinfo->ssl, &ssn ) ) != 0 )
+    {
+        //失败初始化
+        memset(&ssn, 0, sizeof(ssl_session));
     }
     return 0;
 }

@@ -3,10 +3,14 @@
 #include "config.h"
 #include<malloc.h>
 
+
+
+
 #if OPENSSL
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<openssl/err.h>
+
 struct openssl_info
 {
     SSL *ssl;
@@ -61,13 +65,12 @@ typedef mbedtls_ssl_context ssl_context;
 typedef mbedtls_ssl_session ssl_session;
 typedef mbedtls_x509_crt x509_crt;
 typedef mbedtls_x509_crt x509_crt;
-
+static mbedtls_ssl_session ssn;
 struct ssl_info
 {
     entropy_context entropy;
     ctr_drbg_context ctr_drbg;
     ssl_context ssl;
-    ssl_session ssn;
     mbedtls_ssl_config conf;
     x509_crt cacert;
 };
@@ -104,7 +107,7 @@ inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 #include <polarssl/ctr_drbg.h>
 #include <polarssl/error.h>
 #include <polarssl/certs.h>
-
+static ssl_session ssn;
 
 inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 {
@@ -129,7 +132,6 @@ struct ssl_info
     entropy_context entropy;
     ctr_drbg_context ctr_drbg;
     ssl_context ssl;
-    ssl_session ssn;
     x509_crt cacert;
 };
 #endif // ISMBEDTLS
@@ -153,6 +155,19 @@ inline int ssl_free_info(ssl_info *sslinfo){
     return 0;
 }
 #endif
+
+inline int init_ssl_session(){
+    #if OPENSSL
+    #else
+    #if ISMBEDTLS
+    static ssl_session ssn;
+    memset(&ssn,0,sizeof(mbedtls_ssl_session));
+    #else
+    memset(&ssn,0,sizeof(ssl_session));
+    #endif // ISMBEDTLS
+    #endif // OPENSSL
+    return 0;
+}
 #endif // SSLBIO_H_INCLUDED
 
 

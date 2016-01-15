@@ -180,6 +180,8 @@ SSL_library_init();
 SSL_load_error_strings();
 OpenSSL_add_all_algorithms();
 #endif // OPENSSL
+    init_ssl_session();
+
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
 	lastdnstime	= get_curr_unixtime();
