@@ -67,7 +67,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.10-(2016/1/9)";
+string VER = "1.12-(2016/1/15)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -180,6 +180,8 @@ SSL_library_init();
 SSL_load_error_strings();
 OpenSSL_add_all_algorithms();
 #endif // OPENSSL
+    init_ssl_session();
+
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
 	lastdnstime	= get_curr_unixtime();

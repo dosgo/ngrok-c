@@ -56,10 +56,12 @@ int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
 int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,map<int,sockinfo*>*socklist){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
+
    #if OPENSSL
 
     if ( openssl_init_info((*it1)->first, sslinfo ) != -1 )
     {
+        setnonblocking((*it1)->first,1);
         SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
     }
     else
@@ -73,7 +75,8 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     #else
     if (ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
     {
-          SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId );
+
+        SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId );
     }
     else
     {
