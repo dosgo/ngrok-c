@@ -155,7 +155,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort);
+int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
 //#endif
 
 

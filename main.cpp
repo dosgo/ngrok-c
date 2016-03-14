@@ -67,7 +67,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.12-(2016/1/15)";
+string VER = "1.13-(2016/3/12)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -331,7 +331,7 @@ void* proxy( void *arg )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,&tunneloklist,&tunnellist);
+                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,authtoken,&tunneloklist,&tunnellist);
                          if(backcode==-1)
                          {
 
