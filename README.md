@@ -113,6 +113,10 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##2016/3/12
 - 增加http://www.ngrok.cc/服务器支持
 
+##2016/3/29
+- 增加openssl库动态加载，以方便编译openwrt版本。
+- 增加openwrt傻瓜编译教程。
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
@@ -150,6 +154,14 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 还有，最后一行的libpolarssl-mips.a改成2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）.
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
+      - 
+ - 3.openwrt傻瓜编译教程。
+      - 去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
+      - 编辑openwrtbuildv2.sh 修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK。
+      - 把include/openssl，复制到你的下载的sdk,/home/dosgo/OpenWrt-SDK/staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include目录，
+      - 运行编辑openwrtbuildv2.sh,就会在build-mips生成一个叫ngrokc的文件。成功了。。把它复制到bin目录。就可以运行ngrokc了。
+      - 记得安装，libopenssl.ipk，官网有下载。
+      
 
 
 编译就这样了，以后请不要邮件问我怎么编译了，有bug可以联系。
