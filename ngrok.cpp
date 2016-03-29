@@ -101,7 +101,11 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     {
         setnonblocking( tempinfo->tosock, 0 );
         #if OPENSSL
+        #if OPENSSLDL
+        SslWrite( sslinfo->ssl, buf, readlen );
+        #else
         SSL_write( sslinfo->ssl, buf, readlen );
+        #endif // OPENSSLDL
         #else
         #if ISMBEDTLS
         mbedtls_ssl_write( &sslinfo->ssl, (unsigned char *)buf, readlen );

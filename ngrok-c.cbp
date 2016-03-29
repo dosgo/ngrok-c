@@ -22,8 +22,6 @@
 					<Add library="d:\TDM-GCC-32\lib\libpthreadGC2.dll.a" />
 					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
 					<Add library="D:\c\ngrok-c\libmbedcrypto-win32.a" />
-					<Add library="D:\c\ngrok-c\openssl\libcrypto.dll.a" />
-					<Add library="D:\c\ngrok-c\openssl\libssl.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -63,6 +61,8 @@
 		<Unit filename="ngrok.h" />
 		<Unit filename="nonblocking.cpp" />
 		<Unit filename="nonblocking.h" />
+		<Unit filename="openssldl.cpp" />
+		<Unit filename="openssldl.h" />
 		<Unit filename="sendmsg.cpp" />
 		<Unit filename="sendmsg.h" />
 		<Unit filename="sslbio.cpp" />

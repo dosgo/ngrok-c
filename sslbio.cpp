@@ -5,19 +5,32 @@
 #if OPENSSL
 int openssl_init_info(int server_fd,openssl_info *sslinfo)
 {
+    #if OPENSSLDL
+    sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV3());
+    sslinfo->ssl = SslNew(sslinfo->ctx);
+    SslSetFd(sslinfo->ssl,server_fd);
+    SslSetConnectState (sslinfo->ssl);
+    int r=0;
+    while ((r = SslDoHandshake(sslinfo->ssl)) != 1) {
+        int err = SslGetError(sslinfo->ssl, r);
+        if (err == SSL_ERROR_WANT_WRITE) {
 
+        } else if (err == SSL_ERROR_WANT_READ) {
+
+        } else {
+            return -1;
+        }
+        //CPU sleep
+        sleeps(1);
+    }
+    #else
     sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
     sslinfo->ssl = SSL_new(sslinfo->ctx);
-
     SSL_set_fd(sslinfo->ssl,server_fd);
-    //·Ç×èÈû
     SSL_set_connect_state (sslinfo->ssl);
     //SSL_connect(sslinfo->ssl);
     int r=0;
-
-
-
-    //·Ç×èÈûÎÕÊÖ
+    //·
     while ((r = SSL_do_handshake(sslinfo->ssl)) != 1) {
         int err = SSL_get_error(sslinfo->ssl, r);
         if (err == SSL_ERROR_WANT_WRITE) {
@@ -30,8 +43,7 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo)
         //CPU sleep
         sleeps(1);
     }
-
-
+    #endif // OPENSSLDL
     return 0;
 }
 

@@ -67,7 +67,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.13-(2016/3/12)";
+string VER = "1.14-(2016/3/29)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -176,9 +176,18 @@ int main( int argc, char **argv )
 #endif
 
 #if OPENSSL
+#if OPENSSLDL
+const char *err=AbreSSL();
+if(err!=NULL)
+{
+    printf("OpenSSL init fail.\r\nPlease check if the OpenSSL is installed. \r\n%s not found.\r\n",err);
+    exit(0);
+}
+#else
 SSL_library_init();
 SSL_load_error_strings();
 OpenSSL_add_all_algorithms();
+#endif
 #endif // OPENSSL
     init_ssl_session();
 
