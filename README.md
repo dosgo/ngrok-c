@@ -38,10 +38,15 @@ Atoken  -ngrok authtoken. //服务器认证串
 
 
 type    -tcp or http or https.   //要映射的类型，tcp,http,https
+
 Lhost   -local address.     //本地地址，如果是本机直接127.0.0.1
+
 Lport   -local port.     //本地端口
+
 sdname  -Subdomain.     //子域名
+
 Hostname -hostname      //自定义域名映射      
+
 Rport    -remote port  //远程端口，tcp映射的时候，制定端口使用。
 
 
