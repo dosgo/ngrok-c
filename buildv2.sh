@@ -10,7 +10,7 @@ rm -rf $DIR/ngrokc
 rm -rf $DIR/sslbio.o
 rm -rf $DIR/openssldl.o
 CC=g++
-YH="-g  -rdynamic"
+YH="-g  -rdynamic -DOPENSSL=1 -DOPENSSLDL=1"
 $CC  $YH  -c sendmsg.cpp -o $DIR/sendmsg.o
 $CC  $YH  -c openssldl.cpp -o $DIR/openssldl.o
 $CC  $YH -c cJSON.c -o $DIR/cJSON.o

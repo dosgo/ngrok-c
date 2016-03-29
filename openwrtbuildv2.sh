@@ -12,7 +12,7 @@ rm -rf $DIR/openssldl.o
 rm -rf $DIR/ngrokc
 
 CC=mips-openwrt-linux-g++
-YH="-Wall -fexceptions -O2"
+YH="-Wall -fexceptions -DOPENSSL=1 -DOPENSSLDL=1  -O2"
 $CC $YH -c $1 sendmsg.cpp -o $DIR/sendmsg.o
 $CC $YH -c openssldl.cpp -o $DIR/openssldl.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
