@@ -29,11 +29,14 @@ run openwrtbuild.sh
 ##使用说明
 
 命令
+
 ngrok-polarssl -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xxx] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo]
 
 
 Shost   -Server host.   //服务器host
+
 Sport   -server port.   //服务器端口
+
 Atoken  -ngrok authtoken. //服务器认证串
 
 
