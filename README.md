@@ -129,6 +129,12 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 增加openwrt傻瓜编译教程。
 - 关于需要luci界面的，恩山有大神写了。我提交了。叫luci-app-ngrokc_git-15.290.16504-8c2fd44-1_all.ipk,下载安装好以后把编译好的ngrokc替换/usr/bin/里面的ngrokc，改权限，重启就可以了。。
 
+##2016/3/31
+- 修复openssl版本连接不了sslv2服务器问题。
+
+
+
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
@@ -158,7 +164,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
 
 
-- 2.openssl版本
+- 2.polarssl版本
       - 把下载的polarssl里面的include/polarssl，或者include/mbedtls 文件夹复制到，你SDK里面的staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include里面，（可能根据SDK路径有所不同）。
       - 然后把第二步生成的，2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）放到ngrok-c目录。
       - 再修改，ngrok-c里面的config.h，#define OPENSSL 1，改成#define OPENSSL 0，如你的是2.0版本，请ISMBEDTLS 0改成ISMBEDTLS 1，如果是1.3，ISMBEDTLS 0
