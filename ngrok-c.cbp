@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-SER[Shost:tunnel.phpor.me,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo]" />
+				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo]" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -22,6 +22,8 @@
 					<Add library="d:\TDM-GCC-32\lib\libpthreadGC2.dll.a" />
 					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
 					<Add library="D:\c\ngrok-c\libmbedcrypto-win32.a" />
+					<Add library="D:\c\test\ngrok-c\openssl\libcrypto.dll.a" />
+					<Add library="D:\c\test\ngrok-c\openssl\libssl.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">

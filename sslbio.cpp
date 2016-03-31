@@ -6,7 +6,7 @@
 int openssl_init_info(int server_fd,openssl_info *sslinfo)
 {
     #if OPENSSLDL
-    sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV3());
+    sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV23());
     sslinfo->ssl = SslNew(sslinfo->ctx);
     SslSetFd(sslinfo->ssl,server_fd);
     SslSetConnectState (sslinfo->ssl);
@@ -24,7 +24,7 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo)
         sleeps(1);
     }
     #else
-    sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv3_method());
+    sslinfo->ctx = (SSL_CTX*)SSL_CTX_new (SSLv23_method());
     sslinfo->ssl = SSL_new(sslinfo->ctx);
     SSL_set_fd(sslinfo->ssl,server_fd);
     SSL_set_connect_state (sslinfo->ssl);
