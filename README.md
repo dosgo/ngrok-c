@@ -139,6 +139,11 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 修复openssl版本连接不了sslv2服务器问题。
 
 
+##2016/4/4
+- 去掉线程减少内存占用。
+- 修改发送接收缓存区大小，避免阻塞。
+
+
 
 
 ###关于编译对应路由的版本的ngrokc。
