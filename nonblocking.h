@@ -1,10 +1,13 @@
 #ifndef NONBLOCKING_H_INCLUDED
 #define NONBLOCKING_H_INCLUDED
 #include "config.h"
-#include <pthread.h>
+
 #include <string.h>
 #if  WIN32
+#include <winsock.h>
+#include <winsock2.h>
 #include <windows.h>
+
 #else
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -19,31 +22,28 @@
 using namespace std;
 
 #if WIN32
- #if   _MSC_VER   >   1000
-  #pragma   once
-  #endif
 
-  /*   Argument   structure   for   SIO_KEEPALIVE_VALS   */
+struct tcp_keepalive {
+  u_long onoff;
+  u_long keepalivetime;
+  u_long keepaliveinterval;
+};
 
-  struct   tcp_keepalive   {
-          u_long     onoff;
-          u_long     keepalivetime;
-          u_long     keepaliveinterval;
-  };
+#define SIO_RCVALL _WSAIOW(IOC_VENDOR,1)
+#define SIO_RCVALL_MCAST _WSAIOW(IOC_VENDOR,2)
+#define SIO_RCVALL_IGMPMCAST _WSAIOW(IOC_VENDOR,3)
+#define SIO_KEEPALIVE_VALS _WSAIOW(IOC_VENDOR,4)
+#define SIO_ABSORB_RTRALERT _WSAIOW(IOC_VENDOR,5)
+#define SIO_UCAST_IF _WSAIOW(IOC_VENDOR,6)
+#define SIO_LIMIT_BROADCASTS _WSAIOW(IOC_VENDOR,7)
+#define SIO_INDEX_BIND _WSAIOW(IOC_VENDOR,8)
+#define SIO_INDEX_MCASTIF _WSAIOW(IOC_VENDOR,9)
+#define SIO_INDEX_ADD_MCAST _WSAIOW(IOC_VENDOR,10)
+#define SIO_INDEX_DEL_MCAST _WSAIOW(IOC_VENDOR,11)
 
-  //   New   WSAIoctl   Options
-
-  #define   SIO_RCVALL                         _WSAIOW(IOC_VENDOR,1)
-  #define   SIO_RCVALL_MCAST             _WSAIOW(IOC_VENDOR,2)
-  #define   SIO_RCVALL_IGMPMCAST     _WSAIOW(IOC_VENDOR,3)
-  #define   SIO_KEEPALIVE_VALS         _WSAIOW(IOC_VENDOR,4)
-  #define   SIO_ABSORB_RTRALERT       _WSAIOW(IOC_VENDOR,5)
-  #define   SIO_UCAST_IF                     _WSAIOW(IOC_VENDOR,6)
-  #define   SIO_LIMIT_BROADCASTS     _WSAIOW(IOC_VENDOR,7)
-  #define   SIO_INDEX_BIND                 _WSAIOW(IOC_VENDOR,8)
-  #define   SIO_INDEX_MCASTIF           _WSAIOW(IOC_VENDOR,9)
-  #define   SIO_INDEX_ADD_MCAST       _WSAIOW(IOC_VENDOR,10)
-  #define   SIO_INDEX_DEL_MCAST       _WSAIOW(IOC_VENDOR,11)
+#define RCVALL_OFF 0
+#define RCVALL_ON 1
+#define RCVALL_SOCKETLEVELONLY 2
 
 inline int SetKeepAlive(int sock){
     BOOL bKeepAlive = TRUE;
@@ -60,8 +60,7 @@ inline int SetKeepAlive(int sock){
     alive_in.keepaliveinterval =60000; // 两次KeepAlive探测间的时间间隔
     alive_in.onoff = TRUE;
     unsigned long ulBytesReturn =0;
-    nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),
-    &alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
+   // nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
     if (nRet == SOCKET_ERROR)
     {
     return -1;
@@ -162,4 +161,15 @@ inline int check_sock(int sock)
 }
 
 void clearsock(int sock,sockinfo * sock_info);
+
+inline int SetBufSize(int sock)
+{
+    //接收缓冲区
+    int opt=12*1024;
+    setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char*)&opt,sizeof(opt));
+    //发送缓冲区
+    setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
+    return 0;
+}
+
 #endif // NONBLOCKING_H_INCLUDED

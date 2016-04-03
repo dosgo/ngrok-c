@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <pthread.h>
 #include <map>
 #include <list>
 #include <iostream>
@@ -67,25 +66,25 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.15-(2016/3/31)";
+string VER = "1.17-(2016/4/4)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
-char authtoken[255]="1zW3MqEwX4iHmbtSAk3t";
+char authtoken[255]="";
 string ClientId = "";
-int		proxyrun	= 0;
 int		pingtime	= 0;
 int		ping		= 25; //不能大于30
-int		linktime	= 45;
 int		mainsock=0;
 int		lastdnstime=0;
+int     lastchecktime=0;
+int     checktime=60;
 int		lastdnsback;
 ssl_info *mainsslinfo=NULL;
 void* sockmain( void *arg );
-void* proxy( void *arg );
+void* proxy( );
 
 struct sockaddr_in server_addr = { 0 };
-//pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 map<int,sockinfo*>socklist;
 map<string,TunnelInfo*>tunnellist;
@@ -105,57 +104,29 @@ void cs( int n )
 
 int CheckStatus()
 {
-    sockinfo *tempinfo;
-	if ( proxyrun == 0 )
-	{
-		proxyrun = 1;
-		pthread_t tproxy;
-        pthread_attr_t attr;
-        pthread_attr_init( &attr );
-        pthread_attr_setdetachstate(&attr,1); //set detach
-        pthread_attr_setstacksize(&attr,2048*1024); //set stacksize 2M
-		pthread_create(&tproxy,&attr,&proxy,NULL);
-	}
-    //判断是否存在
-	if (socklist.count(mainsock)==0||mainsock==0)
-	{
-	    //连接失败
-        if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
+    if(lastchecktime==0||(lastchecktime + checktime) < get_curr_unixtime()){
+        //判断是否存在
+        if (socklist.count(mainsock)==0||mainsock==0)
         {
-            printf("link err\r\n");
-            return -1;
+            //连接失败
+            if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
+            {
+                printf("link err\r\n");
+                return -1;
+            }
         }
-
-	}
-	else
-    {   //检测心跳时间
-	    tempinfo=socklist[mainsock];
-		if ((tempinfo->pongtime < (pingtime-ping-10) && pingtime != 0) )
-		{
-			shutdown( mainsock, 2 );
-			mainsock = 0;
-		}
-	}
+    }
 	return(0);
 }
 
 
 int main( int argc, char **argv )
 {
-	#if WIN32
-	#else
-		#if DEBUG
-		int pid = getpid();
-	 	printf("The pid is:%d\n", pid);
-	 	signal(SIGSEGV, OutputBacktrace);
-		#endif
-	#endif
-
-    	printf("ngrokc v%s \r\n",VER.c_str());
+    printf("ngrokc v%s \r\n",VER.c_str());
 	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
-#if WIN32
+    #if WIN32
 	signal( SIGINT, cs );
-#else
+    #else
 	/* socket close hui fa song xing hao dao zhi tui chu */
 	signal( SIGPIPE, SIG_IGN );
 	struct sigaction sigIntHandler;
@@ -163,17 +134,17 @@ int main( int argc, char **argv )
 	sigemptyset( &sigIntHandler.sa_mask );
 	sigIntHandler.sa_flags = 0;
 	sigaction( SIGINT, &sigIntHandler, NULL );
-#endif
+    #endif
 
 
-#if WIN32
+    #if WIN32
 	WSADATA wsaData = { 0 };
 	if ( 0 != WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) )
 	{
 		printf( "WSAStartup failed. errno=[%d]\n", WSAGetLastError() );
 		return(-1);
 	}
-#endif
+    #endif
 
 #if OPENSSL
 #if OPENSSLDL
@@ -194,30 +165,14 @@ OpenSSL_add_all_algorithms();
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
 	lastdnstime	= get_curr_unixtime();
-
-	while ( true )
-	{
-
-		if ( lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
-		{
-			lastdnsback	= net_dns( &server_addr, s_name, s_port );
-			lastdnstime	= get_curr_unixtime();
-			printf( "update dns\r\n" );
-		}
-		//dns解析失败
-        if (lastdnsback != -1)
-        {
-            CheckStatus();
-        }
-		sleeps(ping * 1000);
-	}
+    proxy();
 	return(0);
 }
 
 
-void* proxy( void *arg )
+void* proxy(  )
 {
-	pthread_detach( pthread_self() );
+
 	fd_set	writeSet;
 	fd_set	readSet;
 	int		maxfd = 0;
@@ -233,10 +188,11 @@ void* proxy( void *arg )
 	map<int, sockinfo*>::iterator it;
 	map<int, sockinfo*>::iterator it1;
 	map<int, sockinfo*>::iterator it2;
+	map<int, sockinfo*>::iterator it3;
 	int backcode=0;
-	while ( proxyrun )
+	while ( true )
 	{
-
+        //ping
 	    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
         {
 
@@ -249,11 +205,34 @@ void* proxy( void *arg )
             if(sendlen==-1)
             {
                 shutdown( mainsock,2);
+                //释放所有连接
+                for ( it3 = socklist.begin(); it3 != socklist.end(); )
+                {
+                    clearsock( it1->first,  it1->second);
+                }
+                socklist.clear();
+                tunneloklist.clear();
                 mainsock = 0;
-                proxyrun=0;
+                continue;
             }
             pingtime = get_curr_unixtime();
 	    }
+
+
+	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
+		{
+			lastdnsback	= net_dns( &server_addr, s_name, s_port );
+			lastdnstime	= get_curr_unixtime();
+			printf( "update dns\r\n" );
+		}
+		//dns解析成功
+        if (lastdnsback != -1)
+        {
+            CheckStatus();
+        }
+
+
+
 
 		timeout.tv_sec	= 0;
 		timeout.tv_usec = 5000;
@@ -280,8 +259,6 @@ void* proxy( void *arg )
 			//继续遍历
 			++it;
 		}
-
-
 
 
 
@@ -420,7 +397,5 @@ void* proxy( void *arg )
 		//睡1豪秒，避免CPU过高
 		sleeps(2);
 	}
-	/* 退出 */
-	proxyrun = 0;
 	return(0);
 }
