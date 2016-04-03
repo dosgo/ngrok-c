@@ -2,11 +2,15 @@
 #define __CONFIG_H__
 
 #ifndef OPENSSL
-#define OPENSSL 0
+#define OPENSSL 1
+#endif
+
+#ifndef OPENSSLDL
+#define OPENSSLDL 1
 #endif
 
 #ifndef ISMBEDTLS
-#define ISMBEDTLS 1
+#define ISMBEDTLS 0
 #endif
 
 

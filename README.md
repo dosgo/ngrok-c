@@ -26,20 +26,31 @@ run openwrtbuild.sh
 
 
 
-##use 
+##使用说明
+
+命令
 
 ngrok-polarssl -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xxx] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo]
 
 
-Shost   -Server host.  
-Sport   -server port.  
-Atoken  -ngrok authtoken.
+Shost   -Server host.   //服务器host
+
+Sport   -server port.   //服务器端口
+
+Atoken  -ngrok authtoken. //服务器认证串
 
 
-type    -tcp or http or https.  
-Lhost   -local address.  
-Lport   -local port.  
-sdname  -Subdomain.
+type    -tcp or http or https.   //要映射的类型，tcp,http,https
+
+Lhost   -local address.     //本地地址，如果是本机直接127.0.0.1
+
+Lport   -local port.     //本地端口
+
+sdname  -Subdomain.     //子域名
+
+Hostname -hostname      //自定义域名映射      
+
+Rport    -remote port  //远程端口，tcp映射的时候，制定端口使用。
 
 
 ##Example
@@ -110,6 +121,20 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##2015/12/30
 - 修复一个超长url在大端下,无法使用的bug。
 
+##2016/3/12
+- 增加http://www.ngrok.cc/服务器支持
+
+##2016/3/29
+- 增加openssl库动态加载，以方便编译openwrt版本。
+- 增加openwrt傻瓜编译教程。
+- 关于需要luci界面的，恩山有大神写了。我提交了。叫luci-app-ngrokc_git-15.290.16504-8c2fd44-1_all.ipk,下载安装好以后把编译好的ngrokc替换/usr/bin/里面的ngrokc，改权限，重启就可以了。。
+
+##2016/3/31
+- 修复openssl版本连接不了sslv2服务器问题。
+
+
+
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
@@ -139,7 +164,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
 
 
-- 2.openssl版本
+- 2.polarssl版本
       - 把下载的polarssl里面的include/polarssl，或者include/mbedtls 文件夹复制到，你SDK里面的staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include里面，（可能根据SDK路径有所不同）。
       - 然后把第二步生成的，2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）放到ngrok-c目录。
       - 再修改，ngrok-c里面的config.h，#define OPENSSL 1，改成#define OPENSSL 0，如你的是2.0版本，请ISMBEDTLS 0改成ISMBEDTLS 1，如果是1.3，ISMBEDTLS 0
@@ -147,6 +172,14 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 还有，最后一行的libpolarssl-mips.a改成2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）.
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
+      
+- 3.openwrt傻瓜编译教程。
+      - 去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
+      - 编辑openwrtbuildv2.sh 修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK。
+      - 把include/openssl，复制到你的下载的sdk,/home/dosgo/OpenWrt-SDK/staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include目录，
+      - 运行编辑openwrtbuildv2.sh,就会在build-mips生成一个叫ngrokc的文件。成功了。。把它复制到bin目录。就可以运行ngrokc了。
+      - 记得安装，libopenssl.ipk，官网有下载。
+      
 
 
 编译就这样了，以后请不要邮件问我怎么编译了，有bug可以联系。

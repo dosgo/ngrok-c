@@ -7,6 +7,7 @@
 
 
 #if OPENSSL
+
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<openssl/err.h>
@@ -21,11 +22,19 @@ int openssl_init_info(int server_fd,openssl_info *sslinfo);
 int openssl_free_info(openssl_info *sslinfo);
 typedef openssl_info ssl_info;
 
-
+#if OPENSSLDL
+#include "openssldl.h"
+#endif // OPENSSLDL
 inline int SslRecv(SSL* ssl, char* buffer, int ilen)
 {
-  int  r=SSL_read(ssl,buffer,ilen);
-  switch(SSL_get_error(ssl,r)){
+  #if OPENSSLDL
+   int  r=SslRead(ssl,buffer,ilen);
+   switch(SslGetError(ssl,r)){
+  #else
+     int  r=SSL_read(ssl,buffer,ilen);
+     switch(SSL_get_error(ssl,r)){
+  #endif
+
     case SSL_ERROR_NONE:
       return r;
     case SSL_ERROR_ZERO_RETURN:
@@ -40,9 +49,15 @@ inline int SslRecv(SSL* ssl, char* buffer, int ilen)
 
 inline int openssl_free_info(openssl_info *sslinfo)
 {
+    #if OPENSSLDL
+    SslShutdown( sslinfo->ssl );
+    SslFree( sslinfo->ssl );
+    SslCtxFree( sslinfo->ctx  );
+    #else
     SSL_shutdown( sslinfo->ssl );
     SSL_free( sslinfo->ssl );
     SSL_CTX_free( sslinfo->ctx  );
+    #endif // OPENSSLDL
    //CRYPTO_cleanup_all_ex_data();
     //ERR_remove_state();
     return 0;

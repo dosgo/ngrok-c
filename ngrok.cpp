@@ -101,7 +101,11 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     {
         setnonblocking( tempinfo->tosock, 0 );
         #if OPENSSL
+        #if OPENSSLDL
+        SslWrite( sslinfo->ssl, buf, readlen );
+        #else
         SSL_write( sslinfo->ssl, buf, readlen );
+        #endif // OPENSSLDL
         #else
         #if ISMBEDTLS
         mbedtls_ssl_write( &sslinfo->ssl, (unsigned char *)buf, readlen );
@@ -273,7 +277,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
 }
 
 
-int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,map<string,int>*tunneloklist,map<string,TunnelInfo*>*tunnellist){
+int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,int>*tunneloklist,map<string,TunnelInfo*>*tunnellist){
    //¼ì²âÊÇ·ñ¶Ï¿ª
    if(check_sock(*mainsock)!= 0)
    {
@@ -359,9 +363,9 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
                         {
                             tunnelinfo = it->second;
                             #if OPENSSL
-                            SendReqTunnel(*mainsock,sslinfo->ssl, it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            SendReqTunnel(*mainsock,sslinfo->ssl, it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
                             #else
-                            SendReqTunnel(*mainsock,&sslinfo->ssl,it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport );
+                            SendReqTunnel(*mainsock,&sslinfo->ssl,it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport,authtoken );
                             #endif
                         }
                     }

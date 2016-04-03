@@ -5,6 +5,7 @@
 #include <windows.h>
 #else
 #include <errno.h>
+#include <sys/select.h>
 #include <netinet/in.h>
 inline void milliseconds_sleep( unsigned long mSec )
 {

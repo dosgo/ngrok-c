@@ -109,7 +109,11 @@ inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
         setnonblocking(sock,0);
     }
     #if OPENSSL
+        #if OPENSSLDL
+        int len=SslWrite( ssl, buffer, 8+strlen(msgstr));
+        #else
         int len=SSL_write( ssl, buffer, 8+strlen(msgstr));
+        #endif // OPENSSL
     #else
         #if ISMBEDTLS
             int len=mbedtls_ssl_write(ssl, buffer, 8+strlen(msgstr));
@@ -155,7 +159,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort);
+int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
 //#endif
 
 
