@@ -23,7 +23,13 @@ run build.sh instead of makefile
 #openwrt
 run openwrtbuild.sh
 
-
+#tomatoware
+###openssl
+cp Makefile.openssl.static Makefile
+make
+###porlarssl
+cp Makefile.porlarssl.static Makefile
+make
 
 
 ##使用说明
