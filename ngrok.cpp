@@ -22,6 +22,7 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     int proxy_fd = socket( AF_INET, SOCK_STREAM, 0 );
     int flag = 1;
     setsockopt( proxy_fd, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
+    SetBufSize(proxy_fd);
     setnonblocking( proxy_fd, 1 );
     SetKeepAlive(proxy_fd);
     connect( proxy_fd, (struct sockaddr *) &server_addr, sizeof(server_addr) );
@@ -242,6 +243,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
                     int flag = 1;
                     setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
+                    SetBufSize(tcp);
                    // SOL_SOCKET
                   //  setnonblocking( tcp, 1 );
                     if(connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr))==0)
@@ -407,7 +409,8 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken)
 {
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
-	if(connect( *mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
+    SetBufSize(*mainsock);
+	if(connect(*mainsock, (struct sockaddr *) &server_addr, sizeof(server_addr) ) != 0 )
 	{
         echo("connect failed...!\r\n");
         #if WIN32
