@@ -464,12 +464,11 @@
 
 1459702993 d:\c\ngrok-c\cjson.h
 
-1457782393 source:d:\c\ngrok-c\main.cpp
+1459869184 source:d:\c\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
 	<errno.h>
-	<pthread.h>
 	<map>
 	<list>
 	<iostream>

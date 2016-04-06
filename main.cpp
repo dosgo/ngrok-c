@@ -66,7 +66,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.17-(2016/4/4)";
+string VER = "1.18-(2016/4/5)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -208,7 +208,7 @@ void* proxy(  )
                 //释放所有连接
                 for ( it3 = socklist.begin(); it3 != socklist.end(); )
                 {
-                    clearsock( it1->first,  it1->second);
+                    clearsock( it3->first,  it3->second);
                 }
                 socklist.clear();
                 tunneloklist.clear();
