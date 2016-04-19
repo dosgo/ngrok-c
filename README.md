@@ -145,6 +145,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 去掉线程减少内存占用。
 - 修改发送接收缓存区大小，避免阻塞。
 
+##2016/04/19
+- 1.17版本，长期运行会出问题，建议2天定时重启。
 
 
 
