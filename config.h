@@ -10,10 +10,10 @@
 #endif
 
 #ifndef ISMBEDTLS
-#define ISMBEDTLS 0
+#define ISMBEDTLS 1
 #endif
 
-#define MAXBUF 2048
+#define MAXBUF 9216
 #define DEBUG 0
 
 #include <stdarg.h>
