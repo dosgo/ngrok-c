@@ -66,7 +66,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.19-(2016/4/19)";
+string VER = "1.20-(2016/4/19)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -76,9 +76,9 @@ int		pingtime	= 0;
 int		ping		= 25; //不能大于30
 int		mainsock=0;
 int		lastdnstime=0;
-int     lastchecktime=0;
-int     checktime=60;
+int mainsockstatus=1;
 int		lastdnsback;
+int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
 void* sockmain( void *arg );
 void* proxy( );
@@ -88,8 +88,6 @@ struct sockaddr_in server_addr = { 0 };
 
 map<int,sockinfo*>socklist;
 map<string,TunnelInfo*>tunnellist;
-map<string,int>tunneloklist;
-
 
 void cs( int n )
 {
@@ -104,14 +102,17 @@ void cs( int n )
 
 int CheckStatus()
 {
-    if(lastchecktime==0||(lastchecktime + checktime) < get_curr_unixtime()){
-        //判断是否存在
-        if (socklist.count(mainsock)==0||mainsock==0)
-        {
+
+    //判断是否存在
+    if (socklist.count(mainsock)==0||mainsock==0)
+    {
+        if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
             if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
             {
+                mainsockstatus=0;
                 printf("link err\r\n");
+                lasterrtime=get_curr_unixtime();
                 return -1;
             }
         }
@@ -177,7 +178,7 @@ void* proxy(  )
 	fd_set	readSet;
 	int		maxfd = 0;
 	unsigned char	buf[MAXBUF];
-	char		tempjson[MAXBUF + 1];
+	char	tempjson[MAXBUF + 1];
 	struct timeval	timeout;
 
 	int		maxfdp		= 0;
@@ -204,20 +205,24 @@ void* proxy(  )
             //发送失败断开连接
             if(sendlen==-1)
             {
-                shutdown( mainsock,2);
-                //释放所有连接
-                for ( it3 = socklist.begin(); it3 != socklist.end(); )
-                {
-                    clearsock( it3->first,  it3->second);
-                }
-                socklist.clear();
-                tunneloklist.clear();
-                mainsock = 0;
-                continue;
+                mainsockstatus=0;
             }
             pingtime = get_curr_unixtime();
 	    }
-
+        //控制链接断开,关闭所有连接
+        if(mainsockstatus==0){
+            shutdown( mainsock,2);
+            //释放所有连接
+            for ( it3 = socklist.begin(); it3 != socklist.end(); )
+            {
+                clearsock( it3->first,  it3->second);
+                it3++;
+            }
+            socklist.clear();
+            mainsock = 0;
+            //改回状态
+            mainsockstatus=1;
+        }
 
 	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
 		{
@@ -228,6 +233,7 @@ void* proxy(  )
 		//dns解析成功
         if (lastdnsback != -1)
         {
+           // printf("CheckStatus11");
             CheckStatus();
         }
 
@@ -317,15 +323,13 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,authtoken,&tunneloklist,&tunnellist);
+                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,authtoken,&tunnellist);
                          if(backcode==-1)
                          {
-
-                            clearsock( it1->first, tempinfo );
-							socklist.erase(it1++);
-							mainsock=0;
-							tunneloklist.clear();
-                            continue;
+                             //控制链接断开，标记清空
+                             mainsockstatus=0;
+                             lasterrtime=get_curr_unixtime();
+                             break;
                          }
                     }
 

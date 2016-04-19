@@ -60,7 +60,7 @@ inline int SetKeepAlive(int sock){
     alive_in.keepaliveinterval =60000; // 两次KeepAlive探测间的时间间隔
     alive_in.onoff = TRUE;
     unsigned long ulBytesReturn =0;
-   // nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
+    //nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
     if (nRet == SOCKET_ERROR)
     {
     return -1;

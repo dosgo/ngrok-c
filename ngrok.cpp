@@ -36,14 +36,13 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     (*socklist).insert( map<int, sockinfo*> :: value_type( proxy_fd, sinfo ) );
     return 0;
 }
-int NewTunnel(cJSON	*json,map<string,int>*tunneloklist){
+int NewTunnel(cJSON	*json){
     cJSON	*Payload	= cJSON_GetObjectItem(json, "Payload" );
     char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
     if(strcmp(error,"")==0)
     {
         char	*url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
         char	*protocol	= cJSON_GetObjectItem( Payload, "Protocol" )->valuestring;
-        (*tunneloklist)[string(protocol)]=1;
         echo("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
     }
     else
@@ -279,7 +278,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
 }
 
 
-int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,int>*tunneloklist,map<string,TunnelInfo*>*tunnellist){
+int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,TunnelInfo*>*tunnellist){
    //¼ì²âÊÇ·ñ¶Ï¿ª
    if(check_sock(*mainsock)!= 0)
    {
@@ -394,7 +393,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
 				}
 				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
-				    if(NewTunnel(json,tunneloklist)==-1)
+				    if(NewTunnel(json)==-1)
                     {
                         return -1;
                     }
