@@ -13,7 +13,7 @@
 #define ISMBEDTLS 1
 #endif
 
-#define MAXBUF 9216
+#define MAXBUF 2048
 #define DEBUG 0
 
 #include <stdarg.h>
