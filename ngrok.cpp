@@ -93,7 +93,8 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
 int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
     int readlen;
     int bufsize=1024*20;//20K
-    char buf[bufsize+1]={0};
+    char buf[bufsize+1];
+    memset(buf,0,bufsize+1);
     #if WIN32
     readlen = recv( (*it1)->first, (char *) buf, bufsize, 0 );
     #else
@@ -128,8 +129,8 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
 int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen,sendlen;
    int bufsize=1024*20;//20K
-   char buf[bufsize+1]={0};
-
+   char buf[bufsize+1];
+   memset(buf,0,bufsize+1);
    #if OPENSSL
     readlen =  SslRecv(sslinfo1->ssl,buf,bufsize);
    #else
