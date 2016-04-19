@@ -165,7 +165,7 @@ void clearsock(int sock,sockinfo * sock_info);
 inline int SetBufSize(int sock)
 {
     //接收缓冲区
-    int opt=12*1024;
+    int opt=25*1024;//30K
     setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char*)&opt,sizeof(opt));
     //发送缓冲区
     setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
