@@ -90,12 +90,13 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     return 0;
 }
 
-int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
+int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
     int readlen;
+    char buf[MAXBUF+1]={0};
     #if WIN32
-    readlen = recv( (*it1)->first, (char *) buf, maxbuf-1, 0 );
+    readlen = recv( (*it1)->first, (char *) buf, MAXBUF-1, 0 );
     #else
-    readlen = recv( (*it1)->first, buf, maxbuf-1, 0 );
+    readlen = recv( (*it1)->first, buf, MAXBUF-1, 0 );
     #endif
     if ( readlen > 0&&sslinfo!=NULL )
     {
@@ -123,12 +124,13 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,char *buf,int maxbuf,sockin
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
+int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen,sendlen;
+   char buf[MAXBUF+1]={0};
    #if OPENSSL
-    readlen =  SslRecv(sslinfo1->ssl,buf,maxbuf);
+    readlen =  SslRecv(sslinfo1->ssl,buf,MAXBUF);
    #else
-    readlen =  SslRecv( &sslinfo1->ssl, (unsigned char *) buf, maxbuf );
+    readlen =  SslRecv( &sslinfo1->ssl, (unsigned char *) buf, MAXBUF );
    #endif
 
 
@@ -164,18 +166,20 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist){
+int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelInfo*>*tunnellist){
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
     #else
     unsigned long long packlen;
     #endif
+    char	tempjson[MAXBUF + 1];
     char Protocol[10]={0};
+    char buf[MAXBUF +1]={0};
     #if OPENSSL
-    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf-1);
+    readlen =  SslRecv(sslinfo->ssl,buf,MAXBUF-1);
     #else
-    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf-1);
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
     #endif // OPENSSL
 
     if ( readlen ==0||readlen ==-2)
@@ -200,7 +204,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
     /* copy到临时缓存区 */
     if ( tempinfo1->packbuflen == 0 )
     {
-        tempinfo1->packbuf = (unsigned char *) malloc( maxbuf );
+        tempinfo1->packbuf = (unsigned char *) malloc( MAXBUF );
     }
 
 
@@ -219,7 +223,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
         }
         if ( tempinfo1->packbuflen == packlen + 8 )
         {
-            memset( tempjson, 0, maxbuf+1 );
+            memset( tempjson, 0, MAXBUF+1 );
             memcpy( tempjson, tempinfo1->packbuf + 8, packlen );
             free( tempinfo1->packbuf );
             echo("%s\r\n",tempjson);
@@ -278,7 +282,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
 }
 
 
-int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockinfo*>*socklist,char *tempjson,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,TunnelInfo*>*tunnellist){
+int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,TunnelInfo*>*tunnellist){
    //检测是否断开
    if(check_sock(*mainsock)!= 0)
    {
@@ -288,17 +292,17 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     ssl_info *sslinfo=tempinfo->sslinfo;
     TunnelInfo	*tunnelinfo;
     int readlen;
-
+    char buf[MAXBUF+1]={0};
     #if WIN32
     unsigned __int64 packlen;
     #else
     unsigned long long packlen;
     #endif
-
+    char	tempjson[MAXBUF + 1];
     #if OPENSSL
-    readlen =  SslRecv(sslinfo->ssl,buf,maxbuf);
+    readlen =  SslRecv(sslinfo->ssl,buf,MAXBUF);
     #else
-    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,maxbuf);
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF);
     #endif // OPENSSL
 
     if ( readlen ==0||readlen ==-2)
@@ -316,7 +320,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     /* copy到临时缓存区 */
     if ( tempinfo->packbuflen == 0 )
     {
-        tempinfo->packbuf = (unsigned char *) malloc( maxbuf );
+        tempinfo->packbuf = (unsigned char *) malloc( MAXBUF );
     }
     memcpy( tempinfo->packbuf + tempinfo->packbuflen, buf, readlen );
     tempinfo->packbuflen = tempinfo->packbuflen + readlen;
@@ -329,7 +333,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
         }
         if ( tempinfo->packbuflen == packlen + 8 )
         {
-                memset( tempjson, 0, maxbuf+1 );
+                memset( tempjson, 0, MAXBUF+1 );
                 memcpy( tempjson, tempinfo->packbuf + 8, packlen );
                 free( tempinfo->packbuf );
                 tempinfo->packbuf	= NULL;
@@ -405,7 +409,7 @@ int CmdSock(int *mainsock,int maxbuf,char *buf,sockinfo *tempinfo,map<int,sockin
     return 0;
 }
 
-int ConnectMain(int maxbuf,int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken)
+int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken)
 {
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
     SetBufSize(*mainsock);

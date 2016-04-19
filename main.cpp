@@ -65,8 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-#define MAXBUF 2048
-string VER = "1.20-(2016/4/19)";
+string VER = "1.21-(2016/4/19)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -108,7 +107,7 @@ int CheckStatus()
     {
         if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(MAXBUF,&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
+            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
             {
                 mainsockstatus=0;
                 printf("link err\r\n");
@@ -177,8 +176,7 @@ void* proxy(  )
 	fd_set	writeSet;
 	fd_set	readSet;
 	int		maxfd = 0;
-	unsigned char	buf[MAXBUF];
-	char	tempjson[MAXBUF + 1];
+	//unsigned char	buf[MAXBUF];
 	struct timeval	timeout;
 
 	int		maxfdp		= 0;
@@ -289,15 +287,14 @@ void* proxy(  )
 			    /*等于1才是添加到 readSet的*/
 				if (FD_ISSET( it1->first, &readSet )&&tempinfo->isconnect==1 )
 				{
-                    //先清空
-                    memset((char *)buf,0,MAXBUF);
+
                     sslinfo1 = tempinfo->sslinfo;
                     /* 远程的转发给本地 */
                     if ( tempinfo->istype == 1 )
                     {
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,tempjson,&tunnellist);
+                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo,&socklist,&tunnellist);
                             if(backcode==-1)
                             {
                               continue;
@@ -306,7 +303,7 @@ void* proxy(  )
 
                         if( tempinfo->isconnectlocal == 2||tempinfo->isconnectlocal == 1  )
                         {
-                            backcode=RemoteToLocal(sslinfo1,MAXBUF,(char *)buf,tempinfo,&it1,&socklist);
+                            backcode=RemoteToLocal(sslinfo1,tempinfo,&it1,&socklist);
                             if(backcode==-1)
                             {
                               continue;
@@ -315,7 +312,7 @@ void* proxy(  )
                     }
                     /* 本地的转发给远程 */
                     else if(tempinfo->istype == 2){
-                        backcode=LocalToRemote(&it1,(char*)buf,MAXBUF,tempinfo,sslinfo1,&socklist);
+                        backcode=LocalToRemote(&it1,tempinfo,sslinfo1,&socklist);
                         if(backcode==-1)
                         {
                           continue;
@@ -323,7 +320,7 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,MAXBUF,(char *)buf,tempinfo,&socklist,tempjson,server_addr,&ClientId,authtoken,&tunnellist);
+                         backcode=CmdSock(&mainsock,tempinfo,&socklist,server_addr,&ClientId,authtoken,&tunnellist);
                          if(backcode==-1)
                          {
                              //控制链接断开，标记清空
