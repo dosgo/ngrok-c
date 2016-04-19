@@ -66,7 +66,7 @@
 
 using namespace std;
 #define MAXBUF 2048
-string VER = "1.18-(2016/4/5)";
+string VER = "1.19-(2016/4/19)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -179,7 +179,7 @@ void* proxy(  )
 	unsigned char	buf[MAXBUF];
 	char		tempjson[MAXBUF + 1];
 	struct timeval	timeout;
-	TunnelInfo	*tunnelinfo	= NULL;
+
 	int		maxfdp		= 0;
 	int ret=0;
 	ssl_info *sslinfo1;
@@ -291,7 +291,7 @@ void* proxy(  )
                     {
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,tempjson,&tunnellist,tunnelinfo);
+                            backcode=ConnectLocal(sslinfo1,(char *)buf,MAXBUF,&it1,tempinfo,&socklist,tempjson,&tunnellist);
                             if(backcode==-1)
                             {
                               continue;

@@ -165,7 +165,7 @@ int RemoteToLocal(ssl_info *sslinfo1,int maxbuf,char *buf,sockinfo *tempinfo1,ma
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist,TunnelInfo	*tunnelinfo){
+int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,char *tempjson,map<string,TunnelInfo*>*tunnellist){
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
@@ -239,7 +239,7 @@ int ConnectLocal(ssl_info *sslinfo,char *buf,int maxbuf,map<int, sockinfo*>::ite
                 cJSON_Delete( json );
                 if((*tunnellist).count( string( Protocol ) ) > 0 )
                 {
-                    tunnelinfo = (*tunnellist)[string( Protocol )];
+                    TunnelInfo	*tunnelinfo = (*tunnellist)[string( Protocol )];
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
                     int flag = 1;
                     setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
