@@ -167,8 +167,8 @@ inline int SetBufSize(int sock)
     //接收缓冲区
     int opt=25*1024;//30K
     setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char*)&opt,sizeof(opt));
-    //发送缓冲区
-    setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
+    //发送缓冲区  (这个千万不要。。发送不需要缓存区)
+   // setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
     return 0;
 }
 

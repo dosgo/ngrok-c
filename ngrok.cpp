@@ -92,7 +92,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
 
 int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
     int readlen;
-    int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
+    int bufsize=1024*10;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
     //oolarssl 最大发送长度不能超过16K。。还是改成15吧
     char buf[bufsize+1];
     memset(buf,0,bufsize+1);
@@ -129,7 +129,7 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
 
 int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen,sendlen;
-   int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
+   int bufsize=1024*10;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);

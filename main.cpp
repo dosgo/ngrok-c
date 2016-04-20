@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.23-(2016/4/20)";
+string VER = "1.24-(2016/4/20)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
