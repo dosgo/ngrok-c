@@ -2,15 +2,15 @@
 #define __CONFIG_H__
 
 #ifndef OPENSSL
-#define OPENSSL 1
+#define OPENSSL 0
 #endif
 
 #ifndef OPENSSLDL
-#define OPENSSLDL 1
+#define OPENSSLDL 0
 #endif
 
 #ifndef ISMBEDTLS
-#define ISMBEDTLS 1
+#define ISMBEDTLS 0
 #endif
 
 #define MAXBUF 2048
