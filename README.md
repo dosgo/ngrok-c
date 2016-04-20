@@ -150,6 +150,10 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 大幅减少CPU消耗，一般10%以下
 
 
+##2016/04/20
+- 修复1.22版本的polarssl下的bug，如果你使用的是ngrokc1.22版本，并且是polarssl版本，请更新，那个版本有重大bug，openssl版本没问题。
+
+
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
