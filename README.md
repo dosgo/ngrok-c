@@ -151,7 +151,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 ##2016/04/20
-- 修复1.22版本的polarssl下的bug，如果你使用的是ngrokc1.22版本，并且是polarssl版本，请更新，那个版本有重大bug，openssl版本没问题。
+- 修复1.22版本的polarssl下的bug，如果你使用的是ngrokc1.22版本，请更新，那个版本有重大bug，openssl版本没问题。
+- 全部建议到1.24稳定版本。
 
 
 
