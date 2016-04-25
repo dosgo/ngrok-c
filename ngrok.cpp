@@ -36,13 +36,89 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     (*socklist).insert( map<int, sockinfo*> :: value_type( proxy_fd, sinfo ) );
     return 0;
 }
-int NewTunnel(cJSON	*json){
+
+int InitTunnelList(list<TunnelInfo*>*tunnellist){
+    list<TunnelInfo*>::iterator iter;
+    for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
+    {
+        TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
+        memset(tunnelinfo->ReqId,0,30);
+        tunnelinfo->regtime=0;
+        tunnelinfo->regstate=0;
+    }
+    return 0;
+}
+
+int GetLocalAddrInfo(char *url,struct sockaddr_in *local_addr,list<TunnelInfo*>*tunnellist){
+    list<TunnelInfo*>::iterator iter;
+    char protocol[32] = { 0 };
+    char host[128] = { 0 };
+    char portstr[8] = { 0 };
+    int port=0;
+    sscanf(url,"%[^:]://%[^:]:%[1-9]",protocol,host,portstr);
+    port=atoi(portstr);
+
+      //进行迭代遍历
+    for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
+    {
+        	TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
+            if(strcasecmp(protocol,tunnelinfo->protocol)==0){
+             if(strcasecmp(protocol,"tcp")==0){
+                if(port==tunnelinfo->remoteport)
+                {
+                    int	l1= inet_addr( tunnelinfo->localhost );
+                    local_addr->sin_family	= AF_INET;
+                    local_addr->sin_port	= htons(tunnelinfo->localport );
+                    memcpy(&local_addr->sin_addr, &l1, 4 );
+                    return 0;
+                }
+             }
+             else
+             {
+                if(strcasecmp(host,tunnelinfo->hostname)==0){
+                    int		l1		= inet_addr( tunnelinfo->localhost );
+                    local_addr->sin_family	= AF_INET;
+                    local_addr->sin_port	= htons(tunnelinfo->localport );
+                    memcpy(&local_addr->sin_addr, &l1, 4 );
+                    return 0;
+                }
+             }
+
+        }
+    }
+    return -1;
+}
+int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnellist){
+    list<TunnelInfo*>::iterator iter;
+    char protocol[32] = { 0 };
+    char host[128] = { 0 };
+    char portstr[8]={0};
+    int port =0;
+    sscanf(url,"%[^:]://%[^:]:%[1-9]",protocol,host,portstr);
+    port=atoi(portstr);
+      //进行迭代遍历
+    for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
+    {
+        TunnelInfo	*tunnelinfo =(TunnelInfo*)*iter;
+        if(strcasecmp(ReqId,tunnelinfo->ReqId)==0){
+            memcpy(tunnelinfo->hostname,host,strlen(host));
+            tunnelinfo->remoteport=port;
+            tunnelinfo->regstate=regstate;
+        }
+
+    }
+    return 0;
+}
+
+int NewTunnel(cJSON	*json,list<TunnelInfo*>*tunnellist){
     cJSON	*Payload	= cJSON_GetObjectItem(json, "Payload" );
     char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
     if(strcmp(error,"")==0)
     {
         char	*url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
+        char	*ReqId		= cJSON_GetObjectItem( Payload, "ReqId" )->valuestring;
         char	*protocol	= cJSON_GetObjectItem( Payload, "Protocol" )->valuestring;
+        SetLocalAddrInfo(url,ReqId,1,tunnellist);
         echo("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
     }
     else
@@ -172,7 +248,7 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelInfo*>*tunnellist){
+int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,list<TunnelInfo*>*tunnellist){
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
@@ -180,7 +256,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
     unsigned long long packlen;
     #endif
     char	tempjson[MAXBUF + 1];
-    char Protocol[10]={0};
+
     char buf[MAXBUF +1]={0};
     #if OPENSSL
     readlen =  SslRecv(sslinfo->ssl,buf,MAXBUF-1);
@@ -188,6 +264,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
     #endif // OPENSSL
 
+    struct sockaddr_in local_addr={0};
     if ( readlen ==0||readlen ==-2)
     {
         clearsock( (*it1)->first, tempinfo1 );
@@ -241,21 +318,21 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
             {
                 cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
                 char	*Url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
-                GetProtocol( Url, Protocol );
                  /*
                  * 清除
                  */
+                int backinfo=GetLocalAddrInfo(Url,&local_addr,tunnellist);
                 cJSON_Delete( json );
-                if((*tunnellist).count( string( Protocol ) ) > 0 )
+                if(backinfo==0)
                 {
-                    TunnelInfo	*tunnelinfo = (*tunnellist)[string( Protocol )];
+
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
                     int flag = 1;
                     setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
                     SetBufSize(tcp);
                    // SOL_SOCKET
                   //  setnonblocking( tcp, 1 );
-                    if(connect( tcp, (struct sockaddr *) &tunnelinfo->local_addr, sizeof(tunnelinfo->local_addr))==0)
+                    if(connect( tcp, (struct sockaddr *) &local_addr, sizeof(local_addr))==0)
                     {
                         setnonblocking( tcp, 1 );
                         sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
@@ -288,7 +365,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
 }
 
 
-int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,map<string,TunnelInfo*>*tunnellist){
+int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,list<TunnelInfo*>*tunnellist){
    //检测是否断开
    if(check_sock(*mainsock)!= 0)
    {
@@ -296,7 +373,6 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
    }
 
     ssl_info *sslinfo=tempinfo->sslinfo;
-    TunnelInfo	*tunnelinfo;
     int readlen;
     char buf[MAXBUF+1]={0};
     #if WIN32
@@ -367,18 +443,6 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
                         SendPing(*mainsock, &sslinfo->ssl );
                         #endif
                         tempinfo->isauth=1;
-
-                        /*认证成功，注册通道*/
-                        map<string, TunnelInfo*>::iterator it;
-                        for ( it = (*tunnellist).begin(); it != (*tunnellist).end(); ++it )
-                        {
-                            tunnelinfo = it->second;
-                            #if OPENSSL
-                            SendReqTunnel(*mainsock,sslinfo->ssl, it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
-                            #else
-                            SendReqTunnel(*mainsock,&sslinfo->ssl,it->first.c_str(),tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport,authtoken );
-                            #endif
-                        }
                     }
                     else
                     {
@@ -403,10 +467,7 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 				}
 				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
-				    if(NewTunnel(json)==-1)
-                    {
-                        return -1;
-                    }
+				    NewTunnel(json,tunnellist);
 				}
 				cJSON_Delete( json );
 			}

@@ -36,9 +36,12 @@ struct TunnelInfo
     char subdomain[255];
     char hostname[255];
     char httpauth[255];
+    char protocol[10];
+    char ReqId[30];
     int localport;
-    struct sockaddr_in local_addr;
     int remoteport;
+    int regtime;
+    int regstate;
 };
 
 
@@ -50,7 +53,7 @@ inline int get_curr_unixtime()
     return time(&now);
 }
 
-int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
+int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
 
 inline int strpos( char *str, char c )
 {
@@ -61,19 +64,9 @@ inline int strpos( char *str, char c )
 }
 
 
-inline int GetProtocol(char *url,char *Protocol)
-{
-	int	plen= strpos( url, ':' );
-	if(plen>0)
-    {
-        memcpy( Protocol, url, plen );
-        return 0;
-    }
-	return -1;
-}
 
 
-int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
+
 inline int getvalue(char * str,const char *key,char * value){
     int ypos=0;
     if ( strncmp(str,key,strlen(key)) == 0 )
@@ -159,7 +152,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
+int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
 //#endif
 
 

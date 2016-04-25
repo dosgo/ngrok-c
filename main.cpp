@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.24-(2016/4/20)";
+string VER = "1.25-(2016/4/25)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -86,7 +86,8 @@ struct sockaddr_in server_addr = { 0 };
 
 
 map<int,sockinfo*>socklist;
-map<string,TunnelInfo*>tunnellist;
+//map<string,TunnelInfo*>tunnellist;
+ list<TunnelInfo*> tunnellist;
 
 void cs( int n )
 {
@@ -188,6 +189,9 @@ void* proxy(  )
 	map<int, sockinfo*>::iterator it1;
 	map<int, sockinfo*>::iterator it2;
 	map<int, sockinfo*>::iterator it3;
+    list<TunnelInfo*>::iterator listit;
+    TunnelInfo *tunnelinfo;
+    char ReqId[20]={0};
 	int backcode=0;
 	while ( true )
 	{
@@ -220,6 +224,8 @@ void* proxy(  )
             mainsock = 0;
             //改回状态
             mainsockstatus=1;
+            //初始化通道
+            InitTunnelList(&tunnellist);
         }
 
 	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
@@ -235,7 +241,28 @@ void* proxy(  )
             CheckStatus();
         }
 
+        //注册端口
+        if(socklist.count(mainsock)!=0&&mainsock!=0){
 
+            tempinfo=socklist[mainsock];
+            if(tempinfo->isauth==1){
+                for ( listit = tunnellist.begin(); listit != tunnellist.end(); ++listit )
+                {
+
+                    tunnelinfo =(TunnelInfo	*)*listit;
+                    if(tunnelinfo->regtime==0||(tunnelinfo->regstate==0&&(tunnelinfo->regtime+600)<get_curr_unixtime())){
+                        #if OPENSSL
+                        SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
+                        #else
+                        SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport,authtoken );
+                        #endif
+                        //copy
+                        memcpy(tunnelinfo->ReqId,(const void*)ReqId,strlen(ReqId));
+                        tunnelinfo->regtime=get_curr_unixtime();//已发
+                    }
+                }
+            }
+        }
 
 
 		timeout.tv_sec	= 0;
