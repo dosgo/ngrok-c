@@ -154,6 +154,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 - 修复1.22版本的polarssl下的bug，如果你使用的是ngrokc1.22版本，请更新，那个版本有重大bug，openssl版本没问题。
 - 全部建议到1.24稳定版本。
 
+##2016/04/25
+-1.25 版本（测试）增加多个通道功能，避免多个进程，可以注册N个通道，如- ngrokc -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example1] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example2]
+- 这是一个支持ngrok完全协议的版本。go语言以后可能员生支持mips，这个就没人用了。可能不更新了。
 
 
 ###关于编译对应路由的版本的ngrokc。
