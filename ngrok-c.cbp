@@ -16,11 +16,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="D:\c\ngrok-c\libmbedtls-win32.a" />
-					<Add library="D:\c\ngrok-c\libmbedx509-win32.a" />
-					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
 					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
-					<Add library="D:\c\ngrok-c\libmbedcrypto-win32.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">

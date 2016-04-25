@@ -111,7 +111,7 @@ struct sockinfo
     int istype; //1=remote 2=local
     int tosock;
     unsigned char *packbuf;
-     unsigned long long packbuflen;
+    unsigned long long packbuflen;
     int isconnectlocal;
     int isauth;
     int pongtime;

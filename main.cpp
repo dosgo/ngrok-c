@@ -65,18 +65,19 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.25-(2016/4/25)";
+string VER = "1.26-(2016/4/26)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
 char authtoken[255]="";
 string ClientId = "";
-int		pingtime	= 0;
-int		ping		= 25; //不能大于30
-int		mainsock=0;
-int		lastdnstime=0;
+int	pingtime	= 0;
+int	ping		= 25; //不能大于30
+int	mainsock=0;
+int	lastdnstime=0;
 int mainsockstatus=1;
-int		lastdnsback;
+int regtunneltime=0;
+int	lastdnsback;
 int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
 void* sockmain( void *arg );
@@ -245,12 +246,12 @@ void* proxy(  )
         if(socklist.count(mainsock)!=0&&mainsock!=0){
 
             tempinfo=socklist[mainsock];
-            if(tempinfo->isauth==1){
+            if(tempinfo->isauth==1&&regtunneltime+60<get_curr_unixtime()){
+                regtunneltime=get_curr_unixtime();
                 for ( listit = tunnellist.begin(); listit != tunnellist.end(); ++listit )
                 {
-
                     tunnelinfo =(TunnelInfo	*)*listit;
-                    if(tunnelinfo->regtime==0||(tunnelinfo->regstate==0&&(tunnelinfo->regtime+600)<get_curr_unixtime())){
+                    if(tunnelinfo->regstate==0){
                         #if OPENSSL
                         SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
                         #else
