@@ -168,7 +168,11 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
     if ( readlen > 0&&sslinfo!=NULL )
     {
         //·¢ËÍµ½Ô¶³Ì
+        #if OPENSSL
         sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
+        #else
+         sendremote(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
+        #endif
     }else  {
         shutdown( tempinfo->tosock, 2 );
         clearsock( (*it1)->first, tempinfo);
