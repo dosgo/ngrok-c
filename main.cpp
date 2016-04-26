@@ -202,7 +202,6 @@ void* proxy(  )
 	sockinfo *tempinfo1 ;
 	map<int, sockinfo*>::iterator it;
 	map<int, sockinfo*>::iterator it1;
-	map<int, sockinfo*>::iterator it2;
 	map<int, sockinfo*>::iterator it3;
     list<TunnelInfo*>::iterator listit;
     TunnelInfo *tunnelinfo;
@@ -410,10 +409,9 @@ void* proxy(  )
 						//本地连接
                         if ( tempinfo->istype == 2 )
 						{
-                            it2 = socklist.find(tempinfo->tosock);
-                            if(it2 != socklist.end())
+                            if(socklist.count(tempinfo->tosock)>0)
                             {
-                                tempinfo1 = it2->second;
+                                tempinfo1 =socklist[tempinfo->tosock];
                                 tempinfo1->isconnectlocal=2;
                                 /* copy到临时缓存区 */
                                 if ( tempinfo1->packbuflen > 0 )
@@ -424,7 +422,6 @@ void* proxy(  )
                                     tempinfo1->packbuf	= NULL;
                                     tempinfo1->packbuflen	= 0;
                                     if(backcode<1){
-                                        printf("close");
                                         shutdown(it1->first,2);//关闭自己
                                         shutdown(tempinfo->tosock,2);//关闭对方
                                     }
