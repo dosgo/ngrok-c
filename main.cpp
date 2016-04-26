@@ -239,7 +239,6 @@ void* proxy(  )
 		//dns解析成功
         if (lastdnsback != -1)
         {
-           // printf("CheckStatus11");
             CheckStatus();
         }
 
@@ -278,8 +277,7 @@ void* proxy(  )
 		//map<int, sockinfo*>::iterator it;
 		for ( it = socklist.begin(); it != socklist.end();  )
 		{
-		    //这里也检测下，避免阻塞连接多阻塞。
-		    checkping();//ping
+
 			tempinfo = it->second;
 			/* 如果未连接才添加，写入监听 */
 			if ( tempinfo->isconnect == 0 )
@@ -316,6 +314,8 @@ void* proxy(  )
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
 			    tempinfo = it1->second;
+			      //ping
+                checkping();//这里添加个ping避免超时
                 //判断连接超时sock
                 if((tempinfo->linktime+3)<get_curr_unixtime()&&tempinfo->isconnect==0)
                 {

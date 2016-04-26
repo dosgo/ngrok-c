@@ -22,13 +22,11 @@
 inline int echo(const char* format, ...)
 {
     int n=0;
-    if(DEBUG==1){
-        va_list ap;
-        va_start(ap, format);
-        n = vprintf(format,ap);
-        fflush(stdout);
-        va_end(ap);
-    }
+    va_list ap;
+    va_start(ap, format);
+    n = vprintf(format,ap);
+    fflush(stdout);
+    va_end(ap);
     return n;
 }
 
