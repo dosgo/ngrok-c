@@ -90,31 +90,27 @@ return 0;
 struct sockinfo
 {
     openssl_info *sslinfo;
-    int isssl;
     int isconnect;
-    int linkunixtime;
     int istype; //1=remote 2=local,3=cmd
     int tosock;
     unsigned char *packbuf;
     unsigned long long packbuflen;
     int isconnectlocal;
+    int linktime;
     int isauth;
-    int pongtime;
 };
 #else
 struct sockinfo
 {
     ssl_info *sslinfo;
-    int isssl;
     int isconnect;
-    int linkunixtime;
-    int istype; //1=remote 2=local
+    int istype; //1=remote 2=local,3=cmd
     int tosock;
     unsigned char *packbuf;
     unsigned long long packbuflen;
     int isconnectlocal;
+    int linktime;
     int isauth;
-    int pongtime;
 };
 #endif
 

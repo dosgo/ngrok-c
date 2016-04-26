@@ -30,8 +30,8 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     sinfo->istype		= 1;
     sinfo->isconnect	= 0;
     sinfo->packbuflen	= 0;
+    sinfo->linktime=get_curr_unixtime();
     sinfo->sslinfo		= NULL;
-    sinfo->linkunixtime	= get_curr_unixtime();
     sinfo->isconnectlocal	= 0;
     (*socklist).insert( map<int, sockinfo*> :: value_type( proxy_fd, sinfo ) );
     return 0;
@@ -123,8 +123,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
 
-   #if OPENSSL
-
+    #if OPENSSL
     if ( openssl_init_info((*it1)->first, sslinfo ) != -1 )
     {
         setnonblocking((*it1)->first,1);
@@ -146,7 +145,6 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     }
     else
     {
-        echo( "getsockoptclose sock:%d\r\n", (*it1)->first );
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
         (*socklist).erase((*it1)++);
@@ -158,7 +156,7 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
 
 int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info *sslinfo,map<int,sockinfo*>*socklist){
     int readlen;
-    int bufsize=1024*10;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
+    int bufsize=1024*13;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
     //oolarssl 最大发送长度不能超过16K。。还是改成15吧
     char buf[bufsize+1];
     memset(buf,0,bufsize+1);
@@ -169,21 +167,8 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
     #endif
     if ( readlen > 0&&sslinfo!=NULL )
     {
-        setnonblocking( tempinfo->tosock, 0 );
-        #if OPENSSL
-        #if OPENSSLDL
-        SslWrite( sslinfo->ssl, buf, readlen );
-        #else
-        SSL_write( sslinfo->ssl, buf, readlen );
-        #endif // OPENSSLDL
-        #else
-        #if ISMBEDTLS
-        mbedtls_ssl_write( &sslinfo->ssl, (unsigned char *)buf, readlen );
-        #else
-        ssl_write( &sslinfo->ssl,(unsigned char *) buf, readlen );
-        #endif // ISMBEDTLS
-        #endif
-        setnonblocking( tempinfo->tosock, 1 );
+        //发送到远程
+        sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
     }else  {
         shutdown( tempinfo->tosock, 2 );
         clearsock( (*it1)->first, tempinfo);
@@ -195,7 +180,7 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
 
 int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist){
    int readlen,sendlen;
-   int bufsize=1024*10;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
+   int bufsize=1024*13;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);
@@ -214,21 +199,11 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
         shutdown( tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
         (*socklist).erase((*it1)++);
-        if((*socklist).count(tosock)==1)
-        {
-            (*socklist)[tosock]->sslinfo=NULL;
-        }
         return -1;
     }
     else if(readlen >0)
     {
-        setnonblocking( tempinfo1->tosock, 0 );
-        #if WIN32
-        sendlen=send( tempinfo1->tosock, (char *) buf, readlen, 0 );
-        #else
-        sendlen=send( tempinfo1->tosock, buf, readlen, 0 );
-        #endif
-        setnonblocking( tempinfo1->tosock, 1 );
+        sendlen=sendlocal(tempinfo1->tosock,buf,readlen,1);
         if(sendlen<1)
         {
             shutdown((*it1)->first,2);
@@ -264,7 +239,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
 
     if ( readlen ==-1)
     {
-        return -1;
+        return 0;//这里不能用-1不然会导致，map迭代器不自增
     }
     //有时候readlen变成-76导致崩溃
     if ( readlen <1)
@@ -315,38 +290,29 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
                 cJSON_Delete( json );
                 if(backinfo==0)
                 {
-
                     int tcp = socket( AF_INET, SOCK_STREAM, 0 );
                     int flag = 1;
                     setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
                     SetBufSize(tcp);
                    // SOL_SOCKET
-                  //  setnonblocking( tcp, 1 );
-                    if(connect( tcp, (struct sockaddr *) &local_addr, sizeof(local_addr))==0)
-                    {
-                        setnonblocking( tcp, 1 );
-                        sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
-                        sinfo->istype		= 2;
-                        sinfo->isconnect	= 1;
-                        sinfo->sslinfo		= sslinfo;
-                        sinfo->tosock		= (*it1)->first;
-                        (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
-                        /* 远程的带上本地链接 */
-                        tempinfo1->tosock = tcp;
-                        tempinfo1->isconnectlocal= 1;
-                    }
-                    else
-                    {
-                        #if WIN32
-                        echo("GetLastError:%d\r\n",GetLastError());
-                        #else
-                        echo("errno:%d\r\n",errno);
-                        #endif
-                         clearsock( (*it1)->first, tempinfo1 );
-                        (*socklist).erase((*it1)++);
-                        return -1;
-                    }
-
+                    setnonblocking( tcp, 1 );
+                    connect( tcp, (struct sockaddr *) &local_addr, sizeof(local_addr));
+                    sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
+                    sinfo->istype		= 2;
+                    sinfo->isconnect	= 0;
+                    sinfo->sslinfo		= sslinfo;
+                    sinfo->linktime=get_curr_unixtime();
+                    sinfo->tosock		= (*it1)->first;
+                    (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
+                    /* 远程的带上本地链接 */
+                    tempinfo1->tosock = tcp;
+                    tempinfo1->isconnectlocal= 1;
+                }
+                else
+                {
+                    clearsock( (*it1)->first, tempinfo1 );
+                    (*socklist).erase((*it1)++);
+                    return -1;
                 }
             }
         }
@@ -417,7 +383,7 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 				{
 					ReqProxy(server_addr,socklist);
 				}
-				if ( strcmp( Type->valuestring, "AuthResp" ) == 0 )
+				else if ( strcmp( Type->valuestring, "AuthResp" ) == 0 )
 				{
 
                     cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
@@ -443,7 +409,7 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 
 				}
 
-				if ( strcmp( Type->valuestring, "Ping" ) == 0 )
+				else if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
 					#if OPENSSL
                     SendPong( *mainsock,sslinfo->ssl );
@@ -451,11 +417,11 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
                     SendPong( *mainsock,&sslinfo->ssl );
                     #endif
 				}
-				if ( strcmp( Type->valuestring, "Pong" ) == 0 )
+				else if ( strcmp( Type->valuestring, "Pong" ) == 0 )
 				{
-					tempinfo->pongtime = get_curr_unixtime();
+
 				}
-				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
+				else if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
 				    NewTunnel(json,tunnellist,tunneladdr);
 				}

@@ -21,11 +21,14 @@
 #include <string.h>
 inline int echo(const char* format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    int n = vprintf(format,ap);
-    fflush(stdout);
-    va_end(ap);
+    int n=0;
+    if(DEBUG==1){
+        va_list ap;
+        va_start(ap, format);
+        n = vprintf(format,ap);
+        fflush(stdout);
+        va_end(ap);
+    }
     return n;
 }
 

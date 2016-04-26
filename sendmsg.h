@@ -88,6 +88,49 @@ inline int getvalue(char * str,const char *key,char * value){
 }
 
 
+inline int sendremote(int sock,ssl_context *ssl,const char *buf,int buflen,int isblock){
+        int sendlen=0;
+        if(isblock)
+        {
+            setnonblocking(sock,0);
+        }
+        #if OPENSSL
+        #if OPENSSLDL
+        sendlen=SslWrite(ssl, buf, buflen );
+        #else
+        sendlen=SSL_write(ssl, buf, buflen );
+        #endif // OPENSSLDL
+        #else
+        #if ISMBEDTLS
+        sendlen=mbedtls_ssl_write( ssl, (unsigned char *)buf, buflen );
+        #else
+        sendlen=ssl_write( ssl,(unsigned char *) buf, buflen );
+        #endif // ISMBEDTLS
+        #endif
+        if(isblock)
+        {
+            setnonblocking(sock,1);
+        }
+        return sendlen;
+}
+
+inline int sendlocal(int sock,const char *buf,int buflen,int isblock){
+    int sendlen=0;
+    if(isblock)
+    {
+        setnonblocking(sock,0);
+    }
+    #if WIN32
+    sendlen=send( sock, (char *) buf, buflen, 0 );
+    #else
+    sendlen=send( sock, buf, buflen, 0 );
+    #endif
+    if(isblock)
+    {
+        setnonblocking(sock,1);
+    }
+    return sendlen;
+}
 
 
 inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)

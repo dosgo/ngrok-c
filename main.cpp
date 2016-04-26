@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.27-(2016/4/26)";
+string VER = "1.28-(2016/4/27)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -82,9 +82,7 @@ int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
 
 void* proxy( );
-
 struct sockaddr_in server_addr = { 0 };
-
 
 map<int,sockinfo*>socklist;
 //map<string,TunnelInfo*>tunnellist;
@@ -120,7 +118,23 @@ int CheckStatus()
     }
 	return(0);
 }
-
+/*检测ping*/
+int checkping(){
+    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
+    {
+        #if OPENSSL
+        int sendlen = SendPing(mainsock, mainsslinfo->ssl );
+        #else
+        int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
+        #endif
+        //发送失败断开连接
+        if(sendlen==-1)
+        {
+            mainsockstatus=0;
+        }
+        pingtime = get_curr_unixtime();
+    }
+}
 
 int main( int argc, char **argv )
 {
@@ -197,21 +211,8 @@ void* proxy(  )
 	while ( true )
 	{
         //ping
-	    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
-        {
+        checkping();//ping
 
-            #if OPENSSL
-            int sendlen = SendPing(mainsock, mainsslinfo->ssl );
-            #else
-            int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
-            #endif
-            //发送失败断开连接
-            if(sendlen==-1)
-            {
-                mainsockstatus=0;
-            }
-            pingtime = get_curr_unixtime();
-	    }
         //控制链接断开,关闭所有连接
         if(mainsockstatus==0){
             shutdown( mainsock,2);
@@ -277,6 +278,8 @@ void* proxy(  )
 		//map<int, sockinfo*>::iterator it;
 		for ( it = socklist.begin(); it != socklist.end();  )
 		{
+		    //这里也检测下，避免阻塞连接多阻塞。
+		    checkping();//ping
 			tempinfo = it->second;
 			/* 如果未连接才添加，写入监听 */
 			if ( tempinfo->isconnect == 0 )
@@ -289,8 +292,8 @@ void* proxy(  )
 			maxfdp = it->first > maxfdp ? it->first : maxfdp;
 			maxfd++;
 			//继续遍历
+			sleeps(1);
 			++it;
-			sleeps( 1 );
 		}
 
 
@@ -313,6 +316,19 @@ void* proxy(  )
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
 			    tempinfo = it1->second;
+                //判断连接超时sock
+                if((tempinfo->linktime+3)<get_curr_unixtime()&&tempinfo->isconnect==0)
+                {
+					//关闭远程连接
+                    if(tempinfo->istype==2){
+                        echo("连接本地失败");
+                        shutdown( tempinfo->tosock, 2 );
+                    }
+                    clearsock(it1->first,tempinfo);
+                    socklist.erase(it1++);
+                    continue;
+                }
+
 			    /*等于1才是添加到 readSet的*/
 				if (FD_ISSET( it1->first, &readSet )&&tempinfo->isconnect==1 )
 				{
@@ -330,7 +346,7 @@ void* proxy(  )
                             }
                         }
 
-                        if( tempinfo->isconnectlocal == 2||tempinfo->isconnectlocal == 1  )
+                        if( tempinfo->isconnectlocal == 2 )
                         {
                             backcode=RemoteToLocal(sslinfo1,tempinfo,&it1,&socklist);
                             if(backcode==-1)
@@ -364,7 +380,6 @@ void* proxy(  )
 				//可写，表示连接上了
 				if ( FD_ISSET( it1->first, &writeSet )&&tempinfo->isconnect==0 )
 				{
-
 					if ( tempinfo->isconnect == 0 )
 					{
 					    //检测连接是否可用
@@ -379,7 +394,6 @@ void* proxy(  )
 							socklist.erase(it1++);
 							continue;
 						}
-
 						/* 置为1 */
 						tempinfo->isconnect = 1;
 
@@ -390,10 +404,9 @@ void* proxy(  )
                             backcode=RemoteSslInit(&it1,tempinfo,ClientId,&socklist);
                             if(backcode==-1)
                             {
-                              continue;
+                               continue;
                             }
 						}
-
 						//本地连接
                         if ( tempinfo->istype == 2 )
 						{
@@ -405,16 +418,16 @@ void* proxy(  )
                                 /* copy到临时缓存区 */
                                 if ( tempinfo1->packbuflen > 0 )
                                 {
-                                    setnonblocking( it1->first, 0 );
-                                    #if WIN32
-                                    send(it1->first,(char *)tempinfo1->packbuf,tempinfo1->packbuflen, 0 );
-                                    #else
-                                    send( it1->first, tempinfo1->packbuf, tempinfo1->packbuflen, 0 );
-                                    #endif
-                                    setnonblocking(it1->first, 1 );
+                                    //发送到本地
+                                    backcode=sendlocal(it1->first,(char*)tempinfo1->packbuf, tempinfo1->packbuflen,1);
                                     free( tempinfo1->packbuf );
                                     tempinfo1->packbuf	= NULL;
                                     tempinfo1->packbuflen	= 0;
+                                    if(backcode<1){
+                                        printf("close");
+                                        shutdown(it1->first,2);//关闭自己
+                                        shutdown(tempinfo->tosock,2);//关闭对方
+                                    }
                                 }
                             }
 						}
