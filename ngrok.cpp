@@ -37,7 +37,7 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     return 0;
 }
 
-int InitTunnelList(list<TunnelInfo*>*tunnellist){
+int InitTunnelList(list<TunnelInfo*>*tunnellist,map<string,TunnelReq*>*tunneladdr){
     list<TunnelInfo*>::iterator iter;
     for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
     {
@@ -46,49 +46,34 @@ int InitTunnelList(list<TunnelInfo*>*tunnellist){
         tunnelinfo->regtime=0;
         tunnelinfo->regstate=0;
     }
+
+    //释放所有通道信息
+    map<string, TunnelReq*>::iterator it3;
+    for ( it3 = (*tunneladdr).begin(); it3 != (*tunneladdr).end(); )
+    {
+       free(it3->second);
+       it3++;
+    }
+    (*tunneladdr).clear();
     return 0;
 }
 
-int GetLocalAddrInfo(char *url,struct sockaddr_in *local_addr,list<TunnelInfo*>*tunnellist){
-    list<TunnelInfo*>::iterator iter;
-    char protocol[32] = { 0 };
-    char host[128] = { 0 };
-    char portstr[8] = { 0 };
-    int port=0;
-    sscanf(url,"%[^:]://%[^:]:%[1-9]",protocol,host,portstr);
-    port=atoi(portstr);
 
-      //进行迭代遍历
-    for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
+
+int GetLocalAddr(char *url,struct sockaddr_in *local_addr,map<string,TunnelReq*> *tunneladdr){
+    if((*tunneladdr).count(string(url))!=0)
     {
-        	TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
-            if(strcasecmp(protocol,tunnelinfo->protocol)==0){
-             if(strcasecmp(protocol,"tcp")==0){
-                if(port==tunnelinfo->remoteport)
-                {
-                    int	l1= inet_addr( tunnelinfo->localhost );
-                    local_addr->sin_family	= AF_INET;
-                    local_addr->sin_port	= htons(tunnelinfo->localport );
-                    memcpy(&local_addr->sin_addr, &l1, 4 );
-                    return 0;
-                }
-             }
-             else
-             {
-                if(strcasecmp(host,tunnelinfo->hostname)==0){
-                    int		l1		= inet_addr( tunnelinfo->localhost );
-                    local_addr->sin_family	= AF_INET;
-                    local_addr->sin_port	= htons(tunnelinfo->localport );
-                    memcpy(&local_addr->sin_addr, &l1, 4 );
-                    return 0;
-                }
-             }
-
-        }
+            TunnelReq *tunnelreq =(*tunneladdr)[string(url)];
+            int		l1		= inet_addr( tunnelreq->localhost );
+            local_addr->sin_family	= AF_INET;
+            local_addr->sin_port	= htons(tunnelreq->localport );
+            memcpy(&local_addr->sin_addr, &l1, 4 );
+            return 0;
     }
     return -1;
 }
-int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnellist){
+
+int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr){
     list<TunnelInfo*>::iterator iter;
     char protocol[32] = { 0 };
     char host[128] = { 0 };
@@ -104,13 +89,18 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnel
             memcpy(tunnelinfo->hostname,host,strlen(host));
             tunnelinfo->remoteport=port;
             tunnelinfo->regstate=regstate;
+            TunnelReq *tunnelreq = (TunnelReq *) malloc( sizeof(TunnelReq));
+            memset(tunnelreq,0,sizeof(TunnelReq));
+            memcpy(tunnelreq->localhost,tunnelinfo->localhost,strlen(tunnelinfo->localhost));
+            tunnelreq->localport=tunnelinfo->localport;
+            (*tunneladdr).insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
         }
 
     }
     return 0;
 }
 
-int NewTunnel(cJSON	*json,list<TunnelInfo*>*tunnellist){
+int NewTunnel(cJSON	*json,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr){
     cJSON	*Payload	= cJSON_GetObjectItem(json, "Payload" );
     char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
     if(strcmp(error,"")==0)
@@ -118,7 +108,7 @@ int NewTunnel(cJSON	*json,list<TunnelInfo*>*tunnellist){
         char	*url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
         char	*ReqId		= cJSON_GetObjectItem( Payload, "ReqId" )->valuestring;
         char	*protocol	= cJSON_GetObjectItem( Payload, "Protocol" )->valuestring;
-        SetLocalAddrInfo(url,ReqId,1,tunnellist);
+        SetLocalAddrInfo(url,ReqId,1,tunnellist,tunneladdr);
         echo("Add tunnel ok,type:%s url:%s\r\n",protocol,url);
     }
     else
@@ -248,7 +238,7 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,list<TunnelInfo*>*tunnellist){
+int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelReq*> *tunneladdr){
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
@@ -321,7 +311,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
                  /*
                  * 清除
                  */
-                int backinfo=GetLocalAddrInfo(Url,&local_addr,tunnellist);
+                int backinfo=GetLocalAddr(Url,&local_addr,tunneladdr);
                 cJSON_Delete( json );
                 if(backinfo==0)
                 {
@@ -365,7 +355,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
 }
 
 
-int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,list<TunnelInfo*>*tunnellist){
+int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr){
    //检测是否断开
    if(check_sock(*mainsock)!= 0)
    {
@@ -467,7 +457,7 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 				}
 				if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
 				{
-				    NewTunnel(json,tunnellist);
+				    NewTunnel(json,tunnellist,tunneladdr);
 				}
 				cJSON_Delete( json );
 			}

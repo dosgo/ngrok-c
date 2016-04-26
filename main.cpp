@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.26-(2016/4/26)";
+string VER = "1.27-(2016/4/26)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -80,7 +80,7 @@ int regtunneltime=0;
 int	lastdnsback;
 int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
-void* sockmain( void *arg );
+
 void* proxy( );
 
 struct sockaddr_in server_addr = { 0 };
@@ -88,8 +88,8 @@ struct sockaddr_in server_addr = { 0 };
 
 map<int,sockinfo*>socklist;
 //map<string,TunnelInfo*>tunnellist;
- list<TunnelInfo*> tunnellist;
-
+list<TunnelInfo*> tunnellist;
+map<string,TunnelReq*> tunneladdr;
 void cs( int n )
 {
 	if(n == SIGINT )
@@ -226,7 +226,7 @@ void* proxy(  )
             //改回状态
             mainsockstatus=1;
             //初始化通道
-            InitTunnelList(&tunnellist);
+            InitTunnelList(&tunnellist,&tunneladdr);
         }
 
 	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
@@ -290,6 +290,7 @@ void* proxy(  )
 			maxfd++;
 			//继续遍历
 			++it;
+			sleeps( 1 );
 		}
 
 
@@ -322,7 +323,7 @@ void* proxy(  )
                     {
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo,&socklist,&tunnellist);
+                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo,&socklist,&tunneladdr);
                             if(backcode==-1)
                             {
                               continue;
@@ -348,7 +349,7 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,tempinfo,&socklist,server_addr,&ClientId,authtoken,&tunnellist);
+                         backcode=CmdSock(&mainsock,tempinfo,&socklist,server_addr,&ClientId,authtoken,&tunnellist,&tunneladdr);
                          if(backcode==-1)
                          {
                              //控制链接断开，标记清空

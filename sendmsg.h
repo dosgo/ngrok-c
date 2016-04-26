@@ -44,6 +44,12 @@ struct TunnelInfo
     int regstate;
 };
 
+struct TunnelReq
+{
+    char localhost[255];
+    int localport;
+    int regtime;
+};
 
 
 
