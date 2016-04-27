@@ -200,6 +200,7 @@ void* proxy(  )
 	int ret=0;
 	ssl_info *sslinfo1;
 	sockinfo *tempinfo ;
+	sockinfo *tempinfo1;
 	map<int, sockinfo*>::iterator it;
 	map<int, sockinfo*>::iterator it1;
 	map<int, sockinfo*>::iterator it3;
@@ -410,6 +411,16 @@ void* proxy(  )
                             if(backcode==-1)
                             {
                                continue;
+                            }
+						}
+
+                        //本地连接
+                        if ( tempinfo->istype == 2 )
+						{
+                            if(socklist.count(tempinfo->tosock)>0)
+                            {
+                                tempinfo1 = socklist[tempinfo->tosock];
+                                tempinfo1->isconnectlocal=2;
                             }
 						}
 
