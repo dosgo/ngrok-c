@@ -134,6 +134,7 @@ int checkping(){
         }
         pingtime = get_curr_unixtime();
     }
+    return 0;
 }
 
 int main( int argc, char **argv )
@@ -199,7 +200,6 @@ void* proxy(  )
 	int ret=0;
 	ssl_info *sslinfo1;
 	sockinfo *tempinfo ;
-	sockinfo *tempinfo1 ;
 	map<int, sockinfo*>::iterator it;
 	map<int, sockinfo*>::iterator it1;
 	map<int, sockinfo*>::iterator it3;
@@ -336,6 +336,7 @@ void* proxy(  )
                     /* 远程的转发给本地 */
                     if ( tempinfo->istype == 1 )
                     {
+                        //未连接本地
                         if ( tempinfo->isconnectlocal == 0 )
                         {
                             backcode=ConnectLocal(sslinfo1,&it1,tempinfo,&socklist,&tunneladdr);
@@ -344,7 +345,12 @@ void* proxy(  )
                               continue;
                             }
                         }
-
+                        //等待本地连接完成
+                        if( tempinfo->isconnectlocal == 1 )
+                        {
+                            sleeps( 1 );//避免频繁触发cpu过高
+                        }
+                        //本地连接完成转发
                         if( tempinfo->isconnectlocal == 2 )
                         {
                             backcode=RemoteToLocal(sslinfo1,tempinfo,&it1,&socklist);
@@ -406,28 +412,7 @@ void* proxy(  )
                                continue;
                             }
 						}
-						//本地连接
-                        if ( tempinfo->istype == 2 )
-						{
-                            if(socklist.count(tempinfo->tosock)>0)
-                            {
-                                tempinfo1 =socklist[tempinfo->tosock];
-                                tempinfo1->isconnectlocal=2;
-                                /* copy到临时缓存区 */
-                                if ( tempinfo1->packbuflen > 0 )
-                                {
-                                    //发送到本地
-                                    backcode=sendlocal(it1->first,(char*)tempinfo1->packbuf, tempinfo1->packbuflen,1);
-                                    free( tempinfo1->packbuf );
-                                    tempinfo1->packbuf	= NULL;
-                                    tempinfo1->packbuflen	= 0;
-                                    if(backcode<1){
-                                        shutdown(it1->first,2);//关闭自己
-                                        shutdown(tempinfo->tosock,2);//关闭对方
-                                    }
-                                }
-                            }
-						}
+
 					}
 				}
 				//继续遍历
