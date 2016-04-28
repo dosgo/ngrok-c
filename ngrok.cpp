@@ -203,6 +203,11 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
         shutdown( tosock, 2 );
         clearsock( (*it1)->first, tempinfo1 );
         (*socklist).erase((*it1)++);
+        //这行绝对不能删除，用标记ssl已经销毁，删除会导致崩溃。
+        if((*socklist).count(tosock)==1)
+        {
+            (*socklist)[tosock]->sslinfo=NULL;
+        }
         return -1;
     }
     else if(readlen >0)
