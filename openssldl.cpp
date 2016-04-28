@@ -46,6 +46,9 @@ TSslX509d2i          SslX509d2i = 0;
 TSslX509i2d          SslX509i2d = 0;
 TSslSetConnectState  SslSetConnectState = 0;//dosgo
 TSslDoHandshake  SslDoHandshake = 0;//dosgo
+TSsLGetSession   SsLGetSession = 0;//dosgo
+TSsLSetSession   SsLSetSession = 0;//dosgo
+
 
 //----------------------------------------------------------------------------
 void FechaSSL()
@@ -127,6 +130,8 @@ const char * AbreSSL()
     SslX509i2d          = (TSslX509i2d)    GETPROC(ssl_handle2, "i2d_X509");
     SslSetConnectState  = (TSslSetConnectState)   GETPROC(ssl_handle1, "SSL_set_connect_state");//dosgo
     SslDoHandshake      = (TSslDoHandshake)   GETPROC(ssl_handle1, "SSL_do_handshake");//dosgo
+    SsLGetSession      = (TSsLGetSession)   GETPROC(ssl_handle1, "SSL_get_session");//dosgo
+    SsLSetSession      = (TSsLSetSession)   GETPROC(ssl_handle1, "SSL_set_session");//dosgo
     const char * erro = 0;
     if (!SslGetError)         erro = "SSL_get_error";
     if (!SslLibraryInit)      erro = "SSL_library_init";
@@ -155,6 +160,8 @@ const char * AbreSSL()
     if (!SslX509i2d)          erro = "i2d_X509";
     if (!SslSetConnectState)  erro = "SSL_set_connect_state";
     if (!SslDoHandshake)     erro = "SSL_do_handshake";
+    if (!SsLGetSession)     erro = "SSL_get_session";
+    if (!SsLSetSession)     erro = "SSL_set_session";
     if (erro)
     {
         FechaSSL();
