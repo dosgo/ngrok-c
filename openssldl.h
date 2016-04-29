@@ -58,6 +58,7 @@ typedef int     (*TSslDoHandshake)(SSL *ssl);//SSL_do_handshake dosgo
 typedef SSL_SESSION * (*TSsLGetSession)(const SSL *ssl);//SSL_get_session dosgo
 typedef int     (*TSsLSetSession)(SSL *to, SSL_SESSION *session);//SSL_set_session dosgo
 typedef long    (*TSslCtxCtrl)(SSL_CTX *ctx,int cmd, long larg, void *parg);//SSL_CTX_ctrl dosgo
+typedef SSL_SESSION *(*TSsLGet1Session)(SSL *ssl);//SSL_get1_session dosgo
 //----------------------------------------------------------------------------
 // Ponteiros de funções
 extern TSslGetError         SslGetError;
@@ -91,6 +92,7 @@ extern TSslDoHandshake      SslDoHandshake;  //dosgo
 extern TSsLSetSession      SsLSetSession;  //dosgo
 extern TSsLGetSession      SsLGetSession;  //dosgo
 extern TSslCtxCtrl      SslCtxCtrl;  //dosgo
+extern TSsLGet1Session      SsLGet1Session;  //dosgo
 //----------------------------------------------------------------------------
 
 

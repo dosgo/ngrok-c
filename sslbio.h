@@ -11,7 +11,7 @@
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<openssl/err.h>
-
+static SSL_SESSION *sess = NULL;
 struct openssl_info
 {
     SSL *ssl;
