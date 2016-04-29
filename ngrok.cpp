@@ -64,6 +64,7 @@ int GetLocalAddr(char *url,struct sockaddr_in *local_addr,map<string,TunnelReq*>
     if((*tunneladdr).count(string(url))!=0)
     {
             TunnelReq *tunnelreq =(*tunneladdr)[string(url)];
+            memset(local_addr,0,sizeof(sockaddr_in));
             int		l1		= inet_addr( tunnelreq->localhost );
             local_addr->sin_family	= AF_INET;
             local_addr->sin_port	= htons(tunnelreq->localport );
