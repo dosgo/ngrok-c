@@ -79,7 +79,7 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnel
     char host[128] = { 0 };
     char portstr[8]={0};
     int port =0;
-    sscanf(url,"%[^:]://%[^:]:%[1-9]",protocol,host,portstr);
+    sscanf(url,"%[^:]://%[^:]:%[0-9]",protocol,host,portstr);
     port=atoi(portstr);
       //进行迭代遍历
     for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)

@@ -33,7 +33,6 @@ int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,con
     memset(str,0,1024);
     memcpy(ReqId,guid,strlen(guid));//copy
     sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",protocol,guid,HostName,Subdomain,RemotePort,authtoken);
-    printf("SendReqTunnel:%s\r\n",str);
     return sendpack(sock,ssl,str,1);
 }
 
