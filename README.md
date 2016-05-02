@@ -158,6 +158,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 -1.25 版本（测试）增加多个通道功能，避免多个进程，可以注册N个通道，如- ngrokc -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example1] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:Example2]
 - 这是一个支持ngrok完全协议的版本。go语言以后可能员生支持mips，这个就没人用了。可能不更新了。
 
+##2016/05/2
+-1.32稳定版本，修复1.25版本tcp映射出错问题。修复1.25的崩溃bug。
+
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
