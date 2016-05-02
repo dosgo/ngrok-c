@@ -27,13 +27,13 @@ char *rand_str(char *str,const int len)
 
 int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort,char *authtoken)
 {
-    char guid[37];
-    memset(guid,0,37);
+    char guid[20]={0};
     rand_str(guid,5);
     char str[1024];
     memset(str,0,1024);
     memcpy(ReqId,guid,strlen(guid));//copy
     sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",protocol,guid,HostName,Subdomain,RemotePort,authtoken);
+    printf("SendReqTunnel:%s\r\n",str);
     return sendpack(sock,ssl,str,1);
 }
 

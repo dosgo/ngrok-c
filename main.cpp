@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.30-(2016/4/30)";
+string VER = "1.31-(2016/5/2)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -252,13 +252,15 @@ void* proxy(  )
                 {
                     tunnelinfo =(TunnelInfo	*)*listit;
                     if(tunnelinfo->regstate==0){
+                        memset(ReqId,0,20);
+                        memset(tunnelinfo->ReqId,0,20);
                         #if OPENSSL
                         SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
                         #else
                         SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport,authtoken );
                         #endif
                         //copy
-                        memcpy(tunnelinfo->ReqId,(const void*)ReqId,strlen(ReqId));
+                        memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
                         tunnelinfo->regtime=get_curr_unixtime();//已发
                     }
                 }
@@ -317,7 +319,7 @@ void* proxy(  )
 			      //ping
                 checkping();//这里添加个ping避免超时
                 //判断连接超时sock
-                if((tempinfo->linktime+3)<get_curr_unixtime()&&tempinfo->isconnect==0)
+                if((tempinfo->linktime+10)<get_curr_unixtime()&&tempinfo->isconnect==0)
                 {
 					//关闭远程连接
                     if(tempinfo->istype==2){

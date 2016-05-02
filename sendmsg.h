@@ -33,12 +33,12 @@ using namespace std;
 struct TunnelInfo
 {
     char localhost[255];
+    int localport;
     char subdomain[255];
     char hostname[255];
     char httpauth[255];
     char protocol[10];
-    char ReqId[30];
-    int localport;
+    char ReqId[20];
     int remoteport;
     int regtime;
     int regstate;

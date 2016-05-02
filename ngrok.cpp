@@ -42,7 +42,6 @@ int InitTunnelList(list<TunnelInfo*>*tunnellist,map<string,TunnelReq*>*tunneladd
     for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
     {
         TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
-        memset(tunnelinfo->ReqId,0,30);
         tunnelinfo->regtime=0;
         tunnelinfo->regstate=0;
     }
