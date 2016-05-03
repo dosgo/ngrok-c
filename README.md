@@ -5,6 +5,8 @@
 - contact me via email: dosgo@qq.com
 
 
+#openwrt 编译方法。
+- 看教程http://www.jianshu.com/p/8428949d946c
 
 
 ##build  
