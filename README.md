@@ -163,6 +163,8 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##2016/05/2
 -1.32稳定版本，修复1.25版本tcp映射出错问题。修复1.25的崩溃bug。
 
+##2016/05/11
+-1.33版本 修复重连子域名bug。
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
