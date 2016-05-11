@@ -27,6 +27,7 @@ int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist){
     SetKeepAlive(proxy_fd);
     connect( proxy_fd, (struct sockaddr *) &server_addr, sizeof(server_addr) );
     sockinfo * sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
+    memset(sinfo,0,sizeof(sockinfo));
     sinfo->istype		= 1;
     sinfo->isconnect	= 0;
     sinfo->packbuflen	= 0;
@@ -76,18 +77,27 @@ int GetLocalAddr(char *url,struct sockaddr_in *local_addr,map<string,TunnelReq*>
 int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr){
     list<TunnelInfo*>::iterator iter;
     char protocol[32] = { 0 };
-    char host[128] = { 0 };
+    char host[256] = { 0 };
     char portstr[8]={0};
+    char subdomain[128]={0};
     int port =0;
     sscanf(url,"%[^:]://%[^:]:%[0-9]",protocol,host,portstr);
     port=atoi(portstr);
+    sscanf(host,"%[^.].",subdomain);
       //进行迭代遍历
     for(iter = (*tunnellist).begin(); iter !=(*tunnellist).end(); iter++)
     {
         TunnelInfo	*tunnelinfo =(TunnelInfo*)*iter;
         if(strcasecmp(ReqId,tunnelinfo->ReqId)==0){
-            memcpy(tunnelinfo->hostname,host,strlen(host));
-            tunnelinfo->remoteport=port;
+
+            //memcpy(tunnelinfo->hostname,host,strlen(host));
+            if(strncmp(protocol,"tcp",3)==0){
+                tunnelinfo->remoteport=port;
+            }
+            if(strncmp(protocol,"http",4)==0){
+                memset(tunnelinfo->subdomain,0,255);
+                memcpy(tunnelinfo->subdomain,subdomain,strlen(subdomain));
+            }
             tunnelinfo->regstate=regstate;
             TunnelReq *tunnelreq = (TunnelReq *) malloc( sizeof(TunnelReq));
             memset(tunnelreq,0,sizeof(TunnelReq));
