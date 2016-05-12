@@ -46,9 +46,16 @@ int UdpCmd(int udpsocket){
     if(udpbuflen>0){
          cJSON *json = cJSON_Parse( buf );
          cJSON *cmd = cJSON_GetObjectItem( json, "cmd" );
+         //ÍË³ö
          if ( strcmp( cmd->valuestring, "exit" ) == 0 ){
             cJSON_Delete( json );
             exit(0);
+         }
+         if ( strcmp( cmd->valuestring, "ping" ) == 0 ){
+            //»Ø¸´
+            char sendbuf[255]="{\"cmd\":\"pong\"}";
+            sendto(udpsocket,sendbuf,strlen(sendbuf),0,(struct sockaddr *)&udpaddr,sizeof(udpaddr));
+            cJSON_Delete( json );
          }
         cJSON_Delete( json );
     }
