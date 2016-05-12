@@ -19,6 +19,8 @@ typedef mbedtls_ssl_context ssl_context;
 #endif // ISMBEDTLS
 #endif
 
+int ControlUdp(int port);
+int UdpCmd(int udpsocket);
 
 int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist);
 

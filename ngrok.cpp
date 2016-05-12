@@ -15,6 +15,45 @@ typedef long long __int64;
 #include<stdlib.h>
 using namespace std;
 
+/*¿ØÖÆudp*/
+int ControlUdp(int port){
+    int sockfd;
+    struct sockaddr_in my_addr;
+    if((sockfd=socket(AF_INET,SOCK_DGRAM,0))==-1)
+    {
+        return -2;
+    }
+    my_addr.sin_family=AF_INET;
+    my_addr.sin_port=htons(port);
+    my_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+    memset(my_addr.sin_zero,0,8);
+    int re_flag=1;
+    int re_len=sizeof(int);
+    setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,(char *)&re_flag,re_len);
+    if(bind(sockfd,(const struct sockaddr *)&my_addr,sizeof(struct sockaddr))==-1)
+    {
+        return -3;
+    }
+    setnonblocking( sockfd, 1 );
+    return sockfd;
+}
+/**/
+int UdpCmd(int udpsocket){
+    struct sockaddr udpaddr;
+    int udplen=sizeof(udpaddr);
+	char buf[1024]={0};
+    int udpbuflen=recvfrom(udpsocket,buf,1024,MSG_PEEK ,&udpaddr,&udplen);
+    if(udpbuflen>0){
+         cJSON *json = cJSON_Parse( buf );
+         cJSON *cmd = cJSON_GetObjectItem( json, "cmd" );
+         if ( strcmp( cmd->valuestring, "exit" ) == 0 ){
+            cJSON_Delete( json );
+            exit(0);
+         }
+        cJSON_Delete( json );
+    }
+    return 0;
+}
 
 
 

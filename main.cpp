@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.33-(2016/5/11)";
+string VER = "1.34-(2016/5/12)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -80,6 +80,11 @@ int regtunneltime=0;
 int	lastdnsback;
 int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
+
+#if UDPCMD
+int udpsocket=0;
+int udpport=1885;
+#endif
 
 void* proxy( );
 struct sockaddr_in server_addr = { 0 };
@@ -163,25 +168,28 @@ int main( int argc, char **argv )
 	}
     #endif
 
-#if OPENSSL
-#if OPENSSLDL
-const char *err=AbreSSL();
-if(err!=NULL)
-{
-    printf("OpenSSL init fail.\r\nPlease check if the OpenSSL is installed. \r\n%s not found.\r\n",err);
-    exit(0);
-}
-#else
-SSL_library_init();
-SSL_load_error_strings();
-OpenSSL_add_all_algorithms();
-#endif
-#endif // OPENSSL
+    #if OPENSSL
+        #if OPENSSLDL
+        const char *err=AbreSSL();
+        if(err!=NULL)
+        {
+            printf("OpenSSL init fail.\r\nPlease check if the OpenSSL is installed. \r\n%s not found.\r\n",err);
+            exit(0);
+        }
+        #else
+        SSL_library_init();
+        SSL_load_error_strings();
+        OpenSSL_add_all_algorithms();
+        #endif
+    #endif // OPENSSL
     init_ssl_session();
 
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
 	lastdnstime	= get_curr_unixtime();
+    #if UDPCMD
+    udpsocket=ControlUdp(udpport);
+    #endif // UDPCMD
     proxy();
 	return(0);
 }
@@ -208,6 +216,7 @@ void* proxy(  )
     TunnelInfo *tunnelinfo;
     char ReqId[20]={0};
 	int backcode=0;
+
 	while ( true )
 	{
         //ping
@@ -296,7 +305,12 @@ void* proxy(  )
 			++it;
 		}
 
-
+        #if UDPCMD
+        if(udpsocket>0){
+            maxfdp = udpsocket > maxfdp ? udpsocket : maxfdp;
+            FD_SET(udpsocket,&readSet );
+        }
+        #endif //
 
 		if(maxfd==0)
 		{
@@ -313,6 +327,15 @@ void* proxy(  )
 
 		if ( ret > 0 )
 		{
+
+
+            #if UDPCMD
+            if(FD_ISSET(udpsocket,&readSet))
+            {
+                UdpCmd(udpsocket);
+            }
+            #endif /
+
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
 			    tempinfo = it1->second;
