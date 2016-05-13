@@ -11,7 +11,7 @@ rm -rf $DIR/nonblocking.o
 rm -rf $DIR/ngrokc
 
 CC=mips-openwrt-linux-g++
-YH="-Wall -fexceptions -DOPENSSL=0 -DISMBEDTLS=0 -O2"
+YH="-Wall -fexceptions -DOPENSSL=0 -DISMBEDTLS=1 -O2"
 $CC $YH -c $1 sendmsg.cpp -o $DIR/sendmsg.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
 $CC $YH -c $1 main.cpp -o $DIR/main.o

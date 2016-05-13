@@ -55,6 +55,10 @@ typedef X509 *  (*TSslX509d2i)(X509 **px, const unsigned char **in, int len);
 typedef int     (*TSslX509i2d)(X509 *x, unsigned char **out);
 typedef void    (*TSslSetConnectState)(SSL *ssl);//SSL_set_connect_state dosgo
 typedef int     (*TSslDoHandshake)(SSL *ssl);//SSL_do_handshake dosgo
+typedef SSL_SESSION * (*TSsLGetSession)(const SSL *ssl);//SSL_get_session dosgo
+typedef int     (*TSsLSetSession)(SSL *to, SSL_SESSION *session);//SSL_set_session dosgo
+typedef long    (*TSslCtxCtrl)(SSL_CTX *ctx,int cmd, long larg, void *parg);//SSL_CTX_ctrl dosgo
+typedef SSL_SESSION *(*TSsLGet1Session)(SSL *ssl);//SSL_get1_session dosgo
 //----------------------------------------------------------------------------
 // Ponteiros de funções
 extern TSslGetError         SslGetError;
@@ -85,6 +89,10 @@ extern TSslX509d2i          SslX509d2i;
 extern TSslX509i2d          SslX509i2d;
 extern TSslSetConnectState  SslSetConnectState;  //dosgo
 extern TSslDoHandshake      SslDoHandshake;  //dosgo
+extern TSsLSetSession      SsLSetSession;  //dosgo
+extern TSsLGetSession      SsLGetSession;  //dosgo
+extern TSslCtxCtrl      SslCtxCtrl;  //dosgo
+extern TSsLGet1Session      SsLGet1Session;  //dosgo
 //----------------------------------------------------------------------------
 
 

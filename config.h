@@ -13,17 +13,19 @@
 #define ISMBEDTLS 0
 #endif
 
-
+#define MAXBUF 2048
 #define DEBUG 0
+#define UDPCMD  1
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 inline int echo(const char* format, ...)
 {
+    int n=0;
     va_list ap;
     va_start(ap, format);
-    int n = vprintf(format,ap);
+    n = vprintf(format,ap);
     fflush(stdout);
     va_end(ap);
     return n;

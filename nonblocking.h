@@ -60,7 +60,7 @@ inline int SetKeepAlive(int sock){
     alive_in.keepaliveinterval =60000; // 两次KeepAlive探测间的时间间隔
     alive_in.onoff = TRUE;
     unsigned long ulBytesReturn =0;
-   // nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
+    //nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
     if (nRet == SOCKET_ERROR)
     {
     return -1;
@@ -90,31 +90,27 @@ return 0;
 struct sockinfo
 {
     openssl_info *sslinfo;
-    int isssl;
     int isconnect;
-    int linkunixtime;
     int istype; //1=remote 2=local,3=cmd
     int tosock;
     unsigned char *packbuf;
     unsigned long long packbuflen;
     int isconnectlocal;
+    int linktime;
     int isauth;
-    int pongtime;
 };
 #else
 struct sockinfo
 {
     ssl_info *sslinfo;
-    int isssl;
     int isconnect;
-    int linkunixtime;
-    int istype; //1=remote 2=local
+    int istype; //1=remote 2=local,3=cmd
     int tosock;
     unsigned char *packbuf;
-     unsigned long long packbuflen;
+    unsigned long long packbuflen;
     int isconnectlocal;
+    int linktime;
     int isauth;
-    int pongtime;
 };
 #endif
 
@@ -165,10 +161,10 @@ void clearsock(int sock,sockinfo * sock_info);
 inline int SetBufSize(int sock)
 {
     //接收缓冲区
-    int opt=12*1024;
+    int opt=25*1024;//30K
     setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char*)&opt,sizeof(opt));
-    //发送缓冲区
-    setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
+    //发送缓冲区  (这个千万不要。。发送不需要缓存区)
+   // setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
     return 0;
 }
 

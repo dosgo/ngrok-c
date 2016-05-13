@@ -33,14 +33,23 @@ using namespace std;
 struct TunnelInfo
 {
     char localhost[255];
+    int localport;
     char subdomain[255];
     char hostname[255];
     char httpauth[255];
-    int localport;
-    struct sockaddr_in local_addr;
+    char protocol[10];
+    char ReqId[20];
     int remoteport;
+    int regtime;
+    int regstate;
 };
 
+struct TunnelReq
+{
+    char localhost[255];
+    int localport;
+    int regtime;
+};
 
 
 
@@ -50,7 +59,7 @@ inline int get_curr_unixtime()
     return time(&now);
 }
 
-int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
+int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken);
 
 inline int strpos( char *str, char c )
 {
@@ -61,19 +70,9 @@ inline int strpos( char *str, char c )
 }
 
 
-inline int GetProtocol(char *url,char *Protocol)
-{
-	int	plen= strpos( url, ':' );
-	if(plen>0)
-    {
-        memcpy( Protocol, url, plen );
-        return 0;
-    }
-	return -1;
-}
 
 
-int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr );
+
 inline int getvalue(char * str,const char *key,char * value){
     int ypos=0;
     if ( strncmp(str,key,strlen(key)) == 0 )
@@ -89,6 +88,49 @@ inline int getvalue(char * str,const char *key,char * value){
 }
 
 
+inline int sendremote(int sock,ssl_context *ssl,const char *buf,int buflen,int isblock){
+        int sendlen=0;
+        if(isblock)
+        {
+            setnonblocking(sock,0);
+        }
+        #if OPENSSL
+        #if OPENSSLDL
+        sendlen=SslWrite(ssl, buf, buflen );
+        #else
+        sendlen=SSL_write(ssl, buf, buflen );
+        #endif // OPENSSLDL
+        #else
+        #if ISMBEDTLS
+        sendlen=mbedtls_ssl_write( ssl, (unsigned char *)buf, buflen );
+        #else
+        sendlen=ssl_write( ssl,(unsigned char *) buf, buflen );
+        #endif // ISMBEDTLS
+        #endif
+        if(isblock)
+        {
+            setnonblocking(sock,1);
+        }
+        return sendlen;
+}
+
+inline int sendlocal(int sock,const char *buf,int buflen,int isblock){
+    int sendlen=0;
+    if(isblock)
+    {
+        setnonblocking(sock,0);
+    }
+    #if WIN32
+    sendlen=send( sock, (char *) buf, buflen, 0 );
+    #else
+    sendlen=send( sock, buf, buflen, 0 );
+    #endif
+    if(isblock)
+    {
+        setnonblocking(sock,1);
+    }
+    return sendlen;
+}
 
 
 inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
@@ -159,7 +201,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
+int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
 //#endif
 
 

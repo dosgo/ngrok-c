@@ -25,41 +25,20 @@ char *rand_str(char *str,const int len)
 
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort,char *authtoken)
+int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort,char *authtoken)
 {
-    char guid[37];
-    memset(guid,0,37);
+    char guid[20]={0};
     rand_str(guid,5);
     char str[1024];
     memset(str,0,1024);
+    memcpy(ReqId,guid,strlen(guid));//copy
     sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",protocol,guid,HostName,Subdomain,RemotePort,authtoken);
     return sendpack(sock,ssl,str,1);
 }
 
 
 
-int getlocaladdr( map<string,TunnelInfo *> *tunnellist,char *url, struct sockaddr_in* local_addr )
-{
-	char	Protocol[10]	= { 0 };
-	int	plen		= strpos( url, ':' );
-	memcpy( Protocol, url, plen );
-	if ( tunnellist->count( string( Protocol ) ) > 0 )
-	{
-		TunnelInfo	*tunnelinfo	= (*tunnellist)[string( Protocol )];
-		int		l1		= inet_addr( tunnelinfo->localhost );
-		printf( "tunnelinfo->localhost %s\r\n", tunnelinfo->localhost );
-		printf( "tunnelinfo->localhost \r\n" );
-		local_addr->sin_family	= AF_INET;
-		local_addr->sin_port	= htons(tunnelinfo->localport );
-		memcpy( &local_addr->sin_addr, &l1, 4 );
-		return 0;
-	}
-	return -1;
-}
-
-
-
-int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken)
+int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken)
 {
 	if ( argc > 1 )
 	{
@@ -110,7 +89,7 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 
 					TunnelInfo *tunnelinfo = (TunnelInfo *) malloc( sizeof(TunnelInfo) );
 					memset( tunnelinfo, 0, sizeof(TunnelInfo) );
-					char Type[255] = { 0 };
+
 
 					while ( run )
 					{
@@ -125,8 +104,9 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
 
-						getvalue(jsonstr,"Type",Type);
+
                         getvalue(jsonstr,"Lhost",tunnelinfo->localhost);
+                        getvalue(jsonstr,"Type",tunnelinfo->protocol);
                         memset( temp, 0, strlen( temp ) );
                         if(getvalue(jsonstr,"Lport",temp)==0)
                         {
@@ -142,13 +122,7 @@ int loadargs( int argc, char **argv ,map<string, TunnelInfo*>*tunnellist,char *s
 						pos = pos + xpos + 1;
 					}
 
-
-
-                    int		l1		= inet_addr( tunnelinfo->localhost );
-                    (&tunnelinfo->local_addr)->sin_family	= AF_INET;
-                     (&tunnelinfo->local_addr)->sin_port	= htons(tunnelinfo->localport );
-                     memcpy(&(&tunnelinfo->local_addr)->sin_addr, &l1, 4 );
-					(*tunnellist)[string( Type )] = tunnelinfo;
+					(*tunnellist).push_back(tunnelinfo);
 				}
 			}
 		}
