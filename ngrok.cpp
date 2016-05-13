@@ -40,7 +40,11 @@ int ControlUdp(int port){
 /**/
 int UdpCmd(int udpsocket){
     struct sockaddr udpaddr;
+    #if WIN32
+    int udplen=sizeof(udpaddr);
+    #else
     socklen_t udplen=sizeof(udpaddr);
+    #endif
 	char buf[1024]={0};
     int udpbuflen=recvfrom(udpsocket,buf,1024,MSG_PEEK ,&udpaddr,&udplen);
     if(udpbuflen>0){
