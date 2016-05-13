@@ -65,7 +65,7 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.34-(2016/5/12)";
+string VER = "1.35-(2016/5/13)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -334,7 +334,7 @@ void* proxy(  )
             {
                 UdpCmd(udpsocket);
             }
-            #endif /
+            #endif
 
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
