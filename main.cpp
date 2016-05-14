@@ -65,7 +65,8 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.35-(2016/5/13)";
+//string VER = "1.35-(2016/5/13)";
+char VER[24]= "1.36-(2016/5/14)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -144,7 +145,7 @@ int checkping(){
 
 int main( int argc, char **argv )
 {
-    printf("ngrokc v%s \r\n",VER.c_str());
+    printf("ngrokc v%s \r\n",VER);
 	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
     #if WIN32
 	signal( SIGINT, cs );
