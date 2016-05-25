@@ -426,8 +426,7 @@ void* proxy(  )
 							socklist.erase(it1++);
 							continue;
 						}
-						/* 置为1 */
-						tempinfo->isconnect = 1;
+
 
 						/* 为远程连接 */
 						if ( tempinfo->istype == 1 )
@@ -438,6 +437,8 @@ void* proxy(  )
                             {
                                continue;
                             }
+                            /* 置为1 */
+                            tempinfo->isconnect = 1;
 						}
 
                         //本地连接
@@ -448,6 +449,8 @@ void* proxy(  )
                                 tempinfo1 = socklist[tempinfo->tosock];
                                 tempinfo1->isconnectlocal=2;
                             }
+                            /* 置为1 */
+                            tempinfo->isconnect = 1;
 						}
 
 					}
