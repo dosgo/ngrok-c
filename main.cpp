@@ -66,7 +66,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.36-(2016/5/14)";
+char VER[24]= "1.37-(2016/5/25)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;

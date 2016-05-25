@@ -283,6 +283,12 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
 }
 
 int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelReq*> *tunneladdr){
+    //±ÜÃâÖ¸ÕëÎª¿Õ±ÀÀ£
+    if(sslinfo==NULL){
+         clearsock( (*it1)->first, tempinfo1 );
+        (*socklist).erase((*it1)++);
+        return -1;
+    }
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
