@@ -2,7 +2,7 @@ rem set MINGW_PATH=D:/MinGW
 rem set C_INCLUDE_PATH=%MINGW_PATH%/include;%MINGW_PATH%/lib/gcc/mingw32/3.4.5/include
 set OPATH=build-win32
 set CC=g++
-set YH=-Wall -fexceptions -O3
+set YH=-Wall -fexceptions -O3 -DOPENSSL=1 -DOPENSSLDL=0
 mkdir %OPATH%
 del %OPATH%\*.o
 %CC%  %YH% -c cJSON.c -o  %OPATH%/cJSON.o
