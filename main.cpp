@@ -66,7 +66,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.37-(2016/5/25)";
+char VER[24]= "1.38-(2016/6/30)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -134,7 +134,7 @@ int checkping(){
         int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
         #endif
         //发送失败断开连接
-        if(sendlen==-1)
+        if(sendlen<1)
         {
             mainsockstatus=0;
         }
