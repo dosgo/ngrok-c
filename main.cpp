@@ -66,7 +66,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.38-(2016/6/30)";
+char VER[24]= "1.39-(2016/7/26)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
@@ -146,7 +146,7 @@ int checkping(){
 int main( int argc, char **argv )
 {
     printf("ngrokc v%s \r\n",VER);
-	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
+	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,&ClientId );
     #if WIN32
 	signal( SIGINT, cs );
     #else

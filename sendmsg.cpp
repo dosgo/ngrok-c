@@ -38,7 +38,7 @@ int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,con
 
 
 
-int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken)
+int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken,string *ClientId)
 {
 	if ( argc > 1 )
 	{
@@ -79,6 +79,12 @@ int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,i
                             *s_port = atoi(temp);
 						}
 						getvalue(jsonstr,"Atoken",authtoken);
+
+						if(getvalue(jsonstr,"Cid",temp)==0)
+                        {
+                            *ClientId = string( temp );
+						}
+
 						pos = pos + xpos + 1;
 					}
 				}
