@@ -5,6 +5,8 @@
 - contact me via email: dosgo@qq.com
 
 
+不会编译的伙伴可以用，hauntek大神写的python版本，https://github.com/hauntek/python-ngrok
+
 #openwrt 编译方法。
 - 看教程http://www.jianshu.com/p/8428949d946c
 
