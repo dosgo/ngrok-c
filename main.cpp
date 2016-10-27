@@ -66,11 +66,12 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.39-(2016/7/26)";
+char VER[24]= "1.40-(2016/10/27)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
 char authtoken[255]="";
+char password[255]={0};//
 string ClientId = "";
 int	pingtime	= 0;
 int	ping		= 25; //不能大于30
@@ -113,7 +114,7 @@ int CheckStatus()
     {
         if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
+            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken,password)==-1)
             {
                 mainsockstatus=0;
                 printf("link err\r\n");
@@ -146,7 +147,7 @@ int checkping(){
 int main( int argc, char **argv )
 {
     printf("ngrokc v%s \r\n",VER);
-	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,&ClientId );
+	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,password,&ClientId );
     #if WIN32
 	signal( SIGINT, cs );
     #else
