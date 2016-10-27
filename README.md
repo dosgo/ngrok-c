@@ -5,6 +5,8 @@
 - contact me via email: dosgo@qq.com
 
 
+不会编译的伙伴可以用，hauntek大神写的python版本，https://github.com/hauntek/python-ngrok
+
 #openwrt 编译方法。
 - 看教程http://www.jianshu.com/p/8428949d946c
 
@@ -165,6 +167,15 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 ##2016/05/11
 -1.33版本 修复重连子域名bug。
+
+##2016/05/25
+-1.37版本 修复一个崩溃bug，建议所有的都升级到这个版本。
+
+##2016/07/26
+-1.39版本 为了增加自定义cid。其它没用
+
+##2016/10/27
+-1.40版本 增加password功能支持。
 
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。

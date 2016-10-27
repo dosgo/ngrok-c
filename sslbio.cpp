@@ -3,6 +3,7 @@
 #include "mytime.h"
 #include "sslbio.h"
 #if OPENSSL
+static SSL_SESSION *sess = NULL;
 int openssl_init_info(int server_fd,openssl_info *sslinfo)
 {
     #if OPENSSLDL

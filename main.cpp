@@ -65,11 +65,13 @@
 #include "nonblocking.h"
 
 using namespace std;
-string VER = "1.34-(2016/5/12)";
+//string VER = "1.35-(2016/5/13)";
+char VER[24]= "1.40-(2016/10/27)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int	s_port= 443;
 char authtoken[255]="";
+char password[255]={0};//
 string ClientId = "";
 int	pingtime	= 0;
 int	ping		= 25; //不能大于30
@@ -112,7 +114,7 @@ int CheckStatus()
     {
         if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken)==-1)
+            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken,password)==-1)
             {
                 mainsockstatus=0;
                 printf("link err\r\n");
@@ -133,7 +135,7 @@ int checkping(){
         int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
         #endif
         //发送失败断开连接
-        if(sendlen==-1)
+        if(sendlen<1)
         {
             mainsockstatus=0;
         }
@@ -144,8 +146,8 @@ int checkping(){
 
 int main( int argc, char **argv )
 {
-    printf("ngrokc v%s \r\n",VER.c_str());
-	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken );
+    printf("ngrokc v%s \r\n",VER);
+	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,password,&ClientId );
     #if WIN32
 	signal( SIGINT, cs );
     #else
@@ -334,7 +336,7 @@ void* proxy(  )
             {
                 UdpCmd(udpsocket);
             }
-            #endif /
+            #endif
 
 			for ( it1 = socklist.begin(); it1 != socklist.end(); )
 			{
@@ -425,8 +427,7 @@ void* proxy(  )
 							socklist.erase(it1++);
 							continue;
 						}
-						/* 置为1 */
-						tempinfo->isconnect = 1;
+
 
 						/* 为远程连接 */
 						if ( tempinfo->istype == 1 )
@@ -437,6 +438,8 @@ void* proxy(  )
                             {
                                continue;
                             }
+                            /* 置为1 */
+                            tempinfo->isconnect = 1;
 						}
 
                         //本地连接
@@ -447,6 +450,8 @@ void* proxy(  )
                                 tempinfo1 = socklist[tempinfo->tosock];
                                 tempinfo1->isconnectlocal=2;
                             }
+                            /* 置为1 */
+                            tempinfo->isconnect = 1;
 						}
 
 					}

@@ -40,7 +40,11 @@ int ControlUdp(int port){
 /**/
 int UdpCmd(int udpsocket){
     struct sockaddr udpaddr;
+    #if WIN32
+    int udplen=sizeof(udpaddr);
+    #else
     socklen_t udplen=sizeof(udpaddr);
+    #endif
 	char buf[1024]={0};
     int udpbuflen=recvfrom(udpsocket,buf,1024,MSG_PEEK ,&udpaddr,&udplen);
     if(udpbuflen>0){
@@ -279,6 +283,12 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
 }
 
 int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelReq*> *tunneladdr){
+    //±ÜÃâÖ¸ÕëÎª¿Õ±ÀÀ£
+    if(sslinfo==NULL){
+         clearsock( (*it1)->first, tempinfo1 );
+        (*socklist).erase((*it1)++);
+        return -1;
+    }
     int readlen;
     #if WIN32
     unsigned __int64		packlen;
@@ -497,7 +507,7 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
     return 0;
 }
 
-int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken)
+int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken,char *password)
 {
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
     SetBufSize(*mainsock);
@@ -531,9 +541,9 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
 	}
 
     #if OPENSSL
-	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken);
+	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken,password);
     #else
-	SendAuth(*mainsock, &(*mainsslinfo)->ssl, *ClientId, authtoken );
+	SendAuth(*mainsock, &(*mainsslinfo)->ssl, *ClientId, authtoken,password);
     #endif
 
     setnonblocking( *mainsock,1);
