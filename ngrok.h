@@ -38,5 +38,5 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
 
 int ConnectLocal(ssl_info *sslinfo1,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelReq*> *tunneladdr);
 int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr);
-int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken,char *password);
+int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken,char *password_c);
 #endif
