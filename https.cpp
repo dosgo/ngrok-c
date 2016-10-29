@@ -1161,13 +1161,15 @@ struct parsed_url *parse_url(const char *url)
     }
 	else
 	{
+	    purl->port =  (char*)malloc(4);
+	    memset(purl->port,0,4);
 	    if(strcmp(purl->scheme,"https")==0)
 	    {
-	        purl->port = "443";
+	        (void)strncpy(purl->port, "443", 3);
 	    }
 	    else
 	    {
-	        purl->port = "80";
+	        (void)strncpy(purl->port, "80", 3);
 	    }
 	}
 
