@@ -177,6 +177,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ##2016/10/27
 -1.40版本 增加password功能支持。
 
+##2016/11/26
+  准备新功能开发，UDP端口映射功能，有没有有兴趣的，一起开发，目前最大的问题在于，我的go语言很烂，别指望官方会加这功能，自己自己动手，又兴趣的加群192182463（QQ群）
+
 ###关于编译对应路由的版本的ngrokc。
 ##一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ##二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
