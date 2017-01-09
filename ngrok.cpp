@@ -536,6 +536,11 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
         #else
         close(*mainsock);
         #endif
+        #if OPENSSL
+        openssl_free_info(*mainsslinfo);
+        #else
+        ssl_free_info(*mainsslinfo);
+        #endif
 		free(*mainsslinfo);
 		return -1;
 	}
