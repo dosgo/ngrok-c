@@ -237,3 +237,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 
 现在tunnel.mobi不能用了。。，哪里还有国内的服务器的。。
+
+
+
+ ![image](https://github.com/dosgo/ngrok-c/bin/alipay.png)
