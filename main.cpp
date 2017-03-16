@@ -8,9 +8,6 @@
 #include <iomanip>
 #include <signal.h>
 
-
-
-
 #if OPENSSL
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
@@ -37,7 +34,6 @@
 #endif // ISMBEDTLS
 
 #endif
-
 
 #if  WIN32
 #include <windows.h>
@@ -69,17 +65,17 @@ using namespace std;
 char VER[24]= "1.41-(2017/01/09)";
 
 char s_name[255]="ngrokd.ngrok.com";
-int	s_port= 443;
+int s_port= 443;
 char authtoken[255]="";
-char password[255]={0};//
+char password_c[255]={0};//
 string ClientId = "";
-int	pingtime	= 0;
-int	ping		= 25; //不能大于30
-int	mainsock=0;
-int	lastdnstime=0;
+int pingtime	= 0;
+int ping		= 25; //不能大于30
+int mainsock=0;
+int lastdnstime=0;
 int mainsockstatus=1;
 int regtunneltime=0;
-int	lastdnsback;
+int lastdnsback;
 int lasterrtime=0;
 ssl_info *mainsslinfo=NULL;
 
@@ -114,7 +110,7 @@ int CheckStatus()
     {
         if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken,password)==-1)
+            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken,password_c)==-1)
             {
                 mainsockstatus=0;
                 printf("link err\r\n");
@@ -147,7 +143,7 @@ int checkping(){
 int main( int argc, char **argv )
 {
     printf("ngrokc v%s \r\n",VER);
-	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,password,&ClientId );
+	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,password_c,&ClientId );
     #if WIN32
 	signal( SIGINT, cs );
     #else
