@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="ngrok-c" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/ngrokc" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-SER[Shost:tunnel.phpor.me,Sport:4443,Cid:ssfd] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo] -AddTun[Type:http,Lhost:192.168.9.1,Lport:80,Sdname:xxdosgo1]  -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50088]  -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:2222,Rport:50099]" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="D:/C/ngrok-c/polarssl/libpolarssl-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedtls-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedx509-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedcrypto-win32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libws2_32.a" />
+					<Add library="D:/C/ngrok-c/openssl/libssl.dll.a" />
+					<Add library="D:/C/ngrok-c/openssl/libcrypto.dll.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/ngrokc" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="-SER[Shost:proxy.qqbrowser.cc,Sport,Sport:4443] -AddTun[Type:http,Sdname:jobtest,Lhost:192.168.8.1,Lport:80]" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="D:/c/ngrok-c/libmbedtls-win32.a" />
+					<Add library="D:/c/ngrok-c/libmbedx509-win32.a" />
+					<Add library="D:/c/ngrok-c/libpolarssl-win32.a" />
+					<Add library="d:/TDM-GCC-32/lib/libpthreadGC2.dll.a" />
+					<Add library="d:/TDM-GCC-32/lib/libws2_32.a" />
+					<Add library="D:/c/ngrok-c/libmbedcrypto-win32.a" />
+					<Add library="D:/c/ngrok-c/openssl/libcrypto.dll.a" />
+					<Add library="D:/c/ngrok-c/openssl/libssl.dll.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="bytestool.h" />
+		<Unit filename="cJSON.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="cJSON.h" />
+		<Unit filename="config.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="ngrok.cpp" />
+		<Unit filename="ngrok.h" />
+		<Unit filename="nonblocking.cpp" />
+		<Unit filename="nonblocking.h" />
+		<Unit filename="opensslbio.cpp" />
+		<Unit filename="opensslbio.h" />
+		<Unit filename="openssldl.cpp" />
+		<Unit filename="openssldl.h" />
+		<Unit filename="polarsslbio.cpp" />
+		<Unit filename="polarsslbio.h" />
+		<Unit filename="sendmsg.cpp" />
+		<Unit filename="sendmsg.h" />
+		<Unit filename="sslbio.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
