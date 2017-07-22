@@ -183,21 +183,16 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
 
-    #if OPENSSL
-    if ( ssl_init_info((*it1)->first, sslinfo ) != -1 )
+
+    if ( ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
     {
+        #if OPENSSL
         setnonblocking((*it1)->first,1);
-        SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
+        #endif
+        SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId);
     }
 
-    #else
-    if (ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
-    {
 
-        SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId );
-    }
-
-    #endif
     else
     {
         #if OPENSSL
@@ -225,11 +220,9 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
     if ( readlen > 0&&sslinfo!=NULL )
     {
         //发送到远程
-        #if OPENSSL
-        sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
-        #else
-         sendremote(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
-        #endif
+
+        sendremote(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
+
     }else  {
         shutdown( tempinfo->tosock, 2 );
         clearsock( (*it1)->first, tempinfo);
@@ -245,11 +238,9 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);
-   #if OPENSSL
-    readlen =  SslRecv(sslinfo1->ssl,buf,bufsize);
-   #else
-    readlen =  SslRecv( &sslinfo1->ssl, (unsigned char *) buf, bufsize );
-   #endif
+
+    readlen =  SslRecv(&sslinfo1->ssl,(unsigned char *)buf,bufsize);
+
 
 
 
@@ -295,11 +286,9 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
     char	tempjson[MAXBUF + 1];
 
     char buf[MAXBUF +1]={0};
-    #if OPENSSL
-    readlen =  SslRecv(sslinfo->ssl,buf,MAXBUF-1);
-    #else
+
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
-    #endif // OPENSSL
+
 
     struct sockaddr_in local_addr={0};
     if ( readlen ==0||readlen ==-2)
@@ -409,11 +398,10 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
     unsigned long long packlen;
     #endif
     char	tempjson[MAXBUF + 1];
-    #if OPENSSL
-    readlen =  SslRecv(sslinfo->ssl,buf,MAXBUF);
-    #else
+
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF);
-    #endif // OPENSSL
+
+
 
     if ( readlen ==0||readlen ==-2)
     {
@@ -465,11 +453,9 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 
                         char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
                         *ClientId = string( cid );
-                        #if OPENSSL
-                        SendPing( *mainsock,sslinfo->ssl );
-                        #else
-                        SendPing(*mainsock, &sslinfo->ssl );
-                        #endif
+
+                        SendPing( *mainsock,&sslinfo->ssl );
+
                         tempinfo->isauth=1;
                     }
                     else
@@ -483,11 +469,9 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 
 				else if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
-					#if OPENSSL
-                    SendPong( *mainsock,sslinfo->ssl );
-                    #else
+
                     SendPong( *mainsock,&sslinfo->ssl );
-                    #endif
+
 				}
 				else if ( strcmp( Type->valuestring, "Pong" ) == 0 )
 				{
@@ -520,12 +504,8 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
 	}
     *mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
 
-    #if OPENSSL
-    if(ssl_init_info(*mainsock, *mainsslinfo ) == -1 )
-    #else
-    if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
-    #endif
 
+    if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
 	{
 		echo( "ssl init failed!\r\n" );
         #if WIN32
@@ -538,11 +518,9 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
 		return -1;
 	}
 
-    #if OPENSSL
-	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
-    #else
-	SendAuth(*mainsock, &(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
-    #endif
+
+	SendAuth(*mainsock,&(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
+
 
     setnonblocking( *mainsock,1);
     sockinfo * sinfo = (sockinfo *) malloc( sizeof(sockinfo) );

@@ -7,18 +7,18 @@
 #include<openssl/err.h>
 struct ssl_info
 {
-    SSL *ssl;
+    SSL ssl;
     SSL_CTX *ctx;
 
 };
-int ssl_init_info(int server_fd,ssl_info *sslinfo);
+int ssl_init_info(int *server_fd,ssl_info *sslinfo);
 int ssl_free_info(ssl_info *sslinfo);
 typedef SSL ssl_context;
 
 #if OPENSSLDL
 #include "openssldl.h"
 #endif // OPENSSLDL
-inline int SslRecv(SSL* ssl, char* buffer, int ilen)
+inline int SslRecv(SSL* ssl, unsigned char* buffer, int ilen)
 {
   #if OPENSSLDL
    int  r=SslRead(ssl,buffer,ilen);
@@ -44,12 +44,12 @@ inline int SslRecv(SSL* ssl, char* buffer, int ilen)
 inline int ssl_free_info(ssl_info *sslinfo)
 {
     #if OPENSSLDL
-    SslShutdown( sslinfo->ssl );
-    SslFree( sslinfo->ssl );
+    SslShutdown( &sslinfo->ssl );
+    SslFree( &sslinfo->ssl );
     SslCtxFree( sslinfo->ctx  );
     #else
-    SSL_shutdown( sslinfo->ssl );
-    SSL_free( sslinfo->ssl );
+    SSL_shutdown( &sslinfo->ssl );
+    SSL_free( &sslinfo->ssl );
     SSL_CTX_free( sslinfo->ctx  );
     #endif //
     return 0;
@@ -58,6 +58,21 @@ inline int ssl_free_info(ssl_info *sslinfo)
 
 inline int init_ssl_session(){
 
+    return 0;
+}
+inline int ssl_lib_init(){
+    #if OPENSSLDL
+    const char *err=AbreSSL();
+    if(err!=NULL)
+    {
+        printf("OpenSSL init fail.\r\nPlease check if the OpenSSL is installed. \r\n%s not found.\r\n",err);
+        exit(0);
+    }
+    #else
+    SSL_library_init();
+    SSL_load_error_strings();
+    OpenSSL_add_all_algorithms();
+    #endif
     return 0;
 }
 #endif // OPENSSLBIO_H_INCLUDED

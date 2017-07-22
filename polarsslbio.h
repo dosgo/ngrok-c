@@ -19,15 +19,32 @@ typedef mbedtls_ssl_context ssl_context;
 typedef mbedtls_ssl_session ssl_session;
 typedef mbedtls_x509_crt x509_crt;
 typedef mbedtls_x509_crt x509_crt;
-static mbedtls_ssl_session ssn;
+#else
+
+#include <polarssl/net.h>
+#include <polarssl/debug.h>
+#include <polarssl/ssl.h>
+#include <polarssl/entropy.h>
+#include <polarssl/ctr_drbg.h>
+#include <polarssl/error.h>
+#include <polarssl/certs.h>
+#endif
+
+static ssl_session ssn;
 struct ssl_info
 {
     entropy_context entropy;
     ctr_drbg_context ctr_drbg;
     ssl_context ssl;
+    #if ISMBEDTLS
     mbedtls_ssl_config conf;
+    #endif
     x509_crt cacert;
 };
+
+
+
+#if ISMBEDTLS
 
 inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 {
@@ -54,14 +71,7 @@ inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 
 
 #else
-#include <polarssl/net.h>
-#include <polarssl/debug.h>
-#include <polarssl/ssl.h>
-#include <polarssl/entropy.h>
-#include <polarssl/ctr_drbg.h>
-#include <polarssl/error.h>
-#include <polarssl/certs.h>
-static ssl_session ssn;
+
 
 inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 {
@@ -81,13 +91,6 @@ inline int SslRecv( ssl_context *ssl,unsigned char* buffer, int ilen)
 }
 
 
-struct ssl_info
-{
-    entropy_context entropy;
-    ctr_drbg_context ctr_drbg;
-    ssl_context ssl;
-    x509_crt cacert;
-};
 #endif // ISMBEDTLS
 int ssl_init_info(int *server_fd,ssl_info *sslinfo);
 
@@ -110,13 +113,7 @@ inline int ssl_free_info(ssl_info *sslinfo){
 }
 
 inline int init_ssl_session(){
-
-    #if ISMBEDTLS
-    static ssl_session ssn;
-    memset(&ssn,0,sizeof(mbedtls_ssl_session));
-    #else
     memset(&ssn,0,sizeof(ssl_session));
-    #endif // ISMBEDTLS
     return 0;
 }
 #endif // POLARSSLBIO_H_INCLUDED

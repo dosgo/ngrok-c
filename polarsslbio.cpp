@@ -3,6 +3,7 @@
 #include "mytime.h"
 #include "polarsslbio.h"
 
+#if OPENSSL ==0
 
 #if ISMBEDTLS
 int ssl_init_info(int *server_fd,ssl_info *sslinfo)
@@ -81,7 +82,7 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 #else
-int ssl_init_info(int *server_fd,ssl_info *sslinfo)
+int ssl_init_info(int *server_fd, ssl_info *sslinfo)
 {
     int ret;
     const char *pers = "ssl";
@@ -140,3 +141,4 @@ int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 
 
 #endif // ISMBEDTLS
+#endif//openssl

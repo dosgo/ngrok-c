@@ -36,7 +36,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.42-(2017/07/22)";
+char VER[24]= "1.43-(2017/07/23)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int s_port= 443;
@@ -62,7 +62,6 @@ void* proxy( );
 struct sockaddr_in server_addr = { 0 };
 
 map<int,sockinfo*>socklist;
-//map<string,TunnelInfo*>tunnellist;
 list<TunnelInfo*> tunnellist;
 map<string,TunnelReq*> tunneladdr;
 void cs( int n )
@@ -99,11 +98,8 @@ int CheckStatus()
 int checkping(){
     if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
     {
-        #if OPENSSL
-        int sendlen = SendPing(mainsock, mainsslinfo->ssl );
-        #else
         int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
-        #endif
+
         //发送失败断开连接
         if(sendlen<1)
         {
@@ -141,20 +137,10 @@ int main( int argc, char **argv )
     #endif
 
     #if OPENSSL
-        #if OPENSSLDL
-        const char *err=AbreSSL();
-        if(err!=NULL)
-        {
-            printf("OpenSSL init fail.\r\nPlease check if the OpenSSL is installed. \r\n%s not found.\r\n",err);
-            exit(0);
-        }
-        #else
-        SSL_library_init();
-        SSL_load_error_strings();
-        OpenSSL_add_all_algorithms();
-        #endif
-    #endif // OPENSSL
+    ssl_lib_init();
+    #else
     init_ssl_session();
+    #endif // OPENSSL
 
 	/* init addr */
 	lastdnsback	= net_dns( &server_addr, s_name, s_port );
@@ -235,11 +221,9 @@ void* proxy(  )
                     if(tunnelinfo->regstate==0){
                         memset(ReqId,0,20);
                         memset(tunnelinfo->ReqId,0,20);
-                        #if OPENSSL
-                        SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
-                        #else
-                        SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport,authtoken );
-                        #endif
+
+                        SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
+
                         //copy
                         memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
                         tunnelinfo->regtime=get_curr_unixtime();//已发
