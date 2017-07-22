@@ -16,7 +16,13 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libpolarssl-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedtls-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedx509-win32.a" />
+					<Add library="D:/C/ngrok-c/polarssl/libmbedcrypto-win32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libws2_32.a" />
+					<Add library="D:/C/ngrok-c/openssl/libssl.dll.a" />
+					<Add library="D:/C/ngrok-c/openssl/libcrypto.dll.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -30,14 +36,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="D:\c\ngrok-c\libmbedtls-win32.a" />
-					<Add library="D:\c\ngrok-c\libmbedx509-win32.a" />
-					<Add library="D:\c\ngrok-c\libpolarssl-win32.a" />
-					<Add library="d:\TDM-GCC-32\lib\libpthreadGC2.dll.a" />
-					<Add library="d:\TDM-GCC-32\lib\libws2_32.a" />
-					<Add library="D:\c\ngrok-c\libmbedcrypto-win32.a" />
-					<Add library="D:\c\ngrok-c\openssl\libcrypto.dll.a" />
-					<Add library="D:\c\ngrok-c\openssl\libssl.dll.a" />
+					<Add library="D:/c/ngrok-c/libmbedtls-win32.a" />
+					<Add library="D:/c/ngrok-c/libmbedx509-win32.a" />
+					<Add library="D:/c/ngrok-c/libpolarssl-win32.a" />
+					<Add library="d:/TDM-GCC-32/lib/libpthreadGC2.dll.a" />
+					<Add library="d:/TDM-GCC-32/lib/libws2_32.a" />
+					<Add library="D:/c/ngrok-c/libmbedcrypto-win32.a" />
+					<Add library="D:/c/ngrok-c/openssl/libcrypto.dll.a" />
+					<Add library="D:/c/ngrok-c/openssl/libssl.dll.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -56,11 +62,14 @@
 		<Unit filename="ngrok.h" />
 		<Unit filename="nonblocking.cpp" />
 		<Unit filename="nonblocking.h" />
+		<Unit filename="opensslbio.cpp" />
+		<Unit filename="opensslbio.h" />
 		<Unit filename="openssldl.cpp" />
 		<Unit filename="openssldl.h" />
+		<Unit filename="polarsslbio.cpp" />
+		<Unit filename="polarsslbio.h" />
 		<Unit filename="sendmsg.cpp" />
 		<Unit filename="sendmsg.h" />
-		<Unit filename="sslbio.cpp" />
 		<Unit filename="sslbio.h" />
 		<Extensions>
 			<code_completion />

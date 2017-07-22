@@ -5,15 +5,14 @@
 #include<openssl/ssl.h>
 #include<openssl/bio.h>
 #include<openssl/err.h>
-struct openssl_info
+struct ssl_info
 {
     SSL *ssl;
     SSL_CTX *ctx;
 
 };
-int ssl_init_info(int server_fd,openssl_info *sslinfo);
-int ssl_free_info(openssl_info *sslinfo);
-typedef openssl_info ssl_info;
+int ssl_init_info(int server_fd,ssl_info *sslinfo);
+int ssl_free_info(ssl_info *sslinfo);
 typedef SSL ssl_context;
 
 #if OPENSSLDL
@@ -42,7 +41,7 @@ inline int SslRecv(SSL* ssl, char* buffer, int ilen)
 }
 
 
-inline int ssl_free_info(openssl_info *sslinfo)
+inline int ssl_free_info(ssl_info *sslinfo)
 {
     #if OPENSSLDL
     SslShutdown( sslinfo->ssl );

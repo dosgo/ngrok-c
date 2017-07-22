@@ -4,7 +4,7 @@
 #include "opensslbio.h"
 
 static SSL_SESSION *sess = NULL;
-int ssl_init_info(int server_fd,openssl_info *sslinfo)
+int ssl_init_info(int server_fd,ssl_info *sslinfo)
 {
     #if OPENSSLDL
     sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV23());

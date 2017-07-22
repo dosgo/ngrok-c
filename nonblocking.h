@@ -86,20 +86,7 @@ return 0;
 
 
 
-#if OPENSSL
-struct sockinfo
-{
-    openssl_info *sslinfo;
-    int isconnect;
-    int istype; //1=remote 2=local,3=cmd
-    int tosock;
-    unsigned char *packbuf;
-    unsigned long long packbuflen;
-    int isconnectlocal;
-    int linktime;
-    int isauth;
-};
-#else
+
 struct sockinfo
 {
     ssl_info *sslinfo;
@@ -112,7 +99,7 @@ struct sockinfo
     int linktime;
     int isauth;
 };
-#endif
+
 
 inline int setnonblocking(int sServer,int _nMode)
 {
