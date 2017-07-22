@@ -16,7 +16,7 @@ void clearsock(int sock,sockinfo * sock_info)
 
           if(sock_info->sslinfo!=NULL)
           {
-              openssl_free_info(sock_info->sslinfo);
+              ssl_free_info(sock_info->sslinfo);
               free(sock_info->sslinfo);
               sock_info->sslinfo=NULL;
           }

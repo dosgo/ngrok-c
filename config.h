@@ -6,11 +6,11 @@
 #endif
 
 #ifndef OPENSSLDL
-#define OPENSSLDL 1
+#define OPENSSLDL 0
 #endif
 
 #ifndef ISMBEDTLS
-#define ISMBEDTLS 0
+#define ISMBEDTLS 1
 #endif
 
 #define MAXBUF 2048

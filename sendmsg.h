@@ -4,18 +4,7 @@
 #include "nonblocking.h"
 #include <string>
 #include <map>
-#if OPENSSL
-#include "openssl/ssl.h"
-typedef SSL ssl_context;
-#else
-#if ISMBEDTLS
-#include <mbedtls/ssl.h>
-typedef mbedtls_ssl_context ssl_context;
-
-#else
-#include "polarssl/ssl.h"
-#endif // ISMBEDTLS
-#endif
+#include "sslbio.h"
 
 #if WIN32
 #include <windows.h>

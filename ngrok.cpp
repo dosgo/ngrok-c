@@ -184,33 +184,30 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
    tempinfo->sslinfo = sslinfo;
 
     #if OPENSSL
-    if ( openssl_init_info((*it1)->first, sslinfo ) != -1 )
+    if ( ssl_init_info((*it1)->first, sslinfo ) != -1 )
     {
         setnonblocking((*it1)->first,1);
         SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
     }
-    else
-    {
-        setnonblocking((*it1)->first,1);
-        /* ssl 初始化失败，移除连接 */
-        clearsock( (*it1)->first, tempinfo );
-        (*socklist).erase((*it1)++);
-        return -1;
-    }
+
     #else
     if (ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
     {
 
         SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId );
     }
+
+    #endif
     else
     {
+        #if OPENSSL
+        setnonblocking((*it1)->first,1);
+        #endif
         /* ssl 初始化失败，移除连接 */
         clearsock( (*it1)->first, tempinfo );
         (*socklist).erase((*it1)++);
         return -1;
     }
-    #endif
     return 0;
 }
 
@@ -524,7 +521,7 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
     *mainsslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
 
     #if OPENSSL
-    if(openssl_init_info(*mainsock, *mainsslinfo ) == -1 )
+    if(ssl_init_info(*mainsock, *mainsslinfo ) == -1 )
     #else
     if(ssl_init_info(mainsock, *mainsslinfo ) == -1 )
     #endif
@@ -537,7 +534,7 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
         close(*mainsock);
         #endif
         #if OPENSSL
-        openssl_free_info(*mainsslinfo);
+        ssl_free_info(*mainsslinfo);
         #else
         ssl_free_info(*mainsslinfo);
         #endif

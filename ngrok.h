@@ -6,18 +6,8 @@
 #include "sendmsg.h"
 #include "nonblocking.h"
 #include "cJSON.h"
-#if OPENSSL
-typedef SSL ssl_context;
-#include "openssl/ssl.h"
-#else
-#if ISMBEDTLS
-#include <mbedtls/ssl.h>
-typedef mbedtls_ssl_context ssl_context;
 
-#else
-#include "polarssl/ssl.h"
-#endif // ISMBEDTLS
-#endif
+
 
 int ControlUdp(int port);
 int UdpCmd(int udpsocket);

@@ -8,32 +8,6 @@
 #include <iomanip>
 #include <signal.h>
 
-#if OPENSSL
-#include <openssl/ssl.h>
-#include <openssl/bio.h>
-#include <openssl/err.h>
-#else
-
-#if ISMBEDTLS
-#include <mbedtls/ssl.h>
-#include <mbedtls/net.h>
-#include <mbedtls/debug.h>
-#include <mbedtls/entropy.h>
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/error.h>
-#include <mbedtls/certs.h>
-//typedef mbedtls_ssl_read ssl_read;
-#else
-#include <polarssl/net.h>
-#include <polarssl/debug.h>
-#include <polarssl/ssl.h>
-#include <polarssl/entropy.h>
-#include <polarssl/ctr_drbg.h>
-#include <polarssl/error.h>
-#include <polarssl/certs.h>
-#endif // ISMBEDTLS
-
-#endif
 
 #if  WIN32
 #include <windows.h>
@@ -62,7 +36,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.41-(2017/01/09)";
+char VER[24]= "1.42-(2017/07/22)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int s_port= 443;
