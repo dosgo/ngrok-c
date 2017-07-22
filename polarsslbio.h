@@ -3,7 +3,7 @@
 #include "config.h"
 #include<malloc.h>
 
-
+#if OPENSSL ==0
 
 #if ISMBEDTLS
 #include <mbedtls/ssl.h>
@@ -116,6 +116,7 @@ inline int init_ssl_session(){
     memset(&ssn,0,sizeof(ssl_session));
     return 0;
 }
+#endif //
 #endif // POLARSSLBIO_H_INCLUDED
 
 

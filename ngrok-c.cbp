@@ -16,13 +16,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add library="D:/C/ngrok-c/polarssl/libpolarssl-win32.a" />
-					<Add library="D:/C/ngrok-c/polarssl/libmbedtls-win32.a" />
-					<Add library="D:/C/ngrok-c/polarssl/libmbedx509-win32.a" />
-					<Add library="D:/C/ngrok-c/polarssl/libmbedcrypto-win32.a" />
-					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libws2_32.a" />
-					<Add library="D:/C/ngrok-c/openssl/libssl.dll.a" />
-					<Add library="D:/C/ngrok-c/openssl/libcrypto.dll.a" />
+					<Add option="-ldl" />
 				</Linker>
 			</Target>
 			<Target title="Release">
