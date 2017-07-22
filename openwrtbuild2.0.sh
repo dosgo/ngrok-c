@@ -6,7 +6,6 @@ mkdir $DIR
 rm -rf $DIR/main.o
 rm -rf $DIR/cJSON.o
 rm -rf $DIR/sendmsg.o
-rm -rf $DIR/sslbio.o
 rm -rf $DIR/nonblocking.o
 rm -rf $DIR/ngrokc
 
@@ -16,9 +15,9 @@ $CC $YH -c $1 sendmsg.cpp -o $DIR/sendmsg.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
 $CC $YH -c $1 main.cpp -o $DIR/main.o
 $CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
-$CC $YH -c $1 sslbio.cpp  -o $DIR/sslbio.o
+$CC $YH -c $1 polarsslbio.cpp  -o $DIR/polarsslbio.o
 $CC $YH -c $1 ngrok.cpp  -o $DIR/ngrok.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/sslbio.o libpolarssl-mips.a libmbedtls.a libmbedx509.a libmbedcrypto.a  -o $DIR/ngrokc   
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/polarsslbio.o libpolarssl-mips.a libmbedtls.a libmbedx509.a libmbedcrypto.a  -o $DIR/ngrokc   
 
 #buill openssl
 #CC=mips-openwrt-linux-gcc
