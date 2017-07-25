@@ -308,7 +308,7 @@ void* proxy(  )
                 {
 					//关闭远程连接
                     if(tempinfo->istype==2){
-                        echo("连接本地失败");
+                        echo("connect local error\r\n");
                         shutdown( tempinfo->tosock, 2 );
                     }
                     clearsock(it1->first,tempinfo);
@@ -380,7 +380,7 @@ void* proxy(  )
 						{
 						    	//关闭远程连接
 							if(tempinfo->istype==2){
-                                echo("连接本地失败");
+                                echo("connect local error\r\n");
 							    shutdown( tempinfo->tosock, 2 );
 							}
 							clearsock(it1->first,tempinfo);
