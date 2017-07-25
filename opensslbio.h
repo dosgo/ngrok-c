@@ -7,7 +7,7 @@
 #include<openssl/err.h>
 struct ssl_info
 {
-    SSL ssl;
+    SSL *ssl;
     SSL_CTX *ctx;
 
 };
@@ -44,12 +44,12 @@ inline int SslRecv(SSL* ssl, unsigned char* buffer, int ilen)
 inline int ssl_free_info(ssl_info *sslinfo)
 {
     #if OPENSSLDL
-    SslShutdown( &sslinfo->ssl );
-    SslFree( &sslinfo->ssl );
+    SslShutdown( sslinfo->ssl );
+    SslFree( sslinfo->ssl );
     SslCtxFree( sslinfo->ctx  );
     #else
-    SSL_shutdown( &sslinfo->ssl );
-    SSL_free( &sslinfo->ssl );
+    SSL_shutdown( sslinfo->ssl );
+    SSL_free( sslinfo->ssl );
     SSL_CTX_free( sslinfo->ctx  );
     #endif //
     return 0;

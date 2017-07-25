@@ -36,7 +36,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.43-(2017/07/23)";
+char VER[24]= "1.44-(2017/07/25)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int s_port= 443;
@@ -98,7 +98,11 @@ int CheckStatus()
 int checkping(){
     if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
     {
+        #if OPENSSL
+        int sendlen = SendPing(mainsock, mainsslinfo->ssl );
+        #else
         int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
+        #endif
 
         //发送失败断开连接
         if(sendlen<1)
@@ -221,9 +225,11 @@ void* proxy(  )
                     if(tunnelinfo->regstate==0){
                         memset(ReqId,0,20);
                         memset(tunnelinfo->ReqId,0,20);
-
+                        #if OPENSSL
+                        SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
+                        #else
                         SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
-
+                        #endif
                         //copy
                         memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
                         tunnelinfo->regtime=get_curr_unixtime();//已发

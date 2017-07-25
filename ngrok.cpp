@@ -188,8 +188,10 @@ int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &
     {
         #if OPENSSL
         setnonblocking((*it1)->first,1);
-        #endif
+        SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
+        #else
         SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId);
+        #endif
     }
 
 
@@ -220,8 +222,11 @@ int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,ssl_info
     if ( readlen > 0&&sslinfo!=NULL )
     {
         //发送到远程
-
+        #if OPENSSL
+        sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
+        #else
         sendremote(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
+        #endif
 
     }else  {
         shutdown( tempinfo->tosock, 2 );
@@ -238,8 +243,11 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);
-
+    #if OPENSSL
+    readlen =  SslRecv(sslinfo1->ssl,(unsigned char *)buf,bufsize);
+    #else
     readlen =  SslRecv(&sslinfo1->ssl,(unsigned char *)buf,bufsize);
+    #endif
 
 
 
@@ -287,7 +295,12 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
 
     char buf[MAXBUF +1]={0};
 
+    #if OPENSSL
+
+    readlen =  SslRecv(sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
+    #else
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
+    #endif
 
 
     struct sockaddr_in local_addr={0};
@@ -399,7 +412,11 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
     #endif
     char	tempjson[MAXBUF + 1];
 
+    #if OPENSSL
+    readlen =  SslRecv(sslinfo->ssl,(unsigned char *)buf,MAXBUF);
+    #else
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF);
+    #endif
 
 
 
@@ -453,8 +470,11 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 
                         char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
                         *ClientId = string( cid );
-
+                        #if OPENSSL
+                        SendPing( *mainsock,sslinfo->ssl );
+                        #else
                         SendPing( *mainsock,&sslinfo->ssl );
+                        #endif
 
                         tempinfo->isauth=1;
                     }
@@ -469,8 +489,12 @@ int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct 
 
 				else if ( strcmp( Type->valuestring, "Ping" ) == 0 )
 				{
+				    #if OPENSSL
 
-                    SendPong( *mainsock,&sslinfo->ssl );
+                    SendPong( *mainsock,sslinfo->ssl );
+                    #else
+                    SendPing( *mainsock,&sslinfo->ssl );
+                    #endif
 
 				}
 				else if ( strcmp( Type->valuestring, "Pong" ) == 0 )
@@ -518,8 +542,11 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
 		return -1;
 	}
 
-
+    #if OPENSSL
+	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
+	#else
 	SendAuth(*mainsock,&(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
+	#endif
 
 
     setnonblocking( *mainsock,1);
