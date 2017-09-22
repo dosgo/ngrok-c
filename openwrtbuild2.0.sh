@@ -14,10 +14,10 @@ YH="-Wall -fexceptions -DOPENSSL=0 -DISMBEDTLS=1 -O2"
 $CC $YH -c $1 sendmsg.cpp -o $DIR/sendmsg.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
 $CC $YH -c $1 main.cpp -o $DIR/main.o
-$CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
-$CC $YH -c $1 polarsslbio.cpp  -o $DIR/polarsslbio.o
-$CC $YH -c $1 ngrok.cpp  -o $DIR/ngrok.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/polarsslbio.o libpolarssl-mips.a libmbedtls.a libmbedx509.a libmbedcrypto.a  -o $DIR/ngrokc   
+$CC $YH -c $1 nonblocking.cpp -o $DIR/nonblocking.o
+$CC $YH -c $1 polarsslbio.cpp -o $DIR/polarsslbio.o
+$CC $YH -c $1 ngrok.cpp -o $DIR/ngrok.o
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/polarsslbio.o libmbedtls.a libmbedx509.a libmbedcrypto.a -o $DIR/ngrokc
 
 #buill openssl
 #CC=mips-openwrt-linux-gcc

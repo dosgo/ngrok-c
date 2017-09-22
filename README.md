@@ -9,6 +9,7 @@
 
 # openwrt 编译方法。
 - 看教程http://www.jianshu.com/p/8428949d946c
+- 另外还需要在mbedtls-lib子目录中以同样方法修改并执行build.sh，并将编译生成的三个.a静态库文件拷贝至上层目录中
 
 
 ## build  
