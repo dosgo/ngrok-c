@@ -18,9 +18,10 @@ $CC $YH -c openssldl.cpp -o $DIR/openssldl.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
 $CC $YH -c $1 main.cpp -o $DIR/main.o
 $CC $YH -c $1 nonblocking.cpp  -o $DIR/nonblocking.o
+$CC $YH -c $1 global.cpp  -o $DIR/global.o
 $CC $YH -c $1 opensslbio.cpp  -o $DIR/opensslbio.o
 $CC $YH -c $1 ngrok.cpp  -o $DIR/ngrok.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/ngrok.o $DIR/opensslbio.o  $DIR/openssldl.o  -o $DIR/ngrokc    -ldl
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/global.o $DIR/ngrok.o $DIR/opensslbio.o  $DIR/openssldl.o  -o $DIR/ngrokc    -ldl
 
 #buill openssl
 #CC=mips-openwrt-linux-gcc

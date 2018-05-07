@@ -8,11 +8,11 @@ ngrokc: $(LIBS)
 	$(CXX) -s $(LIBS) -o ngrokc -lssl -lcrypto -ldl
 sendmsg.o: sendmsg.h
 openssldl.o: openssldl.h
+global.o: global.h
 cJSON.o: cJSON.h
 nonblocking.o: nonblocking.h
 sslbio.o: sslbio.h
 ngrok.o: ngrok.h
-main.o: sendmsg.h openssldl.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h
-
+main.o: sendmsg.h openssldl.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h global.h
 clean:
 	rm -f $(LIBS) ngrokc

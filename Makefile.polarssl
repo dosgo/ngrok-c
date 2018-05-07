@@ -9,9 +9,10 @@ ngrokc: $(LIBS)
 sendmsg.o: sendmsg.h
 cJSON.o: cJSON.h
 nonblocking.o: nonblocking.h
+global.o: global.h
 sslbio.o: sslbio.h
 ngrok.o: ngrok.h
-main.o: sendmsg.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h
+main.o: sendmsg.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h global.h
 
 clean:
 	rm -f $(LIBS) ngrokc

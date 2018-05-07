@@ -12,21 +12,21 @@
 int ControlUdp(int port);
 int UdpCmd(int udpsocket);
 
-int ReqProxy(struct sockaddr_in server_addr,map<int,sockinfo*>*socklist);
+int ReqProxy(struct sockaddr_in server_addr);
 
-int NewTunnel(cJSON	*json,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr);
+int NewTunnel(cJSON	*json);
 
-int InitTunnelList(list<TunnelInfo*>*tunnellist,map<string,TunnelReq*>*tunneladdr);
+int InitTunnelList();
 
-int SetLocalAddrInfo(char *url,char *ReqId,int istunnel,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr);
+int SetLocalAddrInfo(char *url,char *ReqId,int istunnel);
 
-int RemoteSslInit(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo,string &ClientId,map<int,sockinfo*>*socklist);
+int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo,string &ClientId);
 
-int LocalToRemote(map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,ssl_info *sslinfo1,map<int,sockinfo*>*socklist);
+int LocalToRemote(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo1,ssl_info *sslinfo1);
 
-int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::iterator *it1,map<int,sockinfo*>*socklist);
+int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::iterator *it1);
 
-int ConnectLocal(ssl_info *sslinfo1,map<int, sockinfo*>::iterator *it1,sockinfo *tempinfo1,map<int,sockinfo*>*socklist,map<string,TunnelReq*> *tunneladdr);
-int CmdSock(int *mainsock,sockinfo *tempinfo,map<int,sockinfo*>*socklist,struct sockaddr_in server_addr,string *ClientId,char * authtoken,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr);
-int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,map<int,sockinfo*>*socklist,char *authtoken,char *password_c);
+int ConnectLocal(ssl_info *sslinfo1,map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo1);
+int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr,string *ClientId,char * authtoken);
+int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,char *authtoken,char *password_c);
 #endif

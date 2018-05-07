@@ -38,7 +38,7 @@ int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,con
 
 
 
-int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId)
+int loadargs( int argc, char **argv ,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId)
 {
 	if ( argc > 1 )
 	{
@@ -131,7 +131,7 @@ int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,i
 						pos = pos + xpos + 1;
 					}
 
-					(*tunnellist).push_back(tunnelinfo);
+					G_TunnelList.push_back(tunnelinfo);
 				}
 			}
 		}

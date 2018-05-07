@@ -28,7 +28,7 @@ inline int get_curr_unixtime()
     return time(&now);
 }
 
-int loadargs( int argc, char **argv ,list<TunnelInfo*>*tunnellist,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId);
+int loadargs( int argc, char **argv ,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId);
 
 inline int strpos( char *str, char c )
 {

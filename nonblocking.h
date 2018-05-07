@@ -1,7 +1,6 @@
 #ifndef NONBLOCKING_H_INCLUDED
 #define NONBLOCKING_H_INCLUDED
 #include "config.h"
-
 #include <string.h>
 #if  WIN32
 #include <winsock.h>
@@ -63,7 +62,7 @@ inline int SetKeepAlive(int sock){
     //nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
     if (nRet == SOCKET_ERROR)
     {
-    return -1;
+        return -1;
     }
     return 0;
 }
@@ -84,44 +83,7 @@ return 0;
 }
 #endif // WIN32
 
-struct TunnelInfo
-{
-    char localhost[255];
-    int localport;
-    char hostheader[255];
-    char subdomain[255];
-    char hostname[255];
-    char httpauth[255];
-    char protocol[10];
-    char ReqId[20];
-    int remoteport;
-    int regtime;
-    int regstate;
-};
 
-struct TunnelReq
-{
-    char localhost[255];
-    char url[255];
-    char hostheader[255];
-    int localport;
-    int regtime;
-};
-
-
-struct sockinfo
-{
-    ssl_info *sslinfo;
-    TunnelReq *tunnelreq;
-    int isconnect;
-    int istype; //1=remote 2=local,3=cmd
-    int tosock;
-    unsigned char *packbuf;
-    unsigned long long packbuflen;
-    int isconnectlocal;
-    int linktime;
-    int isauth;
-};
 
 
 inline int setnonblocking(int sServer,int _nMode)
@@ -166,7 +128,7 @@ inline int check_sock(int sock)
     return error;
 }
 
-void clearsock(int sock,sockinfo * sock_info);
+void clearsock(int sock,Sockinfo * sock_info);
 
 inline int SetBufSize(int sock)
 {

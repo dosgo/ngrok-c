@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <map>
-#include <list>
 #include <iostream>
 #include <iomanip>
 #include <signal.h>
@@ -61,9 +59,6 @@ int udpport=1885;
 void* proxy( );
 struct sockaddr_in server_addr = { 0 };
 
-map<int,sockinfo*>socklist;
-list<TunnelInfo*> tunnellist;
-map<string,TunnelReq*> tunneladdr;
 void cs( int n )
 {
 	if(n == SIGINT )
@@ -79,11 +74,11 @@ int CheckStatus()
 {
 
     //判断是否存在
-    if (socklist.count(mainsock)==0||mainsock==0)
+    if (G_SockList.count(mainsock)==0||mainsock==0)
     {
         if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,&socklist,authtoken,password_c)==-1)
+            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,authtoken,password_c)==-1)
             {
                 mainsockstatus=0;
                 printf("link err\r\n");
@@ -96,7 +91,7 @@ int CheckStatus()
 }
 /*检测ping*/
 int checkping(){
-    if(pingtime+ping<get_curr_unixtime()&&socklist.count(mainsock)!=0&&mainsock!=0)
+    if(pingtime+ping<get_curr_unixtime()&&G_SockList.count(mainsock)!=0&&mainsock!=0)
     {
         #if OPENSSL
         int sendlen = SendPing(mainsock, mainsslinfo->ssl );
@@ -117,7 +112,7 @@ int checkping(){
 int main( int argc, char **argv )
 {
     printf("ngrokc v%s \r\n",VER);
-	loadargs( argc, argv, &tunnellist, s_name, &s_port, authtoken,password_c,&ClientId );
+	loadargs( argc, argv, s_name, &s_port, authtoken,password_c,&ClientId );
     #if WIN32
 	signal( SIGINT, cs );
     #else
@@ -169,11 +164,11 @@ void* proxy(  )
 	int		maxfdp		= 0;
 	int ret=0;
 	ssl_info *sslinfo1;
-	sockinfo *tempinfo ;
-	sockinfo *tempinfo1;
-	map<int, sockinfo*>::iterator it;
-	map<int, sockinfo*>::iterator it1;
-	map<int, sockinfo*>::iterator it3;
+	Sockinfo *tempinfo ;
+	Sockinfo *tempinfo1;
+	map<int, Sockinfo*>::iterator it;
+	map<int, Sockinfo*>::iterator it1;
+	map<int, Sockinfo*>::iterator it3;
     list<TunnelInfo*>::iterator listit;
     TunnelInfo *tunnelinfo;
     char ReqId[20]={0};
@@ -188,17 +183,17 @@ void* proxy(  )
         if(mainsockstatus==0){
             shutdown( mainsock,2);
             //释放所有连接
-            for ( it3 = socklist.begin(); it3 != socklist.end(); )
+            for ( it3 = G_SockList.begin(); it3 != G_SockList.end(); )
             {
                 clearsock( it3->first,  it3->second);
                 it3++;
             }
-            socklist.clear();
+            G_SockList.clear();
             mainsock = 0;
             //改回状态
             mainsockstatus=1;
             //初始化通道
-            InitTunnelList(&tunnellist,&tunneladdr);
+            InitTunnelList();
         }
 
 	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
@@ -214,12 +209,12 @@ void* proxy(  )
         }
 
         //注册端口
-        if(socklist.count(mainsock)!=0&&mainsock!=0){
+        if(G_SockList.count(mainsock)!=0&&mainsock!=0){
 
-            tempinfo=socklist[mainsock];
+            tempinfo=G_SockList[mainsock];
             if(tempinfo->isauth==1&&regtunneltime+60<get_curr_unixtime()){
                 regtunneltime=get_curr_unixtime();
-                for ( listit = tunnellist.begin(); listit != tunnellist.end(); ++listit )
+                for ( listit = G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
                 {
                     tunnelinfo =(TunnelInfo	*)*listit;
                     if(tunnelinfo->regstate==0){
@@ -248,7 +243,7 @@ void* proxy(  )
 
 		/* 遍历添加 */
 		//map<int, sockinfo*>::iterator it;
-		for ( it = socklist.begin(); it != socklist.end();  )
+		for ( it = G_SockList.begin(); it != G_SockList.end();  )
 		{
 
 			tempinfo = it->second;
@@ -298,7 +293,7 @@ void* proxy(  )
             }
             #endif
 
-			for ( it1 = socklist.begin(); it1 != socklist.end(); )
+			for ( it1 = G_SockList.begin(); it1 != G_SockList.end(); )
 			{
 			    tempinfo = it1->second;
 			      //ping
@@ -312,7 +307,7 @@ void* proxy(  )
                         shutdown( tempinfo->tosock, 2 );
                     }
                     clearsock(it1->first,tempinfo);
-                    socklist.erase(it1++);
+                    G_SockList.erase(it1++);
                     continue;
                 }
 
@@ -327,7 +322,7 @@ void* proxy(  )
                         //未连接本地
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo,&socklist,&tunneladdr);
+                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo);
                             if(backcode==-1)
                             {
                               continue;
@@ -341,7 +336,7 @@ void* proxy(  )
                         //本地连接完成转发
                         if( tempinfo->isconnectlocal == 2 )
                         {
-                            backcode=RemoteToLocal(sslinfo1,tempinfo,&it1,&socklist);
+                            backcode=RemoteToLocal(sslinfo1,tempinfo,&it1);
                             if(backcode==-1)
                             {
                               continue;
@@ -350,7 +345,7 @@ void* proxy(  )
                     }
                     /* 本地的转发给远程 */
                     else if(tempinfo->istype == 2){
-                        backcode=LocalToRemote(&it1,tempinfo,sslinfo1,&socklist);
+                        backcode=LocalToRemote(&it1,tempinfo,sslinfo1);
                         if(backcode==-1)
                         {
                           continue;
@@ -358,7 +353,7 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,tempinfo,&socklist,server_addr,&ClientId,authtoken,&tunnellist,&tunneladdr);
+                         backcode=CmdSock(&mainsock,tempinfo,server_addr,&ClientId,authtoken);
                          if(backcode==-1)
                          {
                              //控制链接断开，标记清空
@@ -384,7 +379,7 @@ void* proxy(  )
 							    shutdown( tempinfo->tosock, 2 );
 							}
 							clearsock(it1->first,tempinfo);
-							socklist.erase(it1++);
+							G_SockList.erase(it1++);
 							continue;
 						}
 
@@ -393,7 +388,7 @@ void* proxy(  )
 						if ( tempinfo->istype == 1 )
 						{
 						    //初始化远程连接
-                            backcode=RemoteSslInit(&it1,tempinfo,ClientId,&socklist);
+                            backcode=RemoteSslInit(&it1,tempinfo,ClientId);
                             if(backcode==-1)
                             {
                                continue;
@@ -405,9 +400,9 @@ void* proxy(  )
                         //本地连接
                         if ( tempinfo->istype == 2 )
 						{
-                            if(socklist.count(tempinfo->tosock)>0)
+                            if(G_SockList.count(tempinfo->tosock)>0)
                             {
-                                tempinfo1 = socklist[tempinfo->tosock];
+                                tempinfo1 = G_SockList[tempinfo->tosock];
                                 tempinfo1->isconnectlocal=2;
                             }
                             /* 置为1 */

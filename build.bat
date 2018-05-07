@@ -9,12 +9,14 @@ del %OPATH%\*.o
 %CC%  %YH% -c main.cpp -o  %OPATH%/main.o
 %CC%  %YH% -c sendmsg.cpp -o  %OPATH%/sendmsg.o
 %CC%  %YH% -c nonblocking.cpp -o %OPATH%/nonblocking.o
+%CC%  %YH% -c global.cpp -o %OPATH%/global.o
+%CC%  %YH% -c openssldl.cpp -o %OPATH%/openssldl.o
 %CC%  %YH% -c sslbio.cpp -o %OPATH%/sslbio.o
 %CC%  %YH%  -c ngrok.cpp  -o %OPATH%/ngrok.o
 
 rem %CC%  %OPATH%\main.o %OPATH%\sendmsg.o %OPATH%\cJSON.o  %OPATH%\nonblocking.o %OPATH%\sslbio.o -o  %OPATH%\ngrokc.exe -L"lib"  "libpolarssl-win32.a"  -lws2_32  -lpthread
 
- %CC% -s %OPATH%\main.o %OPATH%\sendmsg.o  %OPATH%\ngrok.o %OPATH%\cJSON.o  %OPATH%\nonblocking.o %OPATH%\sslbio.o -o  %OPATH%\ngrokc.exe  libpolarssl-win32.a  -lws2_32  -lpthread
+ %CC% -s %OPATH%\main.o %OPATH%\sendmsg.o  %OPATH%\ngrok.o %OPATH%\cJSON.o  %OPATH%\nonblocking.o %OPATH%\sslbio.o %OPATH%\openssldl.o %OPATH%\global.o -o  %OPATH%\ngrokc.exe  libpolarssl-win32.a  -lws2_32  -lpthread
 
 
  

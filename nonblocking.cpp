@@ -3,7 +3,7 @@
 
 
 #if OPENSSL
-void clearsock(int sock,sockinfo * sock_info)
+void clearsock(int sock,Sockinfo * sock_info)
 {
 
       if(sock_info->istype==1)
@@ -39,7 +39,7 @@ void clearsock(int sock,sockinfo * sock_info)
 
 }
 #else
-void clearsock(int sock,sockinfo * sock_info)
+void clearsock(int sock,Sockinfo * sock_info)
 {
 
       if(sock_info->istype==1)

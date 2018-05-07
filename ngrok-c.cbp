@@ -54,6 +54,8 @@
 		</Unit>
 		<Unit filename="cJSON.h" />
 		<Unit filename="config.h" />
+		<Unit filename="global.cpp" />
+		<Unit filename="global.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="ngrok.cpp" />
 		<Unit filename="ngrok.h" />

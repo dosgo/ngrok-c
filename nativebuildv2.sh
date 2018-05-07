@@ -16,10 +16,11 @@ $CC $YH -c  sendmsg.cpp -o build-mips/sendmsg.o
 $CC $YH -c  cJSON.c -o build-mips/cJSON.o
 $CC $YH -c  main.cpp -o build-mips/main.o
 $CC $YH -c  nonblocking.cpp  -o build-mips/nonblocking.o
+$CC $YH -c  global.cpp  -o build-mips/global.o
 $CC $YH -c  sslbio.cpp  -o build-mips/sslbio.o
 $CC $YH -c  openssldl.cpp  -o build-mips/openssldl.o
 $CC $YH -c  ngrok.cpp  -o build-mips/ngrok.o
-$CC  -s build-mips/main.o build-mips/cJSON.o build-mips/sendmsg.o build-mips/nonblocking.o build-mips/ngrok.o build-mips/sslbio.o  build-mips/openssldl.o -o build-mips/ngrokc -ldl   
+$CC  -s build-mips/main.o build-mips/cJSON.o build-mips/sendmsg.o build-mips/nonblocking.o build-mips/global.o build-mips/ngrok.o build-mips/sslbio.o  build-mips/openssldl.o -o build-mips/ngrokc -ldl   
 
 
 

@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include "global.h"
 inline int echo(const char* format, ...)
 {
     int n=0;
