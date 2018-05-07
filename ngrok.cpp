@@ -262,7 +262,7 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::it
         TunnelReq *tunnelreq =  tempinfo1->tunnelreq;
         char protocol[32] = { 0 };
         char remotehost[256] = { 0 };
-        sscanf(tunnelreq->url,"%[^:]://%[^:]",protocol,remotehost);
+        sscanf(tunnelreq->url,"%[^:]://%[^\n]",protocol,remotehost);
         //不是tcp才需要转发
         if(strncmp(protocol,"tcp",3)!=0){
             //需要host头转发
