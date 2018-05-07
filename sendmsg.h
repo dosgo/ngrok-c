@@ -41,7 +41,6 @@ inline int strpos( char *str, char c )
 inline void str_replace(char * cp, int n, char * str)
 {
     int lenofstr;
-    int i;
     char * tmp;
     lenofstr = strlen(str);
     //str3±Èstr2¶Ì£¬ÍùÇ°ÒÆ¶¯

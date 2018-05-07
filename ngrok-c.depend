@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1525661310 source:d:\c\ngrok-c\cjson.c
+1525679085 source:d:\c\ngrok-c\cjson.c
 	<string.h>
 	<stdio.h>
 	<math.h>
@@ -9,9 +9,9 @@
 	<ctype.h>
 	"cJSON.h"
 
-1525661310 d:\c\ngrok-c\cjson.h
+1525679085 d:\c\ngrok-c\cjson.h
 
-1525676858 source:d:\c\ngrok-c\main.cpp
+1525679085 source:d:\c\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -38,21 +38,21 @@
 	"sslbio.h"
 	"nonblocking.h"
 
-1525677190 d:\c\ngrok-c\config.h
+1525679085 d:\c\ngrok-c\config.h
 	<stdarg.h>
 	<stdio.h>
 	<string.h>
 	"global.h"
 
-1525661310 d:\c\ngrok-c\mytime.h
+1525679085 d:\c\ngrok-c\mytime.h
 	<windows.h>
 	<errno.h>
 	<sys/select.h>
 	<netinet/in.h>
 
-1525661310 d:\c\ngrok-c\bytestool.h
+1525679085 d:\c\ngrok-c\bytestool.h
 
-1525676392 d:\c\ngrok-c\ngrok.h
+1525679085 d:\c\ngrok-c\ngrok.h
 	"config.h"
 	<string>
 	<map>
@@ -60,7 +60,7 @@
 	"nonblocking.h"
 	"cJSON.h"
 
-1525674339 d:\c\ngrok-c\sendmsg.h
+1525681126 d:\c\ngrok-c\sendmsg.h
 	"config.h"
 	"nonblocking.h"
 	<string>
@@ -73,7 +73,7 @@
 	<sys/select.h>
 	"bytestool.h"
 
-1525676374 d:\c\ngrok-c\nonblocking.h
+1525679085 d:\c\ngrok-c\nonblocking.h
 	"config.h"
 	<string.h>
 	<winsock.h>
@@ -90,13 +90,13 @@
 	<netinet/in.h>
 	<netinet/tcp.h>
 
-1525661310 d:\c\ngrok-c\sslbio.h
+1525679085 d:\c\ngrok-c\sslbio.h
 	"config.h"
 	<malloc.h>
 	"opensslbio.h"
 	"polarsslbio.h"
 
-1525661310 d:\c\ngrok-c\opensslbio.h
+1525679085 d:\c\ngrok-c\opensslbio.h
 	"config.h"
 	<malloc.h>
 	<openssl/ssl.h>
@@ -104,10 +104,10 @@
 	<openssl/err.h>
 	"openssldl.h"
 
-1525661310 d:\c\ngrok-c\openssldl.h
+1525679085 d:\c\ngrok-c\openssldl.h
 	<openssl/ssl.h>
 
-1525661310 d:\c\ngrok-c\polarsslbio.h
+1525679085 d:\c\ngrok-c\polarsslbio.h
 	"config.h"
 	<malloc.h>
 	<mbedtls/ssl.h>
@@ -125,16 +125,16 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1525676490 source:d:\c\ngrok-c\nonblocking.cpp
+1525679085 source:d:\c\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
 
-1525661310 source:d:\c\ngrok-c\opensslbio.cpp
+1525679085 source:d:\c\ngrok-c\opensslbio.cpp
 	"config.h"
 	<string.h>
 	"mytime.h"
 	"opensslbio.h"
 
-1525661310 source:d:\c\ngrok-c\openssldl.cpp
+1525679085 source:d:\c\ngrok-c\openssldl.cpp
 	<stdio.h>
 	<stdlib.h>
 	<unistd.h>
@@ -142,13 +142,13 @@
 	<windows.h>
 	<dlfcn.h>
 
-1525661310 source:d:\c\ngrok-c\polarsslbio.cpp
+1525679085 source:d:\c\ngrok-c\polarsslbio.cpp
 	"config.h"
 	<string.h>
 	"mytime.h"
 	"polarsslbio.h"
 
-1525676985 source:d:\c\ngrok-c\sendmsg.cpp
+1525679085 source:d:\c\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -157,7 +157,7 @@
 	"sendmsg.h"
 	<stdlib.h>
 
-1525676957 source:d:\c\ngrok-c\ngrok.cpp
+1525679085 source:d:\c\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -169,12 +169,12 @@
 	"sslbio.h"
 	<stdlib.h>
 
-1525676575 d:\c\ngrok-c\global.h
+1525679085 d:\c\ngrok-c\global.h
 	<string>
 	<map>
 	<list>
 	"sslbio.h"
 
-1525676609 source:d:\c\ngrok-c\global.cpp
+1525679085 source:d:\c\ngrok-c\global.cpp
 	"global.h"
 
