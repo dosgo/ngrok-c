@@ -11,12 +11,15 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-SER[Shost:tunnel.phpor.me,Sport:4443,Cid:ssfd] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo] -AddTun[Type:http,Lhost:192.168.9.1,Lport:80,Sdname:xxdosgo1]  -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50088]  -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:2222,Rport:50099]" />
+				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo,Hostheader:] " />
 				<Compiler>
-					<Add option="-g" />
+					<Add option="-m32" />
 				</Compiler>
 				<Linker>
-					<Add option="-ldl" />
+					<Add option="-m32" />
+					<Add library="D:/c/ngrok-c/openssl/libcrypto.dll.a" />
+					<Add library="D:/c/ngrok-c/openssl/libssl.dll.a" />
+					<Add library="C:/TDM-GCC-64/x86_64-w64-mingw32/lib32/libws2_32.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">

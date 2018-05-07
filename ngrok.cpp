@@ -110,19 +110,7 @@ int InitTunnelList(list<TunnelInfo*>*tunnellist,map<string,TunnelReq*>*tunneladd
 
 
 
-int GetLocalAddr(char *url,struct sockaddr_in *local_addr,map<string,TunnelReq*> *tunneladdr){
-    if((*tunneladdr).count(string(url))!=0)
-    {
-            TunnelReq *tunnelreq =(*tunneladdr)[string(url)];
-            memset(local_addr,0,sizeof(sockaddr_in));
-            int		l1		= inet_addr( tunnelreq->localhost );
-            local_addr->sin_family	= AF_INET;
-            local_addr->sin_port	= htons(tunnelreq->localport );
-            memcpy(&local_addr->sin_addr, &l1, 4 );
-            return 0;
-    }
-    return -1;
-}
+
 
 int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnellist,map<string,TunnelReq*> *tunneladdr){
     list<TunnelInfo*>::iterator iter;
@@ -151,8 +139,10 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate,list<TunnelInfo*>*tunnel
             tunnelinfo->regstate=regstate;
             TunnelReq *tunnelreq = (TunnelReq *) malloc( sizeof(TunnelReq));
             memset(tunnelreq,0,sizeof(TunnelReq));
+            memcpy(tunnelreq->url,url,strlen(url));
             memcpy(tunnelreq->localhost,tunnelinfo->localhost,strlen(tunnelinfo->localhost));
             tunnelreq->localport=tunnelinfo->localport;
+            memcpy(tunnelreq->hostheader,tunnelinfo->hostheader,strlen(tunnelinfo->hostheader));
             (*tunneladdr).insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
         }
 
@@ -268,6 +258,31 @@ int RemoteToLocal(ssl_info *sslinfo1,sockinfo *tempinfo1,map<int, sockinfo*>::it
     }
     else if(readlen >0)
     {
+
+        TunnelReq *tunnelreq =  tempinfo1->tunnelreq;
+        char protocol[32] = { 0 };
+        char remotehost[256] = { 0 };
+        sscanf(tunnelreq->url,"%[^:]://%[^:]",protocol,remotehost);
+        //不是tcp才需要转发
+        if(strncmp(protocol,"tcp",3)!=0){
+            //需要host头转发
+            if(strlen(tunnelreq->hostheader)>0){
+                //拼接\r\n用于识别http头rfc协议描述的
+                sprintf(remotehost,"%s\r\n",remotehost);
+                char *p=strstr(buf,remotehost);
+
+                char srchost[256] = { 0 };
+                sprintf(srchost,"%s\r\n",tunnelreq->hostheader);
+                //查到了。。
+                if(p!=false){
+                    //替换http请求头
+                    str_replace(p,strlen(remotehost),srchost);
+                }
+
+            }
+        }
+
+
         sendlen=sendlocal(tempinfo1->tosock,buf,readlen,1);
         if(sendlen<1)
         {
@@ -303,7 +318,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
     #endif
 
 
-    struct sockaddr_in local_addr={0};
+
     if ( readlen ==0||readlen ==-2)
     {
         clearsock( (*it1)->first, tempinfo1 );
@@ -357,35 +372,41 @@ int ConnectLocal(ssl_info *sslinfo,map<int, sockinfo*>::iterator *it1,sockinfo *
             {
                 cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
                 char	*Url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
-                 /*
-                 * 清除
-                 */
-                int backinfo=GetLocalAddr(Url,&local_addr,tunneladdr);
-                cJSON_Delete( json );
-                if(backinfo==0)
+
+                if((*tunneladdr).count(string(Url))!=0)
                 {
-                    int tcp = socket( AF_INET, SOCK_STREAM, 0 );
-                    int flag = 1;
-                    setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
-                    SetBufSize(tcp);
-                   // SOL_SOCKET
-                    setnonblocking( tcp, 1 );
-                    connect( tcp, (struct sockaddr *) &local_addr, sizeof(local_addr));
-                    sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
-                    sinfo->istype		= 2;
-                    sinfo->isconnect	= 0;
-                    sinfo->sslinfo		= sslinfo;
-                    sinfo->linktime=get_curr_unixtime();
-                    sinfo->tosock		= (*it1)->first;
-                    (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
-                    /* 远程的带上本地链接 */
-                    tempinfo1->tosock = tcp;
-                    tempinfo1->isconnectlocal= 1;
+                        TunnelReq *tunnelreq =(*tunneladdr)[string(Url)];
+                        struct sockaddr_in local_addr={0};
+                        local_addr.sin_family	= AF_INET;
+                        local_addr.sin_port	= htons(tunnelreq->localport );
+                        local_addr.sin_addr.s_addr=inet_addr( tunnelreq->localhost );
+
+                        int tcp = socket( AF_INET, SOCK_STREAM, 0 );
+                        int flag = 1;
+                        setsockopt( tcp, IPPROTO_TCP, TCP_NODELAY,(char*)&flag, sizeof(flag) );
+                        SetBufSize(tcp);
+                       // SOL_SOCKET
+                        setnonblocking( tcp, 1 );
+                        connect( tcp, (struct sockaddr *) &local_addr, sizeof(local_addr));
+                        sockinfo *sinfo = (sockinfo *) malloc( sizeof(sockinfo) );
+                        sinfo->istype		= 2;
+                        sinfo->isconnect	= 0;
+                        sinfo->sslinfo		= sslinfo;
+                        sinfo->linktime=get_curr_unixtime();
+                        sinfo->tosock		= (*it1)->first;
+                        (*socklist).insert( map<int, sockinfo*> :: value_type( tcp, sinfo ) );
+                        /* 远程的带上本地链接 */
+                        tempinfo1->tosock = tcp;
+                        tempinfo1->tunnelreq    = tunnelreq;
+                        tempinfo1->isconnectlocal= 1;
+                        cJSON_Delete( json );
                 }
                 else
                 {
+
                     clearsock( (*it1)->first, tempinfo1 );
                     (*socklist).erase((*it1)++);
+                    cJSON_Delete( json );
                     return -1;
                 }
             }

@@ -19,26 +19,6 @@
 #endif
 #include "bytestool.h"
 using namespace std;
-struct TunnelInfo
-{
-    char localhost[255];
-    int localport;
-    char subdomain[255];
-    char hostname[255];
-    char httpauth[255];
-    char protocol[10];
-    char ReqId[20];
-    int remoteport;
-    int regtime;
-    int regstate;
-};
-
-struct TunnelReq
-{
-    char localhost[255];
-    int localport;
-    int regtime;
-};
 
 
 
@@ -58,7 +38,37 @@ inline int strpos( char *str, char c )
 	return(sc - str);
 }
 
-
+inline void str_replace(char * cp, int n, char * str)
+{
+    int lenofstr;
+    int i;
+    char * tmp;
+    lenofstr = strlen(str);
+    //str3比str2短，往前移动
+    if(lenofstr < n)
+    {
+        tmp = cp+n;
+        while(*tmp)
+        {
+            *(tmp-(n-lenofstr)) = *tmp; //n-lenofstr是移动的距离
+            tmp++;
+        }
+        *(tmp-(n-lenofstr)) = *tmp; //move '\0'
+    }
+    else
+            //str3比str2长，往后移动
+        if(lenofstr > n)
+        {
+            tmp = cp;
+            while(*tmp) tmp++;
+            while(tmp>=cp+n)
+            {
+                *(tmp+(lenofstr-n)) = *tmp;
+                tmp--;
+            }
+        }
+    strncpy(cp,str,lenofstr);
+}
 
 
 
