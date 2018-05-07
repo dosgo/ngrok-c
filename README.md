@@ -184,6 +184,10 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 ## 2017/1/9
   -1.41版本 修复一个网络不好可能导致的内存泄漏问题。
   
+## 2018/5/7
+  -1.45版本 增加自定义转发Hostheader功能。用于那些本地会判断host的网站
+  使用方法-AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Hostheader:localhost]
+  
 ### 关于编译对应路由的版本的ngrokc。
 ## 一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
 ## 二.需要先编译polarssl或者opnessl库（取决你想用啥库,2选1）。
@@ -222,7 +226,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
       
-- 3.openwrt傻瓜编译教程。
+- 3.openwrt简单编译教程。
       - 去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
       - 编辑openwrtbuildv2.sh 修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK。
       - 把include/openssl，复制到你的下载的sdk,/home/dosgo/OpenWrt-SDK/staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include目录，
