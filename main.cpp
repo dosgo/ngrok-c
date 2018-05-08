@@ -34,7 +34,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.45-(2018/05/07)";
+char VER[24]= "1.46-(2018/05/8)";
 
 char s_name[255]="ngrokd.ngrok.com";
 int s_port= 443;
@@ -303,7 +303,7 @@ void* proxy(  )
                 {
 					//关闭远程连接
                     if(tempinfo->istype==2){
-                        echo("连接本地失败");
+                        echo("connect local fail\r\n");
                         shutdown( tempinfo->tosock, 2 );
                     }
                     clearsock(it1->first,tempinfo);

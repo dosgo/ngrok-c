@@ -262,23 +262,24 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::it
         TunnelReq *tunnelreq =  tempinfo1->tunnelreq;
         char protocol[32] = { 0 };
         char remotehost[256] = { 0 };
+        char httpline[3]="\r\n";
         sscanf(tunnelreq->url,"%[^:]://%[^\n]",protocol,remotehost);
         //不是tcp才需要转发
         if(strncmp(protocol,"tcp",3)!=0){
             //需要host头转发
             if(strlen(tunnelreq->hostheader)>0){
                 //拼接\r\n用于识别http头rfc协议描述的
-                sprintf(remotehost,"%s\r\n",remotehost);
+                memcpy(remotehost+strlen(remotehost),httpline,2);
                 char *p=strstr(buf,remotehost);
 
                 char srchost[256] = { 0 };
-                sprintf(srchost,"%s\r\n",tunnelreq->hostheader);
+                memcpy(srchost,tunnelreq->hostheader,strlen(tunnelreq->hostheader));
+                memcpy(srchost+strlen(srchost),httpline,2);
                 //查到了。。
                 if(p!=false){
                     //替换http请求头
                     str_replace(p,strlen(remotehost),srchost);
                 }
-
             }
         }
 
