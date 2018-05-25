@@ -13,14 +13,10 @@
 				<Option compiler="gcc" />
 				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo,Hostheader:localhost] " />
 				<Compiler>
-					<Add option="-m32" />
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
-					<Add option="-m32" />
-					<Add library="D:/c/ngrok-c/openssl/libcrypto.dll.a" />
-					<Add library="D:/c/ngrok-c/openssl/libssl.dll.a" />
-					<Add library="C:/TDM-GCC-64/x86_64-w64-mingw32/lib32/libws2_32.a" />
+					<Add option="-ldl" />
 				</Linker>
 			</Target>
 			<Target title="Release">
