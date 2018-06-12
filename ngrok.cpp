@@ -276,7 +276,7 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::it
                 memcpy(srchost,tunnelreq->hostheader,strlen(tunnelreq->hostheader));
                 memcpy(srchost+strlen(srchost),httpline,2);
                 //查到了。。
-                if(p!=false){
+                if(p!=NULL){
                     //替换http请求头
                     str_replace(p,strlen(remotehost),srchost);
                 }
