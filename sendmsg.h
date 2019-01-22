@@ -28,7 +28,7 @@ inline int get_curr_unixtime()
     return time(&now);
 }
 
-int loadargs( int argc, char **argv ,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId);
+int loadargs( int argc, char **argv);
 
 inline int strpos( char *str, char c )
 {
@@ -168,22 +168,22 @@ inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
     return  len;
 }
 
-inline int SendAuth(int sock,ssl_context *ssl,string ClientId,string user,string password_c)
+inline int SendAuth(int sock,ssl_context *ssl)
 {
    // string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
     char str[255];
     memset(str,0,255);
-    sprintf(str,"{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\"%s\",\"Password\": \"%s\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\"%s\"}}",user.c_str(),password_c.c_str(),ClientId.c_str());
+    sprintf(str,"{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\"%s\",\"Password\": \"%s\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\"%s\"}}",mainInfo.authtoken,mainInfo.password_c,mainInfo.ClientId.c_str());
 
     return sendpack(sock,ssl,str,1);
 }
 
 
-inline int SendRegProxy(int sock,ssl_context *ssl,string &ClientId)
+inline int SendRegProxy(int sock,ssl_context *ssl)
 {
     char str[255];
     memset(str,0,255);
-    sprintf(str,"{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\"%s\"}}",ClientId.c_str());
+    sprintf(str,"{\"Type\":\"RegProxy\",\"Payload\":{\"ClientId\":\"%s\"}}",mainInfo.ClientId.c_str());
     return sendpack(sock,ssl,str,1);
 }
 
@@ -199,7 +199,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char *HostName,const char * Subdomain,int RemotePort,char *authtoken);
+int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,TunnelInfo *tunnelInfo);
 //#endif
 
 

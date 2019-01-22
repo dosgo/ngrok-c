@@ -46,8 +46,42 @@ struct Sockinfo
     int isauth;
 };
 
+struct MainInfo
+{
+    char s_name[255];
+    int s_port;
+    char authtoken[255];
+    char password_c[255];//
+    string ClientId ;
+    int pingtime	;
+    int ping	; //
+    int mainsock;
+    int lastdnstime;
+    int mainsockstatus;
+    int regtunneltime;
+    int lastdnsback;
+    int lasterrtime;
+};
 
+
+extern MainInfo mainInfo;
 extern  map<int,Sockinfo*>G_SockList;
 extern  list<TunnelInfo*> G_TunnelList;
 extern  map<string,TunnelReq*> G_TunnelAddr;
+
+inline void InitMainInfo(){
+    memset(mainInfo.authtoken,0,255);
+    memset(mainInfo.password_c,0,255);
+    memset(mainInfo.s_name,0,255);
+    mainInfo.ping=25;
+    mainInfo.s_port=443;
+    mainInfo.pingtime=0;
+    mainInfo.mainsock=0;
+    mainInfo.lastdnstime=0;
+    mainInfo.regtunneltime=0;
+    mainInfo.lastdnsback=0;
+    mainInfo.lasterrtime=0;
+    sprintf(mainInfo.s_name,"ngrokd.ngrok.com");
+}
+
 #endif

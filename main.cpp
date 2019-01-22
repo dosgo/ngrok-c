@@ -34,21 +34,9 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.46-(2018/05/8)";
+char VER[24]= "1.47-(2019/01/22)";
 
-char s_name[255]="ngrokd.ngrok.com";
-int s_port= 443;
-char authtoken[255]="";
-char password_c[255]={0};//
-string ClientId = "";
-int pingtime	= 0;
-int ping		= 25; //不能大于30
-int mainsock=0;
-int lastdnstime=0;
-int mainsockstatus=1;
-int regtunneltime=0;
-int lastdnsback;
-int lasterrtime=0;
+
 ssl_info *mainsslinfo=NULL;
 
 #if UDPCMD
@@ -74,15 +62,15 @@ int CheckStatus()
 {
 
     //判断是否存在
-    if (G_SockList.count(mainsock)==0||mainsock==0)
+    if (G_SockList.count(mainInfo.mainsock)==0||mainInfo.mainsock==0)
     {
-        if(lasterrtime==0||(lasterrtime+60)<get_curr_unixtime()){
+        if(mainInfo.lasterrtime==0||(mainInfo.lasterrtime+60)<get_curr_unixtime()){
             //连接失败
-            if(ConnectMain(&mainsock,server_addr,&mainsslinfo,&ClientId,authtoken,password_c)==-1)
+            if(ConnectMain(&mainInfo.mainsock,server_addr,&mainsslinfo)==-1)
             {
-                mainsockstatus=0;
+                mainInfo.mainsockstatus=0;
                 printf("link err\r\n");
-                lasterrtime=get_curr_unixtime();
+                mainInfo.lasterrtime=get_curr_unixtime();
                 return -1;
             }
         }
@@ -91,28 +79,29 @@ int CheckStatus()
 }
 /*检测ping*/
 int checkping(){
-    if(pingtime+ping<get_curr_unixtime()&&G_SockList.count(mainsock)!=0&&mainsock!=0)
+    if(mainInfo.pingtime+mainInfo.ping<get_curr_unixtime()&&G_SockList.count(mainInfo.mainsock)!=0&&mainInfo.mainsock!=0)
     {
         #if OPENSSL
-        int sendlen = SendPing(mainsock, mainsslinfo->ssl );
+        int sendlen = SendPing(mainInfo.mainsock, mainsslinfo->ssl );
         #else
-        int sendlen = SendPing(mainsock, &mainsslinfo->ssl );
+        int sendlen = SendPing(mainInfo.mainsock, &mainsslinfo->ssl );
         #endif
 
         //发送失败断开连接
         if(sendlen<1)
         {
-            mainsockstatus=0;
+            mainInfo.mainsockstatus=0;
         }
-        pingtime = get_curr_unixtime();
+        mainInfo.pingtime = get_curr_unixtime();
     }
     return 0;
 }
 
 int main( int argc, char **argv )
 {
+    InitMainInfo();//初始化结构体
     printf("ngrokc v%s \r\n",VER);
-	loadargs( argc, argv, s_name, &s_port, authtoken,password_c,&ClientId );
+	loadargs( argc, argv);
     #if WIN32
 	signal( SIGINT, cs );
     #else
@@ -142,8 +131,8 @@ int main( int argc, char **argv )
     #endif // OPENSSL
 
 	/* init addr */
-	lastdnsback	= net_dns( &server_addr, s_name, s_port );
-	lastdnstime	= get_curr_unixtime();
+	mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.s_name, mainInfo.s_port );
+	mainInfo.lastdnstime	= get_curr_unixtime();
     #if UDPCMD
     udpsocket=ControlUdp(udpport);
     #endif // UDPCMD
@@ -180,8 +169,8 @@ void* proxy(  )
         checkping();//ping
 
         //控制链接断开,关闭所有连接
-        if(mainsockstatus==0){
-            shutdown( mainsock,2);
+        if(mainInfo.mainsockstatus==0){
+            shutdown( mainInfo.mainsock,2);
             //释放所有连接
             for ( it3 = G_SockList.begin(); it3 != G_SockList.end(); )
             {
@@ -189,31 +178,31 @@ void* proxy(  )
                 it3++;
             }
             G_SockList.clear();
-            mainsock = 0;
+            mainInfo.mainsock = 0;
             //改回状态
-            mainsockstatus=1;
+            mainInfo.mainsockstatus=1;
             //初始化通道
             InitTunnelList();
         }
 
-	    if (lastdnsback == -1 ||(lastdnstime + 600) < get_curr_unixtime())
+	    if (mainInfo.lastdnsback == -1 ||(mainInfo.lastdnstime + 600) < get_curr_unixtime())
 		{
-			lastdnsback	= net_dns( &server_addr, s_name, s_port );
-			lastdnstime	= get_curr_unixtime();
+			mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.s_name, mainInfo.s_port );
+			mainInfo.lastdnstime	= get_curr_unixtime();
 			printf( "update dns\r\n" );
 		}
 		//dns解析成功
-        if (lastdnsback != -1)
+        if (mainInfo.lastdnsback != -1)
         {
             CheckStatus();
         }
 
         //注册端口
-        if(G_SockList.count(mainsock)!=0&&mainsock!=0){
+        if(G_SockList.count(mainInfo.mainsock)!=0&&mainInfo.mainsock!=0){
 
-            tempinfo=G_SockList[mainsock];
-            if(tempinfo->isauth==1&&regtunneltime+60<get_curr_unixtime()){
-                regtunneltime=get_curr_unixtime();
+            tempinfo=G_SockList[mainInfo.mainsock];
+            if(tempinfo->isauth==1&&mainInfo.regtunneltime+60<get_curr_unixtime()){
+                mainInfo.regtunneltime=get_curr_unixtime();
                 for ( listit = G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
                 {
                     tunnelinfo =(TunnelInfo	*)*listit;
@@ -221,9 +210,9 @@ void* proxy(  )
                         memset(ReqId,0,20);
                         memset(tunnelinfo->ReqId,0,20);
                         #if OPENSSL
-                        SendReqTunnel(mainsock,mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
+                        SendReqTunnel(mainInfo.mainsock,mainsslinfo->ssl,ReqId,tunnelinfo);
                         #else
-                        SendReqTunnel(mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo->protocol,tunnelinfo->hostname,tunnelinfo->subdomain, tunnelinfo->remoteport ,authtoken);
+                        SendReqTunnel(mainInfo.mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo);
                         #endif
                         //copy
                         memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
@@ -353,12 +342,12 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainsock,tempinfo,server_addr,&ClientId,authtoken);
+                         backcode=CmdSock(&mainInfo.mainsock,tempinfo,server_addr);
                          if(backcode==-1)
                          {
                              //控制链接断开，标记清空
-                             mainsockstatus=0;
-                             lasterrtime=get_curr_unixtime();
+                             mainInfo.mainsockstatus=0;
+                             mainInfo.lasterrtime=get_curr_unixtime();
                              break;
                          }
                     }
@@ -388,7 +377,7 @@ void* proxy(  )
 						if ( tempinfo->istype == 1 )
 						{
 						    //初始化远程连接
-                            backcode=RemoteSslInit(&it1,tempinfo,ClientId);
+                            backcode=RemoteSslInit(&it1,tempinfo);
                             if(backcode==-1)
                             {
                                continue;

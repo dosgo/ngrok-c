@@ -25,20 +25,20 @@ char *rand_str(char *str,const int len)
 
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,const char *protocol,const char * HostName,const char * Subdomain,int RemotePort,char *authtoken)
+int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,TunnelInfo *tunnelInfo)
 {
     char guid[20]={0};
     rand_str(guid,5);
     char str[1024];
     memset(str,0,1024);
     memcpy(ReqId,guid,strlen(guid));//copy
-    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",protocol,guid,HostName,Subdomain,RemotePort,authtoken);
+    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",tunnelInfo->protocol,ReqId,tunnelInfo->hostname,tunnelInfo->subdomain,tunnelInfo->remoteport,mainInfo.authtoken);
     return sendpack(sock,ssl,str,1);
 }
 
 
 
-int loadargs( int argc, char **argv ,char *s_name,int * s_port,char * authtoken,char *password_c,string *ClientId)
+int loadargs( int argc, char **argv )
 {
 	if ( argc > 1 )
 	{
@@ -73,17 +73,17 @@ int loadargs( int argc, char **argv ,char *s_name,int * s_port,char * authtoken,
 						}else  {
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
-						getvalue(jsonstr,"Shost",s_name);
+						getvalue(jsonstr,"Shost",mainInfo.s_name);
 						if(getvalue(jsonstr,"Sport",temp)==0)
                         {
-                            *s_port = atoi(temp);
+                            mainInfo.s_port = atoi(temp);
 						}
-						getvalue(jsonstr,"Atoken",authtoken);
-						getvalue(jsonstr,"Password",password_c);
+						getvalue(jsonstr,"Atoken",mainInfo.authtoken);
+						getvalue(jsonstr,"Password",mainInfo.password_c);
 
 						if(getvalue(jsonstr,"Cid",temp)==0)
                         {
-                            *ClientId = string( temp );
+                            mainInfo.ClientId = string( temp );
 						}
 
 						pos = pos + xpos + 1;

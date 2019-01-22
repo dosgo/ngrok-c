@@ -169,7 +169,7 @@ int NewTunnel(cJSON	*json){
     return 0;
 }
 
-int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo,string &ClientId){
+int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
 
@@ -178,9 +178,9 @@ int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo,string &
     {
         #if OPENSSL
         setnonblocking((*it1)->first,1);
-        SendRegProxy((*it1)->first,sslinfo->ssl, ClientId);
+        SendRegProxy((*it1)->first,sslinfo->ssl);
         #else
-        SendRegProxy((*it1)->first,&sslinfo->ssl, ClientId);
+        SendRegProxy((*it1)->first,&sslinfo->ssl);
         #endif
     }
 
@@ -417,7 +417,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
 }
 
 
-int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr,string *ClientId,char * authtoken){
+int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr){
    //¼ì²âÊÇ·ñ¶Ï¿ª
    if(check_sock(*mainsock)!= 0)
    {
@@ -491,7 +491,7 @@ int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr,stri
                     {
 
                         char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
-                        *ClientId = string( cid );
+                        mainInfo.ClientId = string( cid );
                         #if OPENSSL
                         SendPing( *mainsock,sslinfo->ssl );
                         #else
@@ -534,7 +534,7 @@ int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr,stri
     return 0;
 }
 
-int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo,string *ClientId,char *authtoken,char *password_c)
+int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo)
 {
 	*mainsock = socket( AF_INET, SOCK_STREAM, IPPROTO_IP );
     SetBufSize(*mainsock);
@@ -565,7 +565,7 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
 	}
 
     #if OPENSSL
-	SendAuth(*mainsock,(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
+	SendAuth(*mainsock,(*mainsslinfo)->ssl);
 	#else
 	SendAuth(*mainsock,&(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
 	#endif
