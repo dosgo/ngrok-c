@@ -84,6 +84,7 @@ int ReqProxy(struct sockaddr_in server_addr){
     sinfo->linktime=get_curr_unixtime();
     sinfo->sslinfo		= NULL;
     sinfo->isconnectlocal	= 0;
+    sinfo->sock=proxy_fd;
     G_SockList.insert( map<int, Sockinfo*> :: value_type( proxy_fd, sinfo ) );
     return 0;
 }
@@ -169,18 +170,18 @@ int NewTunnel(cJSON	*json){
     return 0;
 }
 
-int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo){
+int RemoteSslInit(Sockinfo *tempinfo){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
 
 
-    if ( ssl_init_info((int *)&(*it1)->first, sslinfo ) != -1 )
+    if ( ssl_init_info(&tempinfo->sock, sslinfo ) != -1 )
     {
         #if OPENSSL
-        setnonblocking((*it1)->first,1);
-        SendRegProxy((*it1)->first,sslinfo->ssl);
+        setnonblocking(tempinfo->sock,1);
+        SendRegProxy(tempinfo->sock,sslinfo->ssl);
         #else
-        SendRegProxy((*it1)->first,&sslinfo->ssl);
+        SendRegProxy(tempinfo->sock,&sslinfo->ssl);
         #endif
     }
 
@@ -188,26 +189,25 @@ int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo){
     else
     {
         #if OPENSSL
-        setnonblocking((*it1)->first,1);
+        setnonblocking(tempinfo->sock,1);
         #endif
         /* ssl 初始化失败，移除连接 */
-        clearsock( (*it1)->first, tempinfo );
-        G_SockList.erase((*it1)++);
+        clearsock(tempinfo );
         return -1;
     }
     return 0;
 }
 
-int LocalToRemote(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo,ssl_info *sslinfo){
+int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
     int readlen;
     int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
     //oolarssl 最大发送长度不能超过16K。。还是改成15吧
     char buf[bufsize+1];
     memset(buf,0,bufsize+1);
     #if WIN32
-    readlen = recv( (*it1)->first, (char *) buf, bufsize, 0 );
+    readlen = recv( tempinfo->sock, (char *) buf, bufsize, 0 );
     #else
-    readlen = recv( (*it1)->first, buf, bufsize, 0 );
+    readlen = recv(  tempinfo->sock, buf, bufsize, 0 );
     #endif
     if ( readlen > 0&&sslinfo!=NULL )
     {
@@ -220,14 +220,13 @@ int LocalToRemote(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo,ssl_info
 
     }else  {
         shutdown( tempinfo->tosock, 2 );
-        clearsock( (*it1)->first, tempinfo);
-        G_SockList.erase((*it1)++);
+        clearsock(tempinfo);
         return -1;
     }
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::iterator *it1){
+int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1){
    int readlen,sendlen;
    int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
@@ -247,8 +246,7 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::it
         /* close to sock */
         int tosock=tempinfo1->tosock;
         shutdown( tosock, 2 );
-        clearsock( (*it1)->first, tempinfo1 );
-        G_SockList.erase((*it1)++);
+        clearsock(tempinfo1 );
         //这行绝对不能删除，用标记ssl已经销毁，删除会导致崩溃。
         if(G_SockList.count(tosock)==1)
         {
@@ -287,18 +285,17 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::it
         sendlen=sendlocal(tempinfo1->tosock,buf,readlen,1);
         if(sendlen<1)
         {
-            shutdown((*it1)->first,2);
+            shutdown(tempinfo1->sock,2);
             shutdown(tempinfo1->tosock,2);
         }
     }
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo1){
+int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo1){
     //避免指针为空崩溃
     if(sslinfo==NULL){
-         clearsock( (*it1)->first, tempinfo1 );
-        G_SockList.erase((*it1)++);
+         clearsock(tempinfo1 );
         return -1;
     }
     int readlen;
@@ -312,7 +309,6 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
     char buf[MAXBUF +1]={0};
 
     #if OPENSSL
-
     readlen =  SslRecv(sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
     #else
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,MAXBUF-1);
@@ -322,8 +318,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
 
     if ( readlen ==0||readlen ==-2)
     {
-        clearsock( (*it1)->first, tempinfo1 );
-        G_SockList.erase((*it1)++);
+        clearsock(tempinfo1);
         return -1;
     }
 
@@ -334,8 +329,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
     //有时候readlen变成-76导致崩溃
     if ( readlen <1)
     {
-        clearsock( (*it1)->first, tempinfo1 );
-        G_SockList.erase((*it1)++);
+        clearsock(tempinfo1 );
         return -1;
     }
 
@@ -394,7 +388,8 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
                         sinfo->isconnect	= 0;
                         sinfo->sslinfo		= sslinfo;
                         sinfo->linktime=get_curr_unixtime();
-                        sinfo->tosock		= (*it1)->first;
+                        sinfo->tosock		= tempinfo1->sock;
+                        sinfo->sock         = tcp;
                         G_SockList.insert( map<int, Sockinfo*> :: value_type( tcp, sinfo ) );
                         /* 远程的带上本地链接 */
                         tempinfo1->tosock = tcp;
@@ -405,8 +400,7 @@ int ConnectLocal(ssl_info *sslinfo,map<int, Sockinfo*>::iterator *it1,Sockinfo *
                 else
                 {
 
-                    clearsock( (*it1)->first, tempinfo1 );
-                    G_SockList.erase((*it1)++);
+                    clearsock(tempinfo1 );
                     cJSON_Delete( json );
                     return -1;
                 }
@@ -576,6 +570,7 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
     sinfo->istype		= 3;
     sinfo->isconnect	= 1;
     sinfo->packbuflen	= 0;
+    sinfo->sock=*mainsock;
     sinfo->sslinfo		= *mainsslinfo;
     G_SockList.insert( map<int, Sockinfo*> :: value_type( *mainsock, sinfo ) );
     return 0;

@@ -128,7 +128,7 @@ inline int check_sock(int sock)
     return error;
 }
 
-void clearsock(int sock,Sockinfo * sock_info);
+void clearsock(Sockinfo * sock_info);
 
 inline int SetBufSize(int sock)
 {

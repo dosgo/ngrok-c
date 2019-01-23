@@ -3,7 +3,7 @@
 
 
 #if OPENSSL
-void clearsock(int sock,Sockinfo * sock_info)
+void clearsock(Sockinfo * sock_info)
 {
 
       if(sock_info->istype==1)
@@ -23,12 +23,12 @@ void clearsock(int sock,Sockinfo * sock_info)
       }
    //   net_close(sock);
 
-      shutdown(sock,2);
+      shutdown(sock_info->sock,2);
       //closesocket(sock);
       #if WIN32
-      closesocket(sock);
+      closesocket(sock_info->sock);
       #else
-      close(sock);
+      close(sock_info->sock);
       #endif
       //ÊÍ·ÅÄÚ´æ
       if(sock_info!=NULL)
@@ -39,7 +39,7 @@ void clearsock(int sock,Sockinfo * sock_info)
 
 }
 #else
-void clearsock(int sock,Sockinfo * sock_info)
+void clearsock(Sockinfo * sock_info)
 {
 
       if(sock_info->istype==1)
@@ -64,17 +64,17 @@ void clearsock(int sock,Sockinfo * sock_info)
       }
 
       #if ISMBEDTLS
-      shutdown(sock,2);
-      //closesocket(sock);
+      shutdown(sock_info->sock,2);
+      //closesocket(sock_info->sock);
       #if WIN32
-      closesocket(sock);
+      closesocket(sock_info->sock);
       #else
-      close(sock);
+      close(sock_info->sock);
       #endif
 
       #else
-      shutdown(sock,2);
-      net_close(sock);
+      shutdown(sock_info->sock,2);
+      net_close(sock_info->sock);
       #endif
 
       //ÊÍ·ÅÄÚ´æ

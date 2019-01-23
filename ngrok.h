@@ -20,13 +20,13 @@ int InitTunnelList();
 
 int SetLocalAddrInfo(char *url,char *ReqId,int istunnel);
 
-int RemoteSslInit(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo);
+int RemoteSslInit(Sockinfo *tempinfo);
 
-int LocalToRemote(map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo1,ssl_info *sslinfo1);
+int LocalToRemote(Sockinfo *tempinfo1,ssl_info *sslinfo1);
 
-int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1,map<int, Sockinfo*>::iterator *it1);
+int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1);
 
-int ConnectLocal(ssl_info *sslinfo1,map<int, Sockinfo*>::iterator *it1,Sockinfo *tempinfo1);
+int ConnectLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1);
 int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr);
 int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainsslinfo);
 #endif

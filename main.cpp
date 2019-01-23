@@ -34,7 +34,7 @@
 
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.47-(2019/01/22)";
+char VER[24]= "1.48-(2019/01/23)";
 
 
 ssl_info *mainsslinfo=NULL;
@@ -174,7 +174,7 @@ void* proxy(  )
             //释放所有连接
             for ( it3 = G_SockList.begin(); it3 != G_SockList.end(); )
             {
-                clearsock( it3->first,  it3->second);
+                clearsock(it3->second);
                 it3++;
             }
             G_SockList.clear();
@@ -295,7 +295,7 @@ void* proxy(  )
                         echo("connect local fail\r\n");
                         shutdown( tempinfo->tosock, 2 );
                     }
-                    clearsock(it1->first,tempinfo);
+                    clearsock(tempinfo);
                     G_SockList.erase(it1++);
                     continue;
                 }
@@ -311,9 +311,10 @@ void* proxy(  )
                         //未连接本地
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,&it1,tempinfo);
+                            backcode=ConnectLocal(sslinfo1,tempinfo);
                             if(backcode==-1)
                             {
+                              G_SockList.erase(it1++);
                               continue;
                             }
                         }
@@ -325,18 +326,20 @@ void* proxy(  )
                         //本地连接完成转发
                         if( tempinfo->isconnectlocal == 2 )
                         {
-                            backcode=RemoteToLocal(sslinfo1,tempinfo,&it1);
+                            backcode=RemoteToLocal(sslinfo1,tempinfo);
                             if(backcode==-1)
                             {
+                              G_SockList.erase(it1++);
                               continue;
                             }
                         }
                     }
                     /* 本地的转发给远程 */
                     else if(tempinfo->istype == 2){
-                        backcode=LocalToRemote(&it1,tempinfo,sslinfo1);
+                        backcode=LocalToRemote(tempinfo,sslinfo1);
                         if(backcode==-1)
                         {
+                          G_SockList.erase(it1++);
                           continue;
                         }
                     }
@@ -367,7 +370,7 @@ void* proxy(  )
                                 echo("连接本地失败");
 							    shutdown( tempinfo->tosock, 2 );
 							}
-							clearsock(it1->first,tempinfo);
+							clearsock(tempinfo);
 							G_SockList.erase(it1++);
 							continue;
 						}
@@ -377,9 +380,10 @@ void* proxy(  )
 						if ( tempinfo->istype == 1 )
 						{
 						    //初始化远程连接
-                            backcode=RemoteSslInit(&it1,tempinfo);
+                            backcode=RemoteSslInit(tempinfo);
                             if(backcode==-1)
                             {
+                               G_SockList.erase(it1++);
                                continue;
                             }
                             /* 置为1 */

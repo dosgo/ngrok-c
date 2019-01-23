@@ -39,6 +39,7 @@ struct Sockinfo
     int isconnect;
     int istype; //1=remote 2=local,3=cmd
     int tosock;
+    int sock;
     unsigned char *packbuf;
     unsigned long long packbuflen;
     int isconnectlocal;
