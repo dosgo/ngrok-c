@@ -226,16 +226,16 @@ int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1){
+int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
    int readlen,sendlen;
    int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);
     #if OPENSSL
-    readlen =  SslRecv(sslinfo1->ssl,(unsigned char *)buf,bufsize);
+    readlen =  SslRecv(sslinfo->ssl,(unsigned char *)buf,bufsize);
     #else
-    readlen =  SslRecv(&sslinfo1->ssl,(unsigned char *)buf,bufsize);
+    readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,bufsize);
     #endif
 
 
@@ -244,9 +244,9 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1){
     if ( readlen ==0||readlen ==-2)
     {
         /* close to sock */
-        int tosock=tempinfo1->tosock;
+        int tosock=tempinfo->tosock;
         shutdown( tosock, 2 );
-        clearsock(tempinfo1 );
+        clearsock(tempinfo );
         //这行绝对不能删除，用标记ssl已经销毁，删除会导致崩溃。
         if(G_SockList.count(tosock)==1)
         {
@@ -257,7 +257,7 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1){
     else if(readlen >0)
     {
 
-        TunnelReq *tunnelreq =  tempinfo1->tunnelreq;
+        TunnelReq *tunnelreq =  tempinfo->tunnelreq;
         char protocol[32] = { 0 };
         char remotehost[256] = { 0 };
         char httpline[3]="\r\n";
@@ -282,20 +282,20 @@ int RemoteToLocal(ssl_info *sslinfo1,Sockinfo *tempinfo1){
         }
 
 
-        sendlen=sendlocal(tempinfo1->tosock,buf,readlen,1);
+        sendlen=sendlocal(tempinfo->tosock,buf,readlen,1);
         if(sendlen<1)
         {
-            shutdown(tempinfo1->sock,2);
-            shutdown(tempinfo1->tosock,2);
+            shutdown(tempinfo->sock,2);
+            shutdown(tempinfo->tosock,2);
         }
     }
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo1){
+int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
     //避免指针为空崩溃
     if(sslinfo==NULL){
-         clearsock(tempinfo1 );
+         clearsock(tempinfo);
         return -1;
     }
     int readlen;
@@ -318,7 +318,7 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo1){
 
     if ( readlen ==0||readlen ==-2)
     {
-        clearsock(tempinfo1);
+        clearsock(tempinfo);
         return -1;
     }
 
@@ -329,38 +329,38 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo1){
     //有时候readlen变成-76导致崩溃
     if ( readlen <1)
     {
-        clearsock(tempinfo1 );
+        clearsock(tempinfo);
         return -1;
     }
 
     /* copy到临时缓存区 */
-    if ( tempinfo1->packbuflen == 0 )
+    if ( tempinfo->packbuflen == 0 )
     {
-        tempinfo1->packbuf = (unsigned char *) malloc( MAXBUF );
+        tempinfo->packbuf = (unsigned char *) malloc( MAXBUF );
     }
 
 
 
-    memcpy( tempinfo1->packbuf + tempinfo1->packbuflen, buf, readlen );
-    tempinfo1->packbuflen = tempinfo1->packbuflen + readlen;
+    memcpy( tempinfo->packbuf + tempinfo->packbuflen, buf, readlen );
+    tempinfo->packbuflen = tempinfo->packbuflen + readlen;
 
 
 
-    if ( tempinfo1->packbuflen > 8 )
+    if ( tempinfo->packbuflen > 8 )
     {
-        memcpy( &packlen, tempinfo1->packbuf, 8 );
+        memcpy( &packlen, tempinfo->packbuf, 8 );
         if ( BigEndianTest() == BigEndian )
         {
             packlen = Swap64( packlen );
         }
-        if ( tempinfo1->packbuflen == packlen + 8 )
+        if ( tempinfo->packbuflen == packlen + 8 )
         {
             memset( tempjson, 0, MAXBUF+1 );
-            memcpy( tempjson, tempinfo1->packbuf + 8, packlen );
-            free( tempinfo1->packbuf );
+            memcpy( tempjson, tempinfo->packbuf + 8, packlen );
+            free( tempinfo->packbuf );
             echo("%s\r\n",tempjson);
-            tempinfo1->packbuf	= NULL;
-            tempinfo1->packbuflen	= 0;
+            tempinfo->packbuf	= NULL;
+            tempinfo->packbuflen	= 0;
             cJSON	*json	= cJSON_Parse( tempjson );
             cJSON	*Type	= cJSON_GetObjectItem( json, "Type" );
             if ( strcmp( Type->valuestring, "StartProxy" ) == 0 )
@@ -388,19 +388,19 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo1){
                         sinfo->isconnect	= 0;
                         sinfo->sslinfo		= sslinfo;
                         sinfo->linktime=get_curr_unixtime();
-                        sinfo->tosock		= tempinfo1->sock;
+                        sinfo->tosock		= tempinfo->sock;
                         sinfo->sock         = tcp;
                         G_SockList.insert( map<int, Sockinfo*> :: value_type( tcp, sinfo ) );
                         /* 远程的带上本地链接 */
-                        tempinfo1->tosock = tcp;
-                        tempinfo1->tunnelreq    = tunnelreq;
-                        tempinfo1->isconnectlocal= 1;
+                        tempinfo->tosock = tcp;
+                        tempinfo->tunnelreq    = tunnelreq;
+                        tempinfo->isconnectlocal= 1;
                         cJSON_Delete( json );
                 }
                 else
                 {
 
-                    clearsock(tempinfo1 );
+                    clearsock(tempinfo);
                     cJSON_Delete( json );
                     return -1;
                 }
