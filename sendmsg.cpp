@@ -73,10 +73,20 @@ int loadargs( int argc, char **argv )
 						}else  {
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
-						getvalue(jsonstr,"Shost",mainInfo.s_name);
+						getvalue(jsonstr,"Shost",mainInfo.shost);
+                        #if UDPTUNNEL
+						if(getvalue(jsonstr,"Udphost",temp)==0)
+                        {
+                            memcpy(mainInfo.udphost,temp,strlen(temp));
+						}
+						if(getvalue(jsonstr,"Udpport",temp)==0)
+                        {
+                            mainInfo.udpport = atoi(temp);
+						}
+						#endif
 						if(getvalue(jsonstr,"Sport",temp)==0)
                         {
-                            mainInfo.s_port = atoi(temp);
+                            mainInfo.sport = atoi(temp);
 						}
 						getvalue(jsonstr,"Atoken",mainInfo.authtoken);
 						getvalue(jsonstr,"Password",mainInfo.password_c);

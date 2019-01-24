@@ -1,0 +1,206 @@
+# depslib dependency file v1.0
+1548150556 source:d:\c\ngrok-c\cjson.c
+	<string.h>
+	<stdio.h>
+	<math.h>
+	<stdlib.h>
+	<float.h>
+	<limits.h>
+	<ctype.h>
+	"cJSON.h"
+
+1548150556 d:\c\ngrok-c\cjson.h
+
+1548312797 source:d:\c\ngrok-c\global.cpp
+	"global.h"
+
+1548315128 d:\c\ngrok-c\global.h
+	<string>
+	<map>
+	<list>
+	"sslbio.h"
+
+1548150556 d:\c\ngrok-c\sslbio.h
+	"config.h"
+	<malloc.h>
+	"opensslbio.h"
+	"polarsslbio.h"
+
+1548321555 d:\c\ngrok-c\config.h
+	<stdarg.h>
+	<stdio.h>
+	<string.h>
+	"global.h"
+
+1548150556 d:\c\ngrok-c\opensslbio.h
+	"config.h"
+	<malloc.h>
+	<openssl/ssl.h>
+	<openssl/bio.h>
+	<openssl/err.h>
+	"openssldl.h"
+
+1548150556 d:\c\ngrok-c\openssldl.h
+	<openssl/ssl.h>
+
+1548150556 d:\c\ngrok-c\polarsslbio.h
+	"config.h"
+	<malloc.h>
+	<mbedtls/ssl.h>
+	<mbedtls/net.h>
+	<mbedtls/debug.h>
+	<mbedtls/entropy.h>
+	<mbedtls/ctr_drbg.h>
+	<mbedtls/error.h>
+	<mbedtls/certs.h>
+	<polarssl/net.h>
+	<polarssl/debug.h>
+	<polarssl/ssl.h>
+	<polarssl/entropy.h>
+	<polarssl/ctr_drbg.h>
+	<polarssl/error.h>
+	<polarssl/certs.h>
+
+1548321580 source:d:\c\ngrok-c\main.cpp
+	"config.h"
+	<string.h>
+	<stdio.h>
+	<errno.h>
+	<iostream>
+	<iomanip>
+	<signal.h>
+	<windows.h>
+	"segment.h"
+	<sys/select.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<sys/time.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	"cJSON.h"
+	"mytime.h"
+	"bytestool.h"
+	"ngrok.h"
+	"sslbio.h"
+	"nonblocking.h"
+	"udp.h"
+
+1548150556 d:\c\ngrok-c\mytime.h
+	<windows.h>
+	<errno.h>
+	<sys/select.h>
+	<netinet/in.h>
+
+1548150556 d:\c\ngrok-c\bytestool.h
+
+1548224312 d:\c\ngrok-c\ngrok.h
+	"config.h"
+	<string>
+	<map>
+	"sendmsg.h"
+	"nonblocking.h"
+	"cJSON.h"
+
+1548311417 d:\c\ngrok-c\sendmsg.h
+	"config.h"
+	"nonblocking.h"
+	<string>
+	<map>
+	"sslbio.h"
+	<windows.h>
+	<errno.h>
+	<netinet/in.h>
+	<string.h>
+	<sys/select.h>
+	"bytestool.h"
+
+1548211877 d:\c\ngrok-c\nonblocking.h
+	"config.h"
+	<string.h>
+	<winsock.h>
+	<winsock2.h>
+	<windows.h>
+	<fcntl.h>
+	<netinet/in.h>
+	<netdb.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<unistd.h>
+	<list>
+	"sslbio.h"
+	<netinet/in.h>
+	<netinet/tcp.h>
+
+1548321730 source:d:\c\ngrok-c\ngrok.cpp
+	"config.h"
+	<string>
+	<windows.h>
+	<unistd.h>
+	<arpa/inet.h>
+	<errno.h>
+	"bytestool.h"
+	"ngrok.h"
+	"sslbio.h"
+	<stdlib.h>
+
+1548212093 source:d:\c\ngrok-c\nonblocking.cpp
+	"nonblocking.h"
+
+1548150556 source:d:\c\ngrok-c\opensslbio.cpp
+	"config.h"
+	<string.h>
+	"mytime.h"
+	"opensslbio.h"
+
+1548150556 source:d:\c\ngrok-c\openssldl.cpp
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	"openssldl.h"
+	<windows.h>
+	<dlfcn.h>
+
+1548150556 source:d:\c\ngrok-c\polarsslbio.cpp
+	"config.h"
+	<string.h>
+	"mytime.h"
+	"polarsslbio.h"
+
+1548312705 source:d:\c\ngrok-c\sendmsg.cpp
+	"config.h"
+	<string>
+	<windows.h>
+	<arpa/inet.h>
+	<errno.h>
+	"sendmsg.h"
+	<stdlib.h>
+
+1546065650 source:d:\c\ngrok-c\base64.c
+	"base64.h"
+	<stdio.h>
+	<stdlib.h>
+
+1546065611 d:\c\ngrok-c\base64.h
+	<stdio.h>
+
+1548321866 source:d:\c\ngrok-c\udp.cpp
+	"udp.h"
+	"ngrok.h"
+	"mytime.h"
+
+1548321806 d:\c\ngrok-c\udp.h
+	<string>
+	<map>
+	<time.h>
+	<list>
+	<winsock.h>
+	"string.h"
+	"cJSON.h"
+	"sendmsg.h"
+	"base64.h"
+	"bytestool.h"
+

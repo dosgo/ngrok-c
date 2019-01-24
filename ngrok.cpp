@@ -81,7 +81,7 @@ int ReqProxy(struct sockaddr_in server_addr){
     sinfo->istype		= 1;
     sinfo->isconnect	= 0;
     sinfo->packbuflen	= 0;
-    sinfo->linktime=get_curr_unixtime();
+    sinfo->linktime=getUnixTime();
     sinfo->sslinfo		= NULL;
     sinfo->isconnectlocal	= 0;
     sinfo->sock=proxy_fd;
@@ -100,12 +100,12 @@ int InitTunnelList(){
 
     //释放所有通道信息
     map<string, TunnelReq*>::iterator it3;
-    for ( it3 = G_TunnelAddr.begin(); it3 != G_TunnelAddr.end(); )
+    for ( it3 = mainInfo.G_TunnelAddr.begin(); it3 != mainInfo.G_TunnelAddr.end(); )
     {
        free(it3->second);
        it3++;
     }
-    G_TunnelAddr.clear();
+    mainInfo.G_TunnelAddr.clear();
     return 0;
 }
 
@@ -130,10 +130,15 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
         if(strcasecmp(ReqId,tunnelinfo->ReqId)==0){
 
             //memcpy(tunnelinfo->hostname,host,strlen(host));
-            if(strncmp(protocol,"tcp",3)==0){
+            if(strnicmp(protocol,"tcp",3)==0){
                 tunnelinfo->remoteport=port;
             }
-            if(strncmp(protocol,"http",4)==0){
+            #if UDPTUNNEL
+            if(strnicmp(protocol,"udp",3)==0){
+                tunnelinfo->remoteport=port;
+            }
+            #endif // UDPTUNNEL
+            if(strnicmp(protocol,"http",4)==0){
                 memset(tunnelinfo->subdomain,0,255);
                 memcpy(tunnelinfo->subdomain,subdomain,strlen(subdomain));
             }
@@ -144,7 +149,17 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
             memcpy(tunnelreq->localhost,tunnelinfo->localhost,strlen(tunnelinfo->localhost));
             tunnelreq->localport=tunnelinfo->localport;
             memcpy(tunnelreq->hostheader,tunnelinfo->hostheader,strlen(tunnelinfo->hostheader));
-            G_TunnelAddr.insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
+
+            #if UDPTUNNEL
+            if(strnicmp(protocol,"udp",3)==0){
+                udpInfo.G_TunnelAddr.insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
+            }
+            #endif // UDPTUNNEL
+            if(strnicmp(protocol,"udp",3)!=0)
+            {
+                mainInfo.G_TunnelAddr.insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
+            }
+
         }
 
     }
@@ -358,7 +373,7 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
             memset( tempjson, 0, MAXBUF+1 );
             memcpy( tempjson, tempinfo->packbuf + 8, packlen );
             free( tempinfo->packbuf );
-            echo("%s\r\n",tempjson);
+            echo("tcp:%s\r\n",tempjson);
             tempinfo->packbuf	= NULL;
             tempinfo->packbuflen	= 0;
             cJSON	*json	= cJSON_Parse( tempjson );
@@ -368,9 +383,9 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
                 cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
                 char	*Url		= cJSON_GetObjectItem( Payload, "Url" )->valuestring;
 
-                if(G_TunnelAddr.count(string(Url))!=0)
+                if(mainInfo.G_TunnelAddr.count(string(Url))!=0)
                 {
-                        TunnelReq *tunnelreq =G_TunnelAddr[string(Url)];
+                        TunnelReq *tunnelreq =mainInfo.G_TunnelAddr[string(Url)];
                         struct sockaddr_in local_addr={0};
                         local_addr.sin_family	= AF_INET;
                         local_addr.sin_port	= htons(tunnelreq->localport );
@@ -387,7 +402,7 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
                         sinfo->istype		= 2;
                         sinfo->isconnect	= 0;
                         sinfo->sslinfo		= sslinfo;
-                        sinfo->linktime=get_curr_unixtime();
+                        sinfo->linktime=getUnixTime();
                         sinfo->tosock		= tempinfo->sock;
                         sinfo->sock         = tcp;
                         G_SockList.insert( map<int, Sockinfo*> :: value_type( tcp, sinfo ) );
@@ -469,7 +484,7 @@ int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr){
                 free( tempinfo->packbuf );
                 tempinfo->packbuf	= NULL;
                 tempinfo->packbuflen	= 0;
-                echo("%s\r\n",tempjson);
+                echo("tcp:%s\r\n",tempjson);
                 cJSON *json = cJSON_Parse( tempjson );
 				cJSON *Type = cJSON_GetObjectItem( json, "Type" );
 				if ( strcmp( Type->valuestring, "ReqProxy" ) == 0 )
@@ -487,7 +502,7 @@ int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr){
                         char	*cid		= cJSON_GetObjectItem( Payload, "ClientId" )->valuestring;
                         mainInfo.ClientId = string( cid );
                         #if OPENSSL
-                        SendPing( *mainsock,sslinfo->ssl );
+                         SendPing( *mainsock,sslinfo->ssl );
                         #else
                         SendPing( *mainsock,&sslinfo->ssl );
                         #endif

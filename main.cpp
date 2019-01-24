@@ -31,10 +31,12 @@
 #include "ngrok.h"
 #include "sslbio.h"
 #include "nonblocking.h"
-
+#if UDPTUNNEL
+#include "udp.h"
+#endif
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.48-(2019/01/23)";
+char VER[24]= "1.49-(2019/01/24)";
 
 
 ssl_info *mainsslinfo=NULL;
@@ -64,13 +66,13 @@ int CheckStatus()
     //判断是否存在
     if (G_SockList.count(mainInfo.mainsock)==0||mainInfo.mainsock==0)
     {
-        if(mainInfo.lasterrtime==0||(mainInfo.lasterrtime+60)<get_curr_unixtime()){
+        if(mainInfo.lasterrtime==0||(mainInfo.lasterrtime+60)<getUnixTime()){
             //连接失败
             if(ConnectMain(&mainInfo.mainsock,server_addr,&mainsslinfo)==-1)
             {
                 mainInfo.mainsockstatus=0;
                 printf("link err\r\n");
-                mainInfo.lasterrtime=get_curr_unixtime();
+                mainInfo.lasterrtime=getUnixTime();
                 return -1;
             }
         }
@@ -79,7 +81,7 @@ int CheckStatus()
 }
 /*检测ping*/
 int checkping(){
-    if(mainInfo.pingtime+mainInfo.ping<get_curr_unixtime()&&G_SockList.count(mainInfo.mainsock)!=0&&mainInfo.mainsock!=0)
+    if(mainInfo.pingtime+mainInfo.ping<getUnixTime()&&G_SockList.count(mainInfo.mainsock)!=0&&mainInfo.mainsock!=0)
     {
         #if OPENSSL
         int sendlen = SendPing(mainInfo.mainsock, mainsslinfo->ssl );
@@ -92,7 +94,7 @@ int checkping(){
         {
             mainInfo.mainsockstatus=0;
         }
-        mainInfo.pingtime = get_curr_unixtime();
+        mainInfo.pingtime = getUnixTime();
     }
     return 0;
 }
@@ -131,11 +133,14 @@ int main( int argc, char **argv )
     #endif // OPENSSL
 
 	/* init addr */
-	mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.s_name, mainInfo.s_port );
-	mainInfo.lastdnstime	= get_curr_unixtime();
+	mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.shost, mainInfo.sport );
+	mainInfo.lastdnstime	= getUnixTime();
     #if UDPCMD
     udpsocket=ControlUdp(udpport);
     #endif // UDPCMD
+    #if UDPTUNNEL
+    initUdp();
+    #endif // UDPTUNNEL
     proxy();
 	return(0);
 }
@@ -168,6 +173,14 @@ void* proxy(  )
         //ping
         checkping();//ping
 
+        #if UDPTUNNEL
+         //login
+        CheckUdpAuth(udpInfo.msock);
+        //reg tunnel
+        CheckRegTunnel(udpInfo.msock);
+        CheckUdpPing(udpInfo.msock);//ping
+        #endif // UDPTUNNEL
+
         //控制链接断开,关闭所有连接
         if(mainInfo.mainsockstatus==0){
             shutdown( mainInfo.mainsock,2);
@@ -185,10 +198,10 @@ void* proxy(  )
             InitTunnelList();
         }
 
-	    if (mainInfo.lastdnsback == -1 ||(mainInfo.lastdnstime + 600) < get_curr_unixtime())
+	    if (mainInfo.lastdnsback == -1 ||(mainInfo.lastdnstime + 600) < getUnixTime())
 		{
-			mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.s_name, mainInfo.s_port );
-			mainInfo.lastdnstime	= get_curr_unixtime();
+			mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.shost, mainInfo.sport );
+			mainInfo.lastdnstime	= getUnixTime();
 			printf( "update dns\r\n" );
 		}
 		//dns解析成功
@@ -201,12 +214,12 @@ void* proxy(  )
         if(G_SockList.count(mainInfo.mainsock)!=0&&mainInfo.mainsock!=0){
 
             tempinfo=G_SockList[mainInfo.mainsock];
-            if(tempinfo->isauth==1&&mainInfo.regtunneltime+60<get_curr_unixtime()){
-                mainInfo.regtunneltime=get_curr_unixtime();
-                for ( listit = G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
+            if(tempinfo->isauth==1&&mainInfo.regtunneltime+60<getUnixTime()){
+                mainInfo.regtunneltime=getUnixTime();
+                for ( listit =G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
                 {
-                    tunnelinfo =(TunnelInfo	*)*listit;
-                    if(tunnelinfo->regstate==0){
+                    tunnelinfo =(TunnelInfo	*)*listit;//udp不在这里注册
+                    if(tunnelinfo->regstate==0&&stricmp(tunnelinfo->protocol,"udp")!=0){
                         memset(ReqId,0,20);
                         memset(tunnelinfo->ReqId,0,20);
                         #if OPENSSL
@@ -216,7 +229,7 @@ void* proxy(  )
                         #endif
                         //copy
                         memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
-                        tunnelinfo->regtime=get_curr_unixtime();//已发
+                        tunnelinfo->regtime=getUnixTime();//已发
                     }
                 }
             }
@@ -258,6 +271,15 @@ void* proxy(  )
         }
         #endif //
 
+        #if UDPTUNNEL
+        if(udpInfo.msock>0){
+            maxfdp = udpInfo.msock > maxfdp ? udpInfo.msock : maxfdp;
+            FD_SET(udpInfo.msock,&readSet );
+            maxfdp = udpInfo.lsock > maxfdp ? udpInfo.lsock : maxfdp;
+            FD_SET(udpInfo.lsock,&readSet );
+        }
+        #endif // UDPTUNNEL
+
 		if(maxfd==0)
 		{
 			sleeps( 500 );
@@ -281,6 +303,10 @@ void* proxy(  )
                 UdpCmd(udpsocket);
             }
             #endif
+            #if UDPTUNNEL
+               UdpRecv(&readSet);
+            #endif // UDPTUNNEL
+
 
 			for ( it1 = G_SockList.begin(); it1 != G_SockList.end(); )
 			{
@@ -288,7 +314,7 @@ void* proxy(  )
 			      //ping
                 checkping();//这里添加个ping避免超时
                 //判断连接超时sock
-                if((tempinfo->linktime+10)<get_curr_unixtime()&&tempinfo->isconnect==0)
+                if((tempinfo->linktime+10)<getUnixTime()&&tempinfo->isconnect==0)
                 {
 					//关闭远程连接
                     if(tempinfo->istype==2){
@@ -350,7 +376,7 @@ void* proxy(  )
                          {
                              //控制链接断开，标记清空
                              mainInfo.mainsockstatus=0;
-                             mainInfo.lasterrtime=get_curr_unixtime();
+                             mainInfo.lasterrtime=getUnixTime();
                              break;
                          }
                     }

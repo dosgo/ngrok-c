@@ -22,13 +22,14 @@ using namespace std;
 
 
 
-inline int get_curr_unixtime()
+inline int getUnixTime()
 {
     time_t now;
     return time(&now);
 }
 
 int loadargs( int argc, char **argv);
+char *rand_str(char *str,const int len);
 
 inline int strpos( char *str, char c )
 {

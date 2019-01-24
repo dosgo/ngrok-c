@@ -49,8 +49,10 @@ struct Sockinfo
 
 struct MainInfo
 {
-    char s_name[255];
-    int s_port;
+    char shost[255];
+    char udphost[255];
+    int sport;
+    int udpport;
     char authtoken[255];
     char password_c[255];//
     string ClientId ;
@@ -62,27 +64,57 @@ struct MainInfo
     int regtunneltime;
     int lastdnsback;
     int lasterrtime;
+    map<string,TunnelReq*> G_TunnelAddr;
 };
-
+#if UDPTUNNEL
+struct UdpInfo
+ {
+      int auth;  //login  flag
+      int authtime;  //login  flag
+      int regTunnel;//login  flag
+      int pingtime;
+      int pongtime;
+      int ping; //不能大于30
+      int msock;
+      int lsock;
+      sockaddr_in servAddr;
+      string ClientId;
+      string authtoken;
+      string password_c;
+      map<string,TunnelReq*>G_TunnelAddr;
+};
+extern  UdpInfo udpInfo;
+#endif
 
 extern MainInfo mainInfo;
 extern  map<int,Sockinfo*>G_SockList;
 extern  list<TunnelInfo*> G_TunnelList;
-extern  map<string,TunnelReq*> G_TunnelAddr;
+
 
 inline void InitMainInfo(){
     memset(mainInfo.authtoken,0,255);
     memset(mainInfo.password_c,0,255);
-    memset(mainInfo.s_name,0,255);
+    memset(mainInfo.shost,0,255);
+    memset(mainInfo.udphost,0,255);
     mainInfo.ping=25;
-    mainInfo.s_port=443;
+    mainInfo.sport=443;
+    mainInfo.udpport=8001;
     mainInfo.pingtime=0;
     mainInfo.mainsock=0;
     mainInfo.lastdnstime=0;
     mainInfo.regtunneltime=0;
     mainInfo.lastdnsback=0;
     mainInfo.lasterrtime=0;
-    sprintf(mainInfo.s_name,"ngrokd.ngrok.com");
+    sprintf(mainInfo.shost,"ngrokd.ngrok.com");
+    sprintf(mainInfo.udphost,"127.0.0.1");
+    #if UDPTUNNEL
+    udpInfo.auth=0;
+    udpInfo.authtime=0;
+    udpInfo.ping=25;
+    udpInfo.regTunnel=0;
+    udpInfo.pongtime=0;
+    udpInfo.pingtime=0;
+    #endif
 }
 
 #endif
