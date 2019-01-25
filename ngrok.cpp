@@ -93,9 +93,13 @@ int InitTunnelList(){
     list<TunnelInfo*>::iterator iter;
     for(iter = G_TunnelList.begin(); iter !=G_TunnelList.end(); iter++)
     {
+
         TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
-        tunnelinfo->regtime=0;
-        tunnelinfo->regstate=0;
+        if(stricmp(tunnelinfo->protocol,"udp")!=0){
+            tunnelinfo->regtime=0;
+            tunnelinfo->regstate=0;
+        }
+
     }
 
     //释放所有通道信息

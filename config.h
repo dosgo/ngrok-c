@@ -16,7 +16,7 @@
 #define MAXBUF 2048
 #define DEBUG 0
 #define UDPCMD  1
-#define UDPTUNNEL 0
+#define UDPTUNNEL 1
 
 #include <stdarg.h>
 #include <stdio.h>

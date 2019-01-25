@@ -89,11 +89,7 @@ int CheckUdpPing(int sock){
         udpInfo.auth=0;
         udpInfo.authtime=0;
         udpInfo.regTunnel=0;
-        map<string,TunnelReq*>::iterator it;
-        for(it=udpInfo.G_TunnelAddr.begin();it!=udpInfo.G_TunnelAddr.end();++it)
-        {
-            udpInfo.G_TunnelAddr.erase(it);
-        }
+        udpInfo.G_TunnelAddr.clear();
     }
     return 0;
 }
@@ -114,7 +110,7 @@ int CheckRegTunnel(int sock){
         for ( listit = G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
         {
             tunnelinfo =(TunnelInfo	*)*listit;
-            if(stricmp(tunnelinfo->protocol,"udp")==0&& tunnelinfo->regstate==0){
+            if(stricmp(tunnelinfo->protocol,"udp")==0){
                 SendUdpReqTunnel(sock,tunnelinfo);
             }
         }
@@ -141,24 +137,24 @@ int UdpRecv(fd_set* readSet){
              if(json)
              {
                 cJSON *Type = cJSON_GetObjectItem( json, "Type" );
-                if ( strcmp( Type->valuestring, "NewTunnel" ) == 0 )
+                if ( stricmp( Type->valuestring, "NewTunnel" ) == 0 )
                 {
                     NewTunnel(json);
                 }
-                else if(strcmp( Type->valuestring, "AuthResp" ) == 0 )
+                else if(stricmp( Type->valuestring, "AuthResp" ) == 0 )
                 {
                     cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
                     char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
-                    if(strcmp(error,"")==0)
+                    if(stricmp(error,"")==0)
                     {
                         udpInfo.auth=1;
                     }
                 }
-                else if(strcmp( Type->valuestring, "Pong" ) == 0 )
+                else if(stricmp( Type->valuestring, "Pong" ) == 0 )
                 {
                     udpInfo.pongtime = getUnixTime();
                 }
-                else if(strcmp( Type->valuestring, "UdpProxy" ) == 0 )
+                else if(stricmp( Type->valuestring, "UdpProxy" ) == 0 )
                 {
 
                     cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
