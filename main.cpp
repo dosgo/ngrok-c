@@ -47,7 +47,7 @@ int udpport=1885;
 #endif
 
 void* proxy( );
-struct sockaddr_in server_addr = { 0 };
+
 
 void cs( int n )
 {
@@ -68,7 +68,7 @@ int CheckStatus()
     {
         if(mainInfo.lasterrtime==0||(mainInfo.lasterrtime+60)<getUnixTime()){
             //连接失败
-            if(ConnectMain(&mainInfo.mainsock,server_addr,&mainsslinfo)==-1)
+            if(ConnectMain(&mainInfo.mainsock,mainInfo.saddr,&mainsslinfo)==-1)
             {
                 mainInfo.mainsockstatus=0;
                 printf("link err\r\n");
@@ -133,7 +133,7 @@ int main( int argc, char **argv )
     #endif // OPENSSL
 
 	/* init addr */
-	mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.shost, mainInfo.sport );
+	mainInfo.lastdnsback	= net_dns( &mainInfo.saddr, mainInfo.shost, mainInfo.sport );
 	mainInfo.lastdnstime	= getUnixTime();
     #if UDPCMD
     udpsocket=ControlUdp(udpport);
@@ -200,7 +200,7 @@ void* proxy(  )
 
 	    if (mainInfo.lastdnsback == -1 ||(mainInfo.lastdnstime + 600) < getUnixTime())
 		{
-			mainInfo.lastdnsback	= net_dns( &server_addr, mainInfo.shost, mainInfo.sport );
+			mainInfo.lastdnsback	= net_dns( &mainInfo.saddr, mainInfo.shost, mainInfo.sport );
 			mainInfo.lastdnstime	= getUnixTime();
 			printf( "update dns\r\n" );
 		}
@@ -371,7 +371,7 @@ void* proxy(  )
                     }
                     //控制连接
                     else if(tempinfo->istype ==3){
-                         backcode=CmdSock(&mainInfo.mainsock,tempinfo,server_addr);
+                         backcode=CmdSock(&mainInfo.mainsock,tempinfo,mainInfo.saddr);
                          if(backcode==-1)
                          {
                              //控制链接断开，标记清空

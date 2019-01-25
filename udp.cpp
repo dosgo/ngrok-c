@@ -212,9 +212,7 @@ int initUdp(){
     udpInfo.msock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP );
     //服务器地址信息
     memset(&udpInfo.servAddr, 0, sizeof(struct sockaddr_in));  //每个字节都用0填充
-    udpInfo.servAddr.sin_family = AF_INET;
-    udpInfo.servAddr.sin_addr.s_addr = inet_addr(mainInfo.udphost);
-    udpInfo.servAddr.sin_port = htons(mainInfo.udpport);
+    net_dns( &udpInfo.servAddr, mainInfo.udphost, mainInfo.udpport);
     //创建socket对象
     udpInfo.lsock=socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP );
     setnonblocking(udpInfo.msock,1);

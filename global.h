@@ -51,6 +51,7 @@ struct MainInfo
 {
     char shost[255];
     char udphost[255];
+    sockaddr_in saddr;
     int sport;
     int udpport;
     char authtoken[255];
