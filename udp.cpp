@@ -119,7 +119,7 @@ int CheckRegTunnel(int sock){
         for ( listit = G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
         {
             tunnelinfo =(TunnelInfo	*)*listit;
-            if(stricmp(tunnelinfo->protocol,"udp")==0){
+            if(strcasecmp(tunnelinfo->protocol,"udp")==0){
                 SendUdpReqTunnel(sock,tunnelinfo);
             }
         }
@@ -133,7 +133,11 @@ int UdpRecv(fd_set* readSet){
         return 0;
     }
     sockaddr_in fromAddr;
-    int addrLen = sizeof(struct  sockaddr_in);
+    #if WIN32
+    int addrLen=sizeof(fromAddr);
+    #else
+    socklen_t addrLen=sizeof(fromAddr);
+    #endif
     char buffer[65535] = {0};
     char srcdata[65535] = {0};
     memset( srcdata, 0, 65535 );
@@ -149,24 +153,24 @@ int UdpRecv(fd_set* readSet){
              if(json)
              {
                 cJSON *Type = cJSON_GetObjectItem( json, "Type" );
-                if ( stricmp( Type->valuestring, "NewTunnel" ) == 0 )
+                if ( strcasecmp( Type->valuestring, "NewTunnel" ) == 0 )
                 {
                     NewTunnel(json);
                 }
-                else if(stricmp( Type->valuestring, "AuthResp" ) == 0 )
+                else if(strcasecmp( Type->valuestring, "AuthResp" ) == 0 )
                 {
                     cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
                     char	*error		= cJSON_GetObjectItem( Payload, "Error" )->valuestring;
-                    if(stricmp(error,"")==0)
+                    if(strcasecmp(error,"")==0)
                     {
                         udpInfo.auth=1;
                     }
                 }
-                else if(stricmp( Type->valuestring, "Pong" ) == 0 )
+                else if(strcasecmp( Type->valuestring, "Pong" ) == 0 )
                 {
                     udpInfo.pongtime = getUnixTime();
                 }
-                else if(stricmp( Type->valuestring, "UdpProxy" ) == 0 )
+                else if(strcasecmp( Type->valuestring, "UdpProxy" ) == 0 )
                 {
 
                     cJSON	*Payload	= cJSON_GetObjectItem( json, "Payload" );
@@ -265,6 +269,5 @@ int UdpClient(){
         }
         sleeps(2);
     }
-    closesocket(udpInfo.msock);
 }
 #endif

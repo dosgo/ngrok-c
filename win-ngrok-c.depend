@@ -14,11 +14,12 @@
 1548312797 source:d:\c\ngrok-c\global.cpp
 	"global.h"
 
-1548643942 d:\c\ngrok-c\global.h
+1548668218 d:\c\ngrok-c\global.h
 	<string>
 	<map>
 	<list>
 	"sslbio.h"
+	<netinet/in.h>
 
 1548150556 d:\c\ngrok-c\sslbio.h
 	"config.h"
@@ -170,7 +171,7 @@
 	"mytime.h"
 	"polarsslbio.h"
 
-1548643961 source:d:\c\ngrok-c\sendmsg.cpp
+1548645038 source:d:\c\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
