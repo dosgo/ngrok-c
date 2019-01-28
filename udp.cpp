@@ -1,6 +1,12 @@
 #include "udp.h"
 #include "ngrok.h"
 #include "mytime.h"
+#if WIN32
+#include <windows.h>
+#else
+#include <arpa/inet.h>
+#endif // WIN32
+
 
 #if UDPTUNNEL
 
