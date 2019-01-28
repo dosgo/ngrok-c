@@ -54,6 +54,7 @@ struct MainInfo
     sockaddr_in saddr;
     int sport;
     int udpport;
+    int udp;
     char authtoken[255];
     char password_c[255];//
     string ClientId ;
@@ -100,6 +101,7 @@ inline void InitMainInfo(){
     mainInfo.ping=25;
     mainInfo.sport=443;
     mainInfo.udpport=8001;
+    mainInfo.udp=0;
     mainInfo.pingtime=0;
     mainInfo.mainsock=0;
     mainInfo.lastdnstime=0;

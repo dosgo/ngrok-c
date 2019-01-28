@@ -79,6 +79,9 @@ int SendUdpReqTunnel(int sock,TunnelInfo* tunnelinfo)
 
 /*检测ping*/
 int CheckUdpPing(int sock){
+    if(mainInfo.udp==0){
+        return 0;
+    }
     if(udpInfo.pingtime+udpInfo.ping<getUnixTime()&&udpInfo.auth!=0)
     {
         SendUdpPing(sock);
@@ -95,6 +98,9 @@ int CheckUdpPing(int sock){
 }
 
 int CheckUdpAuth(int sock){
+    if(mainInfo.udp==0){
+        return 0;
+    }
     if(udpInfo.auth==0&&(udpInfo.authtime==0||udpInfo.authtime+5<getUnixTime())){
        SendUdpAuth(sock);
        udpInfo.authtime=getUnixTime();
@@ -104,6 +110,9 @@ int CheckUdpAuth(int sock){
 }
 
 int CheckRegTunnel(int sock){
+    if(mainInfo.udp==0){
+        return 0;
+    }
     TunnelInfo *tunnelinfo;
     list<TunnelInfo*>::iterator listit;
     if(udpInfo.auth==1&&udpInfo.regTunnel==0){
@@ -120,6 +129,9 @@ int CheckRegTunnel(int sock){
 }
 
 int UdpRecv(fd_set* readSet){
+    if(mainInfo.udp==0){
+        return 0;
+    }
     sockaddr_in fromAddr;
     int addrLen = sizeof(struct  sockaddr_in);
     char buffer[65535] = {0};
@@ -208,6 +220,9 @@ int UdpRecv(fd_set* readSet){
 }
 
 int initUdp(){
+    if(mainInfo.udp==0){
+        return 0;
+    }
     //创建套接字
     udpInfo.msock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP );
     //服务器地址信息

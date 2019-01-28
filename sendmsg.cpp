@@ -75,16 +75,6 @@ int loadargs( int argc, char **argv )
 							memcpy( jsonstr, argvstr + pos + 1, xpos );
 						}
 						getvalue(jsonstr,"Shost",mainInfo.shost);
-                        #if UDPTUNNEL
-						if(getvalue(jsonstr,"Udphost",temp)==0)
-                        {
-                            memcpy(mainInfo.udphost,temp,strlen(temp));
-						}
-						if(getvalue(jsonstr,"Udpport",temp)==0)
-                        {
-                            mainInfo.udpport = atoi(temp);
-						}
-						#endif
 						if(getvalue(jsonstr,"Sport",temp)==0)
                         {
                             mainInfo.sport = atoi(temp);
@@ -100,7 +90,32 @@ int loadargs( int argc, char **argv )
 						pos = pos + xpos + 1;
 					}
 				}
-
+                #if UDPTUNNEL
+				if ( strncmp( argvstr, "-UDPSER", 7 ) == 0 )
+				{
+					run = 1;
+					while ( run )
+					{
+						memset( jsonstr, 0, 1024 );
+						xpos = strpos( argvstr + pos + 1, ',' );
+						if ( xpos == -1 )
+						{
+							xpos = strpos( argvstr + pos + 1, ']' );
+							memcpy( jsonstr, argvstr + pos + 1, xpos );
+							run = 0;
+						}else  {
+							memcpy( jsonstr, argvstr + pos + 1, xpos );
+						}
+						getvalue(jsonstr,"Shost",mainInfo.udphost);
+						if(getvalue(jsonstr,"Sport",temp)==0)
+                        {
+                            mainInfo.udpport = atoi(temp);
+						}
+						pos = pos + xpos + 1;
+					}
+					mainInfo.udp=1;
+				}
+                #endif
 				if ( strncmp( argvstr, "-AddTun", 7 ) == 0 )
 				{
 					run = 1;
