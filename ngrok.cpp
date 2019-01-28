@@ -3,7 +3,9 @@
 
 #if WIN32
 #include <windows.h>
+#include <string>
 #else
+#include <strings.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -13,6 +15,7 @@ typedef long long __int64;
 #include "ngrok.h"
 #include "sslbio.h"
 #include <stdlib.h>
+
 using namespace std;
 
 /*¿ØÖÆudp*/
@@ -134,15 +137,15 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
         if(strcasecmp(ReqId,tunnelinfo->ReqId)==0){
 
             //memcpy(tunnelinfo->hostname,host,strlen(host));
-            if(strnicmp(protocol,"tcp",3)==0){
+            if(strncasecmp(protocol,"tcp",3)==0){
                 tunnelinfo->remoteport=port;
             }
             #if UDPTUNNEL
-            if(strnicmp(protocol,"udp",3)==0){
+            if(strncasecmp(protocol,"udp",3)==0){
                 tunnelinfo->remoteport=port;
             }
             #endif // UDPTUNNEL
-            if(strnicmp(protocol,"http",4)==0){
+            if(strncasecmp(protocol,"http",4)==0){
                 memset(tunnelinfo->subdomain,0,255);
                 memcpy(tunnelinfo->subdomain,subdomain,strlen(subdomain));
             }
@@ -155,11 +158,11 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
             memcpy(tunnelreq->hostheader,tunnelinfo->hostheader,strlen(tunnelinfo->hostheader));
 
             #if UDPTUNNEL
-            if(strnicmp(protocol,"udp",3)==0){
+            if(strncasecmp(protocol,"udp",3)==0){
                 udpInfo.G_TunnelAddr.insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
             }
             #endif // UDPTUNNEL
-            if(strnicmp(protocol,"udp",3)!=0)
+            if(strncasecmp(protocol,"udp",3)!=0)
             {
                 mainInfo.G_TunnelAddr.insert( map<string,TunnelReq*> :: value_type( string(url), tunnelreq ) );
             }

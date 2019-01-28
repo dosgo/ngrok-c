@@ -4,7 +4,9 @@
 #include <map>
 #include <time.h>
 #include <list>
+#if WIN32
 #include <winsock.h>//这个得放bytestool.h前面
+#endif
 #include "string.h"
 #include "cJSON.h"
 #include "sendmsg.h"

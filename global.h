@@ -7,6 +7,11 @@
 #include "sslbio.h"
 using namespace std;
 
+#if WIN32
+#else
+#include <netinet/in.h>
+#endif
+
 struct TunnelInfo
 {
     char localhost[255];
