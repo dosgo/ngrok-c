@@ -22,5 +22,6 @@ $CC $YH -c $1 opensslbio.cpp  -o $DIR/opensslbio.o
 $CC $YH -c $1 openssldl.cpp  -o $DIR/openssldl.o
 $CC $YH -c $1 global.cpp  -o $DIR/global.o
 $CC $YH -c $1 ngrok.cpp  -o $DIR/ngrok.o
-$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/global.o $DIR/opensslbio.o  $DIR/ngrok.o $DIR/openssldl.o  $DIR/udp.o   -o $DIR/ngrokc
+$CC $YH -c $1 base64.c  -o $DIR/base64.o
+$CC -s $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/global.o $DIR/opensslbio.o  $DIR/ngrok.o $DIR/openssldl.o  $DIR/udp.o $DIR/base64.o   -o $DIR/ngrokc
 
