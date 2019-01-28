@@ -219,7 +219,7 @@ void* proxy(  )
                 for ( listit =G_TunnelList.begin(); listit != G_TunnelList.end(); ++listit )
                 {
                     tunnelinfo =(TunnelInfo	*)*listit;//udp不在这里注册
-                    if(tunnelinfo->regstate==0&&stricmp(tunnelinfo->protocol,"udp")!=0){
+                    if(tunnelinfo->regstate==0&&strcasecmp(tunnelinfo->protocol,"udp")!=0){
                         memset(ReqId,0,20);
                         memset(tunnelinfo->ReqId,0,20);
                         #if OPENSSL

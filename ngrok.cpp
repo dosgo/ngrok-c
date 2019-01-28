@@ -98,7 +98,7 @@ int InitTunnelList(){
     {
 
         TunnelInfo *tunnelinfo =(TunnelInfo*)*iter;
-        if(stricmp(tunnelinfo->protocol,"udp")!=0){
+        if(strcasecmp(tunnelinfo->protocol,"udp")!=0){
             tunnelinfo->regtime=0;
             tunnelinfo->regstate=0;
         }
