@@ -16,7 +16,7 @@ using namespace std;
 
 char *rand_str(char *str,const int len)
 {
-    srand(time(0));
+    //srand(time(0));
     int i;
     for(i=0;i<len;++i)
         str[i]='A'+rand()%26;
@@ -26,14 +26,17 @@ char *rand_str(char *str,const int len)
 
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,TunnelInfo *tunnelInfo)
+int SendReqTunnel(int sock,ssl_context *ssl,TunnelInfo *tunnelInfo)
 {
     char guid[20]={0};
     rand_str(guid,5);
     char str[1024];
     memset(str,0,1024);
-    memcpy(ReqId,guid,strlen(guid));//copy
-    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",tunnelInfo->protocol,ReqId,tunnelInfo->hostname,tunnelInfo->subdomain,tunnelInfo->remoteport,mainInfo.authtoken);
+    memset(tunnelInfo->ReqId,0,20);
+    //copy
+    memcpy(tunnelInfo->ReqId,guid,strlen(guid));
+    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",tunnelInfo->protocol,tunnelInfo->ReqId,tunnelInfo->hostname,tunnelInfo->subdomain,tunnelInfo->remoteport,mainInfo.authtoken);
+    tunnelInfo->regtime=getUnixTime();//ÒÑ·¢
     return sendpack(sock,ssl,str,1);
 }
 

@@ -36,7 +36,7 @@
 #endif
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.50-(2019/01/28)";
+char VER[24]= "1.51-(2019/02/18)";
 
 
 ssl_info *mainsslinfo=NULL;
@@ -165,7 +165,7 @@ void* proxy(  )
 	map<int, Sockinfo*>::iterator it3;
     list<TunnelInfo*>::iterator listit;
     TunnelInfo *tunnelinfo;
-    char ReqId[20]={0};
+ //   char ReqId[20]={0};
 	int backcode=0;
 
 	while ( true )
@@ -220,16 +220,11 @@ void* proxy(  )
                 {
                     tunnelinfo =(TunnelInfo	*)*listit;//udp不在这里注册
                     if(tunnelinfo->regstate==0&&strcasecmp(tunnelinfo->protocol,"udp")!=0){
-                        memset(ReqId,0,20);
-                        memset(tunnelinfo->ReqId,0,20);
                         #if OPENSSL
-                        SendReqTunnel(mainInfo.mainsock,mainsslinfo->ssl,ReqId,tunnelinfo);
+                        SendReqTunnel(mainInfo.mainsock,mainsslinfo->ssl,tunnelinfo);
                         #else
-                        SendReqTunnel(mainInfo.mainsock,&mainsslinfo->ssl,ReqId,tunnelinfo);
+                        SendReqTunnel(mainInfo.mainsock,&mainsslinfo->ssl,tunnelinfo);
                         #endif
-                        //copy
-                        memcpy(tunnelinfo->ReqId,ReqId,strlen(ReqId));
-                        tunnelinfo->regtime=getUnixTime();//已发
                     }
                 }
             }

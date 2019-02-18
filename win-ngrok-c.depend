@@ -62,7 +62,7 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1548643662 source:d:\c\ngrok-c\main.cpp
+1550457060 source:d:\c\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -106,7 +106,7 @@
 	"nonblocking.h"
 	"cJSON.h"
 
-1548311417 d:\c\ngrok-c\sendmsg.h
+1550456735 d:\c\ngrok-c\sendmsg.h
 	"config.h"
 	"nonblocking.h"
 	<string>
@@ -136,10 +136,12 @@
 	<netinet/in.h>
 	<netinet/tcp.h>
 
-1548325263 source:d:\c\ngrok-c\ngrok.cpp
+1548668724 source:d:\c\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>
+	<string>
+	<strings.h>
 	<unistd.h>
 	<arpa/inet.h>
 	<errno.h>
@@ -171,7 +173,7 @@
 	"mytime.h"
 	"polarsslbio.h"
 
-1548645038 source:d:\c\ngrok-c\sendmsg.cpp
+1550456970 source:d:\c\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -188,10 +190,12 @@
 1546065611 d:\c\ngrok-c\base64.h
 	<stdio.h>
 
-1548644688 source:d:\c\ngrok-c\udp.cpp
+1548671199 source:d:\c\ngrok-c\udp.cpp
 	"udp.h"
 	"ngrok.h"
 	"mytime.h"
+	<windows.h>
+	<arpa/inet.h>
 
 1548666190 d:\c\ngrok-c\udp.h
 	<string>

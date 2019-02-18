@@ -200,7 +200,7 @@ inline int SendPong(int sock,ssl_context *ssl)
 }
 
 
-int SendReqTunnel(int sock,ssl_context *ssl,char *ReqId,TunnelInfo *tunnelInfo);
+int SendReqTunnel(int sock,ssl_context *ssl,TunnelInfo *tunnelInfo);
 //#endif
 
 
