@@ -145,7 +145,7 @@ int base64_decode(const char *indata, int inlen, char *outdata, int *outlen) {
 
     while (indata[x] != 0) {
         // 需要解码的数据对应的ASCII值对应base64_suffix_map的值
-        c = base64_suffix_map[indata[x++]];
+        c = (unsigned char)base64_suffix_map[(unsigned char)indata[x++]];
         if (c == 255) return -1;// 对应的值不在转码表中
         if (c == 253) continue;// 对应的值是换行或者回车
         if (c == 254) { c = 0; g--; }// 对应的值是'='
