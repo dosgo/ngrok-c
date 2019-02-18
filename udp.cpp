@@ -52,7 +52,7 @@ int SendUdpAuth(int sock)
     return SendUdpPack(sock,udpInfo.servAddr,str);
 }
 
-int SendUdpProxy(int sock,struct sockaddr_in servAddr,char* Data,char* Url,char* ClientAddr)
+int SendUdpProxy(int sock,struct sockaddr_in servAddr,char* Data,char* Url,const char* ClientAddr)
 {
    // string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
     char str[255];
@@ -226,7 +226,7 @@ int UdpRecv(fd_set* readSet){
             }
         }
     }
-
+    return 0;
 }
 
 int initUdp(){

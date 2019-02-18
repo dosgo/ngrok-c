@@ -21,7 +21,7 @@ int SendUdpPack(int sock,  struct sockaddr_in servAddr,const char *msgstr);
 int SendUdpPing(int sock, struct sockaddr_in servAddr);
 int CheckUdpPing(int sock, struct sockaddr_in servAddr);
 int SendUdpAuth(int sock,struct sockaddr_in servAddr);
-int SendUdpProxy(int sock,struct sockaddr_in servAddr,char* Data,char* Url,char* ClientAddr);
+int SendUdpProxy(int sock,struct sockaddr_in servAddr,char* Data,char* Url,const char* ClientAddr);
 int GetUdpRemoteAddr(int localport,char *url);
 int UdpClient();
 int initUdp();
