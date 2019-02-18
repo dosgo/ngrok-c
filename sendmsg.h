@@ -172,9 +172,9 @@ inline int sendpack(int sock,ssl_context *ssl,const char *msgstr,int isblock)
 inline int SendAuth(int sock,ssl_context *ssl)
 {
    // string str="{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\""+user+"\",\"Password\": \"\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\""+ClientId+"\"}}";
-    char str[255];
-    memset(str,0,255);
-    sprintf(str,"{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\"%s\",\"Password\": \"%s\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\"%s\"}}",mainInfo.authtoken,mainInfo.password_c,mainInfo.ClientId.c_str());
+    char str[1024];
+    memset(str,0,1024);
+    sprintf(str,"{\"Type\":\"Auth\",\"Payload\":{\"Version\":\"2\",\"MmVersion\":\"1.7\",\"User\":\"%s\",\"Password\": \"%s\",\"OS\":\"darwin\",\"Arch\":\"amd64\",\"ClientId\":\"%s\"}}",mainInfo.authtoken,mainInfo.pwdc,mainInfo.ClientId.c_str());
 
     return sendpack(sock,ssl,str,1);
 }

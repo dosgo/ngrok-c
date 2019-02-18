@@ -82,7 +82,7 @@ int loadargs( int argc, char **argv )
                             mainInfo.sport = atoi(temp);
 						}
 						getvalue(jsonstr,"Atoken",mainInfo.authtoken);
-						getvalue(jsonstr,"Password",mainInfo.password_c);
+						getvalue(jsonstr,"Password",mainInfo.pwdc);
 
 						if(getvalue(jsonstr,"Cid",temp)==0)
                         {

@@ -61,7 +61,7 @@ struct MainInfo
     int udpport;
     int udp;
     char authtoken[255];
-    char password_c[255];//
+    char pwdc[255];//
     string ClientId ;
     int pingtime	;
     int ping	; //
@@ -100,7 +100,7 @@ extern  list<TunnelInfo*> G_TunnelList;
 
 inline void InitMainInfo(){
     memset(mainInfo.authtoken,0,255);
-    memset(mainInfo.password_c,0,255);
+    memset(mainInfo.pwdc,0,255);
     memset(mainInfo.shost,0,255);
     memset(mainInfo.udphost,0,255);
     mainInfo.ping=25;
