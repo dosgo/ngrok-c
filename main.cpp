@@ -36,7 +36,7 @@
 #endif
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.51-(2019/02/18)";
+char VER[24]= "1.52-(2019/02/18)";
 
 
 ssl_info *mainsslinfo=NULL;
@@ -101,6 +101,8 @@ int checkping(){
 
 int main( int argc, char **argv )
 {
+    //rand
+    srand(time(0));
     InitMainInfo();//初始化结构体
     printf("ngrokc v%s \r\n",VER);
 	loadargs( argc, argv);
