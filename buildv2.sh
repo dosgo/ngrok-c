@@ -1,6 +1,12 @@
 #!/bin/sh
 DIR=build
-mkdir $DIR
+mkdir -p $DIR
+
+## If both openssl 1.0.X and 1.1.X libraries exist, libssl.so/libcrypto.so will point to 1.1 version
+## but currently ngrokc-c does not support openssl 1.1
+## so we force the link to 1.0.X library
+sed -i '/dlopen/s/libssl.so"/libssl.so.1.0.0"/' openssldl.cpp
+sed -i '/dlopen/s/libcrypto.so"/libcrypto.so.1.0.0"/' openssldl.cpp
 
 rm -rf $DIR/main.o
 rm -rf $DIR/cJSON.o
