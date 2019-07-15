@@ -14,7 +14,7 @@
 
 ## build  
 
-ddns.cpp and https.cpp are abondoned 
+ddns.cpp and https.cpp are abandoned 
 
 
 # windows
