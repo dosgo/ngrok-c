@@ -125,7 +125,7 @@ const char * AbreSSL()
     SslPending          = (TSslPending)    GETPROC(ssl_handle1, "SSL_pending");
     SslPrivateKeyFile   = (TSslPrivateKeyFile)GETPROC(ssl_handle1, "SSL_CTX_use_PrivateKey_file");
     SslCertificateFile  = (TSslCertificateFile)GETPROC(ssl_handle1, "SSL_CTX_use_certificate_file");
-    OPENSSLaddallalgorithms = (TOPENSSLaddallalgorithms)GETPROC(ssl_handle2, "OPENSSL_add_all_algorithms");
+    OPENSSLaddallalgorithms = (TOPENSSLaddallalgorithms)GETPROC(ssl_handle2, "OPENSSL_add_all_algorithms_noconf");
     SslGetPeerCertificate = (TSslGetPeerCertificate)GETPROC(ssl_handle1, "SSL_get_peer_certificate");
     SslX509free         = (TSslX509free)   GETPROC(ssl_handle2, "X509_free");
     SslX509d2i          = (TSslX509d2i)    GETPROC(ssl_handle2, "d2i_X509");
@@ -158,7 +158,7 @@ const char * AbreSSL()
     if (!SslPending)          erro = "SSL_pending";
     if (!SslPrivateKeyFile)   erro = "SSL_CTX_use_PrivateKey_file";
     if (!SslCertificateFile)  erro = "SSL_CTX_use_certificate_file";
-    if (!OPENSSLaddallalgorithms) erro = "OPENSSL_add_all_algorithms";
+    //if (!OPENSSLaddallalgorithms) erro = "OPENSSL_add_all_algorithms";
     if (!SslGetPeerCertificate) erro = "SSL_get_peer_certificate";
     if (!SslX509free)         erro = "X509_free";
     if (!SslX509d2i)          erro = "d2i_X509";
@@ -185,7 +185,9 @@ const char * AbreSSL()
     //}
     SslLibraryInit();
     SslLoadErrorStrings();
-    OPENSSLaddallalgorithms();
+    if(OPENSSLaddallalgorithms){
+        OPENSSLaddallalgorithms();
+    }
     //RAND_screen();
     return 0;
 }
