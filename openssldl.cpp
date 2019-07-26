@@ -125,7 +125,7 @@ const char * AbreSSL()
     SslPending          = (TSslPending)    GETPROC(ssl_handle1, "SSL_pending");
     SslPrivateKeyFile   = (TSslPrivateKeyFile)GETPROC(ssl_handle1, "SSL_CTX_use_PrivateKey_file");
     SslCertificateFile  = (TSslCertificateFile)GETPROC(ssl_handle1, "SSL_CTX_use_certificate_file");
-    OPENSSLaddallalgorithms = (TOPENSSLaddallalgorithms)GETPROC(ssl_handle2, "OPENSSL_add_all_algorithms_noconf");
+    OPENSSLaddallalgorithms = (TOPENSSLaddallalgorithms)GETPROC(ssl_handle2, "OPENSSL_add_all_algorithms");
     SslGetPeerCertificate = (TSslGetPeerCertificate)GETPROC(ssl_handle1, "SSL_get_peer_certificate");
     SslX509free         = (TSslX509free)   GETPROC(ssl_handle2, "X509_free");
     SslX509d2i          = (TSslX509d2i)    GETPROC(ssl_handle2, "d2i_X509");
