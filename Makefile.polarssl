@@ -2,7 +2,7 @@ CC?=gcc
 CXX?=g++
 CFLAGS+=-fexceptions -DOPENSSL=0 -O2
 CXXFLAGS=-fexceptions -DOPENSSL=0 -O2
-LIBS=sendmsg.o cJSON.o nonblocking.o sslbio.o ngrok.o main.o
+LIBS=sendmsg.o cJSON.o nonblocking.o polarsslbio.o ngrok.o main.o
 all:: ngrokc $(LIBS)
 ngrokc: $(LIBS)
 	$(CXX) -s $(LIBS) -o ngrokc -lpthread -lpolarssl
@@ -10,7 +10,7 @@ sendmsg.o: sendmsg.h
 cJSON.o: cJSON.h
 nonblocking.o: nonblocking.h
 global.o: global.h
-sslbio.o: sslbio.h
+polarsslbio.o: sslbio.h
 ngrok.o: ngrok.h
 main.o: sendmsg.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h global.h
 
