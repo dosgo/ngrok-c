@@ -188,7 +188,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
   -1.45版本 增加自定义转发Hostheader功能。用于那些本地会判断host的网站
   使用方法-AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Hostheader:localhost]
 ## 2019/07/28
-  -1.53  fix using OpenSSL 1.1 bug。
+  -1.53  add support openssl 1.1。
   
 ### 关于编译对应路由的版本的ngrokc。
 ## 一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
