@@ -29,6 +29,7 @@
 // Tipos
 typedef int (*TSslGetError)(const SSL *s,int ret_code);
 typedef int (*TSslLibraryInit)(void );
+typedef int (*TOpensslInitSsl)(unsigned long long opts, void* v);
 typedef void (*TSslLoadErrorStrings)(void);
 typedef SSL_CTX * (*TSslCtxNew)(SSL_METHOD *meth);
 typedef void     (*TSslCtxFree)(SSL_CTX *);
@@ -37,6 +38,7 @@ typedef SSL_METHOD *(*TSslMethodV2)(void);
 typedef SSL_METHOD *(*TSslMethodV3)(void);
 typedef SSL_METHOD *(*TSslMethodTLSV1)(void);
 typedef SSL_METHOD *(*TSslMethodV23)(void);
+typedef SSL_METHOD *(*TtlsMethod)(void);
 typedef SSL *   (*TSslNew)(SSL_CTX *ctx);
 typedef void    (*TSslFree)(SSL *ssl);
 typedef int     (*TSslAccept)(SSL *ssl);
@@ -63,6 +65,7 @@ typedef SSL_SESSION *(*TSsLGet1Session)(SSL *ssl);//SSL_get1_session dosgo
 // Ponteiros de funções
 extern TSslGetError         SslGetError;
 extern TSslLibraryInit      SslLibraryInit;
+extern TOpensslInitSsl      OpensslInitSsl;   //openssl 1.1 use
 extern TSslLoadErrorStrings SslLoadErrorStrings;
 extern TSslCtxNew           SslCtxNew;
 extern TSslCtxFree          SslCtxFree;
@@ -71,6 +74,7 @@ extern TSslMethodV2         SslMethodV2;
 extern TSslMethodV3         SslMethodV3;
 extern TSslMethodTLSV1      SslMethodTLSV1;
 extern TSslMethodV23        SslMethodV23;
+extern TtlsMethod           TlsMethod;   //openssl 1.1 use
 extern TSslNew              SslNew;
 extern TSslFree             SslFree;
 extern TSslAccept           SslAccept;

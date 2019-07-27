@@ -36,7 +36,7 @@
 #endif
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.52-(2019/02/18)";
+char VER[24]= "1.53-(2019/07/28)";
 
 
 ssl_info *mainsslinfo=NULL;

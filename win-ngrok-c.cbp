@@ -28,7 +28,7 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport,Sport:4443]  -UDPSER[Shost:ngrok.16v16.com,Sport:8001] -AddTun[Type:http,Sdname:jobtest,Lhost:127.0.0.1,Lport:80] -AddTun[Type:udp,Lhost:127.0.0.1,Lport:1006,Rport:50010]" />
+				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo,Hostheader:localhost] " />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-m32" />

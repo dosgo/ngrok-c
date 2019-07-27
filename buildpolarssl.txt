@@ -1,4 +1,0 @@
-1.
-set CC=gcc
-cd library
-make

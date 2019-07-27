@@ -8,7 +8,14 @@ static SSL_SESSION *sess = NULL;
 int ssl_init_info(int *server_fd,ssl_info *sslinfo)
 {
     #if OPENSSLDL
-    sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV23());
+    if(SslMethodV23){
+        sslinfo->ctx = (SSL_CTX*)SslCtxNew (SslMethodV23());
+    }else if(TlsMethod){
+        sslinfo->ctx = (SSL_CTX*)SslCtxNew (TlsMethod());
+    }else{
+        printf("openssl error\r\n");
+    }
+
     SslCtxCtrl(sslinfo->ctx,SSL_CTRL_SET_SESS_CACHE_MODE,SSL_SESS_CACHE_CLIENT,NULL);
     sslinfo->ssl = SslNew(sslinfo->ctx);
     if (sess != NULL)

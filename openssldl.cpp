@@ -20,6 +20,7 @@ static HANDLE_DLL ssl_handle2 = 0; // Aponta para DLL aberta - util
 //----------------------------------------------------------------------------
 TSslGetError         SslGetError = 0;
 TSslLibraryInit      SslLibraryInit = 0;
+TOpensslInitSsl      OpensslInitSsl = 0;
 TSslLoadErrorStrings SslLoadErrorStrings = 0;
 TSslCtxNew           SslCtxNew = 0;
 TSslCtxFree          SslCtxFree = 0;
@@ -28,6 +29,7 @@ TSslMethodV2         SslMethodV2 = 0;
 TSslMethodV3         SslMethodV3 = 0;
 TSslMethodTLSV1      SslMethodTLSV1 = 0;
 TSslMethodV23        SslMethodV23 = 0;
+TtlsMethod           TlsMethod = 0;
 TSslNew              SslNew = 0;
 TSslFree             SslFree = 0;
 TSslAccept           SslAccept = 0;
@@ -78,24 +80,37 @@ const char * AbreSSL()
     ssl_handle1 = LoadLibrary("ssleay32.dll");
     if (ssl_handle1 == 0)
         ssl_handle1 = LoadLibrary("libssl32.dll");
+    if(ssl_handle1==0)
+        ssl_handle1 = LoadLibrary("libssl-1_1.dll");
     if (ssl_handle1 == 0)
-        return "Erro ao carregar ssleay32.dll ou libssl32.dll";
+        return "Erro ao carregar ssleay32.dll/libssl32.dll/libssl-1_1.dll";
     ssl_handle2 = LoadLibrary("libeay32.dll");
+     if(ssl_handle2==0)
+        ssl_handle2 = LoadLibrary("libcrypto.dll");
+    if(ssl_handle2==0)
+        ssl_handle2 = LoadLibrary("libcrypto-1_1.dll");
     if (ssl_handle2 == 0)
     {
         FreeLibrary(ssl_handle1);
         ssl_handle1 = 0;
-        return "Erro ao carregar libeay32.dll";
+        return "Erro ao carregar libeay32.dll/libcrypto-1_1.dll";
     }
 #else
     ssl_handle1 = dlopen("libssl.so", RTLD_LAZY);
     if (ssl_handle1 == 0)
         ssl_handle1 = dlopen("libssl.so.1.0.0", RTLD_LAZY);
     if (ssl_handle1 == 0)
+        ssl_handle1 = dlopen("libssl.so.1.1", RTLD_LAZY);
+    if (ssl_handle1 == 0)
         return "Erro ao carregar libssl.so";
+
+
+
     ssl_handle2 = dlopen("libcrypto.so", RTLD_LAZY);
     if (ssl_handle2 == 0)
-    ssl_handle2 = dlopen("libcrypto.so.1.0.0", RTLD_LAZY);
+        ssl_handle2 = dlopen("libcrypto.so.1.0.0", RTLD_LAZY);
+    if (ssl_handle2 == 0)
+        ssl_handle2 = dlopen("libcrypto.so.1.1", RTLD_LAZY);
     if (ssl_handle2 == 0)
     {
         dlclose(ssl_handle1);
@@ -106,6 +121,7 @@ const char * AbreSSL()
 
     SslGetError         = (TSslGetError)   GETPROC(ssl_handle1, "SSL_get_error");
     SslLibraryInit      = (TSslLibraryInit)GETPROC(ssl_handle1, "SSL_library_init");
+    OpensslInitSsl      = (TOpensslInitSsl)GETPROC(ssl_handle1, "OPENSSL_init_ssl"); //openssl1.1
     SslLoadErrorStrings = (TSslLoadErrorStrings)GETPROC(ssl_handle1, "SSL_load_error_strings");
     SslCtxNew           = (TSslCtxNew)     GETPROC(ssl_handle1, "SSL_CTX_new");
     SslCtxFree          = (TSslCtxFree)    GETPROC(ssl_handle1, "SSL_CTX_free");
@@ -114,6 +130,7 @@ const char * AbreSSL()
     SslMethodV3         = (TSslMethodV3)   GETPROC(ssl_handle1, "SSLv3_method");
     SslMethodTLSV1      = (TSslMethodTLSV1)GETPROC(ssl_handle1, "TLSv1_method");
     SslMethodV23        = (TSslMethodV23)  GETPROC(ssl_handle1, "SSLv23_method");
+    TlsMethod           = (TtlsMethod)     GETPROC(ssl_handle1, "TLS_method"); //openssl1.1
     SslNew              = (TSslNew)        GETPROC(ssl_handle1, "SSL_new");
     SslFree             = (TSslFree)       GETPROC(ssl_handle1, "SSL_free");
     SslAccept           = (TSslAccept)     GETPROC(ssl_handle1, "SSL_accept");
@@ -139,13 +156,15 @@ const char * AbreSSL()
 
     const char * erro = 0;
     if (!SslGetError)         erro = "SSL_get_error";
-    if (!SslLibraryInit)      erro = "SSL_library_init";
-    if (!SslLoadErrorStrings) erro = "SSL_load_error_strings";
+    if (!SslLibraryInit&&!OpensslInitSsl) //openssl 1.0 or 1.1+
+        erro = "SSL_library_init/OpensslInitSsl";
+    if (!SslLoadErrorStrings&&!OpensslInitSsl) //openssl 1.0 or 1.1+
+        erro = "SSL_load_error_strings";
     if (!SslCtxNew)           erro = "SSL_CTX_new";
     if (!SslCtxFree)          erro = "SSL_CTX_free";
     if (!SslSetFd)            erro = "SSL_set_fd";
-    if (!SslMethodV2 && !SslMethodV23 && !SslMethodV3)
-        erro = "SSLv2_method/SSLv3_method";
+    if (  !SslMethodV23 && !TlsMethod)  //openssl 1.0 or 1.1+
+        erro = "SSLv23_method/TlsMethod";
     if (!SslMethodTLSV1)      erro = "TLSv1_method";
     if (!SslNew)              erro = "SSL_new";
     if (!SslFree)             erro = "SSL_free";
@@ -183,10 +202,27 @@ const char * AbreSSL()
     //    FechaSSL();
     //    return "Erro ao inicializar OpenSSL (SSL_library_init)";
     //}
-    SslLibraryInit();
-    SslLoadErrorStrings();
+    //openssl 1.0
+    if(SslLibraryInit){
+        SslLibraryInit();
+    }
+     //openssl 1.0
+    if(SslLoadErrorStrings){
+        SslLoadErrorStrings();
+    }
+    //openssl 1.0
     if(OPENSSLaddallalgorithms){
         OPENSSLaddallalgorithms();
+    }
+
+
+    //openssl 1.1
+    if(OpensslInitSsl){
+        OpensslInitSsl(0,NULL);//==SslLibraryInit();
+    }
+    //openssl 1.1
+    if(OpensslInitSsl){
+         OpensslInitSsl(0x00200000L|0x00000002L, NULL);//==SslLoadErrorStrings()
     }
     //RAND_screen();
     return 0;
