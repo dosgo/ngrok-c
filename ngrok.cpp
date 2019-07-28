@@ -583,7 +583,7 @@ int ConnectMain(int *mainsock,struct sockaddr_in server_addr,ssl_info **mainssli
     #if OPENSSL
 	SendAuth(*mainsock,(*mainsslinfo)->ssl);
 	#else
-	SendAuth(*mainsock,&(*mainsslinfo)->ssl, *ClientId, authtoken,password_c);
+	SendAuth(*mainsock,&(*mainsslinfo)->ssl);
 	#endif
 
 
