@@ -2,6 +2,7 @@
 ###路径自行更改为SDK实际路径
 export PATH=$PATH:'/root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin'
 export STAGING_DIR="/root/op/staging_dir"
+###以下内容无需修改
 DIR=build-mips
 mkdir $DIR
 rm -rf $DIR/main.o
