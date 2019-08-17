@@ -227,8 +227,72 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 还有，最后一行的libpolarssl-mips.a改成2.0版本（libmbedtls.a libmbedcrypto.a libmbedx5.9.a）1.3版本（libpolarssl.a）.
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
+	  
+- 3.这里用Centos7 编译斐讯K2路由做个(纯小白)教程
+
+		###安装相应软件包
+		yum install bzip2 gzip git vim wget -y
+
+		###下载并解压SDK(以下没说明的话均默认在/root目录下操作)
+		wget http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7621/OpenWrt-SDK-15.05-ramips-mt7621_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64.tar.bz2
+		tar jxvf OpenWrt-SDK-15.05.1-ramips-mt7621_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64.tar.bz2
+
+		###文件夹名字太长，改个名字....
+		mv OpenWrt-SDK-15.05.1-ramips-mt7621_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64 op
+
+		###拉取ngrok源码
+		git clone https://github.com/onlyJinx/ngrok-c.git
+
+
+		###开始编译polarsshl库###
+		###下载并解压polarssl
+		wget https://tls.mbed.org/download/mbedtls-2.14.1-gpl.tgz&&tar zxvf mbedtls-2.14.1-gpl.tgz
+
+		###复制buildlib.sh文件到polarssl文件夹
+		cp /root/ngrok-c/buildlib.sh /root/mbedtls-2.14.1/buildlib.sh
+
+		###修改buildlib.sh
+		vim /root/mbedtls-2.14.1/buildlib.sh
+
+		###我这里SDK是这个所以把PATH改成这个
+		###export PATH=$PATH:'/root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin'
+		###export STAGING_DIR="/root/op/staging_dir"
+
+		###下面的SDK编译器名字可以在SDK/bin 下找到，例如:
+		### ls /root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/bin
+		###看到一些gcc和g++之类的，把名字复制替换掉就行了
+
+		###运行buildlib.sh
+		cd /root/mbedtls-2.14.1&&chmod 777 buildlib.sh&&./buildlib.sh
+		###不出意外的话会在library文件夹生成三个文件libmbedcrypto.a,libmbedtls.a,libmbedx509.a
+
+		###把生成的文件复制到ngrok目录下
+		cd /root/mbedtls-2.14.1/library
+		cp {libmbedcrypto.a,libmbedtls.a,libmbedx509.a} /root/ngrok-c/
+
+		###复制polarssl文件夹到SDK/include下
+
+		###cp -r /root/op/staging_dir/target-mipsel_1004kc+dsp_uClibc-0.9.33.2/usr/include/polarssl /root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/include/
+		cp -r /root/mbedtls-2.14.1/include/mbedtls /root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/include/
+
+		###修改config.h文件，我们用的是polarssl2.0 所以把 #define OPENSSL 1，改成#define OPENSSL 0；#define ISMBEDTLS 0改成#define ISMBEDTLS 1(其实默认就是1.....)
+		vim /root/ngrok-c/config.h
+
+		###修改openwrtbuild.sh里面 SDK路径和编译器，SDK路径上边说了就不再重复，这里的编译器改成上面编译polarssh时buildlib.sh里的那个CXX的值
+		###我这里是CXX=mipsel-openwrt-linux-g++，所以openwrtbuild.sh的CC=mipsel-openwrt-linux-g++
+		vim /root/ngrok-c/openwrtbuild.sh
+		###修改CC=mipsel-openwrt-linux-g++，保存退出
+		cd /root/ngrok-c/
+		chmod 777 openwrtbuild.sh&&./openwrtbuild.sh
+
+		###执行完openwrtbuild.sh如果没有提示erroe的话就行了。。。
+
+		###然后会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了
+		###记得安装，libopenssl.ipk，官网有下载。
+		（小声BB:作者很有耐心，纯小白问一下很愚蠢的问题他都会耐心解答，哈哈，再次感谢dosgo）
+
       
-- 3.openwrt简单编译教程。
+- 4.openwrt简单编译教程。
       - 去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
       - 编辑openwrtbuildv2.sh 修改export STAGING_DIR export PATH,把里面的路径改成你下载的SDK。
       - 把include/openssl，复制到你的下载的sdk,/home/dosgo/OpenWrt-SDK/staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include目录，
