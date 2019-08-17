@@ -228,7 +228,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       - 执行openwrtbuild.sh，就行了。。
       - 就会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了。。跑了。。
 	  
-- 3.这里用Centos7 编译斐讯K2路由做个(纯小白)教程
+- 3.这里用Centos7 编译斐讯K2路由(polarssl库)做个(纯小白)教程
 
 		###安装相应软件包
 		yum install bzip2 gzip git vim wget -y
