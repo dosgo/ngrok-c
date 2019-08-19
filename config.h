@@ -6,7 +6,7 @@
 #endif
 
 #ifndef OPENSSLDL
-#define OPENSSLDL 1
+#define OPENSSLDL 0
 #endif
 
 #ifndef ISMBEDTLS
