@@ -241,7 +241,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 		mv OpenWrt-SDK-15.05.1-ramips-mt7621_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64 op
 
 		###拉取ngrok源码
-		git clone https://github.com/onlyJinx/ngrok-c.git
+		git clone https://github.com/dosgo/ngrok-c.git
 
 
 		###开始编译polarsshl库###
@@ -270,9 +270,7 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 		cd /root/mbedtls-2.14.1/library
 		cp {libmbedcrypto.a,libmbedtls.a,libmbedx509.a} /root/ngrok-c/
 
-		###复制polarssl文件夹到SDK/include下
-
-		###cp -r /root/op/staging_dir/target-mipsel_1004kc+dsp_uClibc-0.9.33.2/usr/include/polarssl /root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/include/
+		###复制mbedtls文件夹到SDK/include下
 		cp -r /root/mbedtls-2.14.1/include/mbedtls /root/op/staging_dir/toolchain-mipsel_1004kc+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/include/
 
 		###修改config.h文件，我们用的是polarssl2.0 所以把 #define OPENSSL 1，改成#define OPENSSL 0；#define ISMBEDTLS 0改成#define ISMBEDTLS 1(其实默认就是1.....)
@@ -287,8 +285,13 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
 
 		###执行完openwrtbuild.sh如果没有提示erroe的话就行了。。。
 
-		###然后会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限。。就可以了
-		###记得安装，libopenssl.ipk，官网有下载。
+		###然后会在build-mips生成ngrokc文件。。你用ssh，上传到路由的/bin目录，并且加入执行权限
+		###下面在SSH连接到路由后的操作
+		###记得安装，libstdcpp.ipk，官网有下载，我这个SDK对应的下载地址是
+		wget http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7621/packages/base/libstdcpp_4.8-linaro-1_ramips_1004kc.ipk
+		###安装
+		opkg install libstdcpp_4.8-linaro-1_ramips_1004kc.ipk
+		安装完就可以用了。。。。。
 		（小声BB:作者很有耐心，纯小白问一下很愚蠢的问题他都会耐心解答，哈哈，再次感谢dosgo）
 
       
