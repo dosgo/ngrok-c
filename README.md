@@ -189,6 +189,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
   使用方法-AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Hostheader:localhost]
 ## 2019/07/28
   -1.53  add support openssl 1.1。
+## 2019/11/2
+  -1.54  add support http basic auth。
+    Example  -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Httpauth:"test:test"]
   
 ### 关于编译对应路由的版本的ngrokc。
 ## 一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。

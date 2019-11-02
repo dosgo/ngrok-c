@@ -34,7 +34,7 @@ int SendReqTunnel(int sock,ssl_context *ssl,TunnelInfo *tunnelInfo)
     memset(tunnelInfo->ReqId,0,20);
     //copy
     memcpy(tunnelInfo->ReqId,guid,strlen(guid));
-    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",tunnelInfo->protocol,tunnelInfo->ReqId,tunnelInfo->hostname,tunnelInfo->subdomain,tunnelInfo->remoteport,mainInfo.authtoken);
+    sprintf(str,"{\"Type\":\"ReqTunnel\",\"Payload\":{\"Protocol\":\"%s\",\"ReqId\":\"%s\",\"Hostname\": \"%s\",\"Subdomain\":\"%s\",\"HttpAuth\":\"%s\",\"RemotePort\":%d,\"authtoken\":\"%s\"}}",tunnelInfo->protocol,tunnelInfo->ReqId,tunnelInfo->hostname,tunnelInfo->subdomain,tunnelInfo->httpauth,tunnelInfo->remoteport,mainInfo.authtoken);
     tunnelInfo->regtime=getUnixTime();//ÒÑ·¢
     return sendpack(sock,ssl,str,1);
 }
@@ -155,6 +155,8 @@ int loadargs( int argc, char **argv )
 
                         getvalue(jsonstr,"Sdname",tunnelinfo->subdomain);
                         getvalue(jsonstr,"Hostheader",tunnelinfo->hostheader);
+                        getvalue(jsonstr,"Httpauth",tunnelinfo->httpauth);
+                        //printf("httpAuth:%s\r\n",tunnelinfo->httpauth);
                         getvalue(jsonstr,"Hostname",tunnelinfo->hostname);
 						pos = pos + xpos + 1;
 					}
@@ -166,7 +168,7 @@ int loadargs( int argc, char **argv )
 	}else  {
 		echo( "use " );
         echo("%s",argv[0]);
-		echo( " -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xxxxxxx,Password:xxx] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50199,Hostheader:localhost]" );
+		echo( " -SER[Shost:ngrokd.ngrok.com,Sport:443,Atoken:xx,Password:xx] -AddTun[Type:tcp,Lhost:127.0.0.1,Lport:80,Rport:50199,Hostheader:localhost,Httpauth:\"test:test\"]" );
 		echo( "\r\n" );
 		exit( 1 );
 	}
