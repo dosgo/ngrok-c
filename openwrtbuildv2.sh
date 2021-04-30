@@ -12,7 +12,7 @@ rm -rf $DIR/nonblocking.o
 rm -rf $DIR/ngrokc
 
 CC=mipsel-openwrt-linux-g++
-YH="-Wall -fexceptions -DOPENSSL=1 -DOPENSSLDL=1   -O2"
+YH="-Wall -fexceptions -DOPENSSL=1 -DOPENSSLDL=1   -O2 -ldl"
 $CC $YH -c $1 sendmsg.cpp -o $DIR/sendmsg.o
 $CC $YH -c $1 udp.cpp -o $DIR/udp.o
 $CC $YH -c $1 cJSON.c -o $DIR/cJSON.o
