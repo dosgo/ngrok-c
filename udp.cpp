@@ -12,7 +12,7 @@
 
 int GetUdpRemoteAddr(int localport,char *url){
      map<string,TunnelReq*>::iterator it;
-    //½øÐÐµü´ú±éÀú
+    //è¿›è¡Œè¿­ä»£éåŽ†
     for(it=udpInfo.G_TunnelAddr.begin();it!=udpInfo.G_TunnelAddr.end();++it)
     {
         TunnelReq	*tunnelreq =(TunnelReq*)it->second;
@@ -83,7 +83,7 @@ int SendUdpReqTunnel(int sock,TunnelInfo* tunnelinfo)
 }
 
 
-/*¼ì²âping*/
+/*æ£€æµ‹ping*/
 int CheckUdpPing(int sock){
     if(mainInfo.udp==0){
         return 0;
@@ -93,7 +93,7 @@ int CheckUdpPing(int sock){
         SendUdpPing(sock);
         udpInfo.pingtime=getUnixTime();
     }
-    //¼ì²âµôÏß,³¬¹ý60Ãë
+    //æ£€æµ‹æŽ‰çº¿,è¶…è¿‡60ç§’
     if(udpInfo.pongtime!=0&&udpInfo.pongtime+60<getUnixTime()){
         udpInfo.auth=0;
         udpInfo.authtime=0;
@@ -152,7 +152,7 @@ int UdpRecv(fd_set* readSet){
 
         memset(&fromAddr, 0, sizeof(struct  sockaddr_in));
         int strLen = recvfrom(udpInfo.msock, buffer, 65534, 0, (struct sockaddr *)&fromAddr, &addrLen);
-        if(strlen>0&&strLen!=-1){
+        if(strLen>0&&strLen!=-1){
 
             printf("udp:%s\r\n",buffer+8);
             cJSON *json = cJSON_Parse( buffer+8);
@@ -185,10 +185,10 @@ int UdpRecv(fd_set* readSet){
                     if(udpInfo.G_TunnelAddr.count(string(Url))>0)
                     {
 
-                        //´´½¨ÍøÂçÍ¨ÐÅ¶ÔÏó
+                        //åˆ›å»ºç½‘ç»œé€šä¿¡å¯¹è±¡
                         TunnelReq *tunnelreq= udpInfo.G_TunnelAddr[string(Url)];
                         struct sockaddr_in addr;
-                        memset(&addr, 0, sizeof(struct  sockaddr_in));  //Ã¿¸ö×Ö½Ú¶¼ÓÃ0Ìî³ä
+                        memset(&addr, 0, sizeof(struct  sockaddr_in));  //æ¯ä¸ªå­—èŠ‚éƒ½ç”¨0å¡«å……
                         addr.sin_family =AF_INET;
                         addr.sin_port =htons(tunnelreq->localport);
                         addr.sin_addr.s_addr = inet_addr(tunnelreq->localhost);
@@ -233,19 +233,19 @@ int initUdp(){
     if(mainInfo.udp==0){
         return 0;
     }
-    //´´½¨Ì×½Ó×Ö
+    //åˆ›å»ºå¥—æŽ¥å­—
     udpInfo.msock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-    //·þÎñÆ÷µØÖ·ÐÅÏ¢
-    memset(&udpInfo.servAddr, 0, sizeof(struct sockaddr_in));  //Ã¿¸ö×Ö½Ú¶¼ÓÃ0Ìî³ä
+    //æœåŠ¡å™¨åœ°å€ä¿¡æ¯
+    memset(&udpInfo.servAddr, 0, sizeof(struct sockaddr_in));  //æ¯ä¸ªå­—èŠ‚éƒ½ç”¨0å¡«å……
     net_dns( &udpInfo.servAddr, mainInfo.udphost, mainInfo.udpport);
-    //´´½¨socket¶ÔÏó
+    //åˆ›å»ºsocketå¯¹è±¡
     udpInfo.lsock=socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP );
     setnonblocking(udpInfo.msock,1);
     setnonblocking(udpInfo.lsock,1);
     return 0;
 }
 
-/*²»Êµ¼ÊÊ¹ÓÃ,±£Áô²Î¿¼*/
+/*ä¸å®žé™…ä½¿ç”¨,ä¿ç•™å‚è€ƒ*/
 int UdpClient(){
 
     initUdp();
@@ -263,11 +263,11 @@ int UdpClient(){
         CheckUdpPing(udpInfo.msock);//ping
 
 
-        FD_ZERO(&readSet);//×ÜÊÇÕâÑùÏÈÇå¿ÕÒ»¸öÃèÊö·û¼¯
-        FD_SET(udpInfo.msock,&readSet); //°Ñsock·ÅÈëÒª²âÊÔµÄÃèÊö·û¼¯
-        FD_SET(udpInfo.lsock,&readSet); //°Ñsock·ÅÈëÒª²âÊÔµÄÃèÊö·û¼¯
+        FD_ZERO(&readSet);//æ€»æ˜¯è¿™æ ·å…ˆæ¸…ç©ºä¸€ä¸ªæè¿°ç¬¦é›†
+        FD_SET(udpInfo.msock,&readSet); //æŠŠsockæ”¾å…¥è¦æµ‹è¯•çš„æè¿°ç¬¦é›†
+        FD_SET(udpInfo.lsock,&readSet); //æŠŠsockæ”¾å…¥è¦æµ‹è¯•çš„æè¿°ç¬¦é›†
         int maxfd=udpInfo.msock>udpInfo.lsock?udpInfo.msock:udpInfo.lsock;
-        SelectRcv = select(maxfd+1,&readSet,0,0, &timeout); //¼ì²é¸ÃÌ×½Ó×ÖÊÇ·ñ¿É¶Á
+        SelectRcv = select(maxfd+1,&readSet,0,0, &timeout); //æ£€æŸ¥è¯¥å¥—æŽ¥å­—æ˜¯å¦å¯è¯»
 
         if (SelectRcv > 0)
         {
