@@ -18,7 +18,7 @@ typedef long long __int64;
 
 using namespace std;
 
-/*¿ØÖÆudp*/
+/*æ§åˆ¶udp*/
 int ControlUdp(int port){
     int sockfd;
     struct sockaddr_in my_addr;
@@ -53,13 +53,13 @@ int UdpCmd(int udpsocket){
     if(udpbuflen>0){
          cJSON *json = cJSON_Parse( buf );
          cJSON *cmd = cJSON_GetObjectItem( json, "cmd" );
-         //ÍË³ö
+         //é€€å‡º
          if ( strcmp( cmd->valuestring, "exit" ) == 0 ){
             cJSON_Delete( json );
             exit(0);
          }
          if ( strcmp( cmd->valuestring, "ping" ) == 0 ){
-            //»Ø¸´
+            //å›å¤
             char sendbuf[255]="{\"cmd\":\"pong\"}";
             sendto(udpsocket,sendbuf,strlen(sendbuf),0,(struct sockaddr *)&udpaddr,sizeof(udpaddr));
             cJSON_Delete( json );
@@ -105,7 +105,7 @@ int InitTunnelList(){
 
     }
 
-    //ÊÍ·ÅËùÓĞÍ¨µÀĞÅÏ¢
+    //é‡Šæ”¾æ‰€æœ‰é€šé“ä¿¡æ¯
     map<string, TunnelReq*>::iterator it3;
     for ( it3 = mainInfo.G_TunnelAddr.begin(); it3 != mainInfo.G_TunnelAddr.end(); )
     {
@@ -130,7 +130,7 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
     sscanf(url,"%[^:]://%[^:]:%[0-9]",protocol,host,portstr);
     port=atoi(portstr);
     sscanf(host,"%[^.].",subdomain);
-      //½øĞĞµü´ú±éÀú
+      //è¿›è¡Œè¿­ä»£éå†
     for(iter = G_TunnelList.begin(); iter !=G_TunnelList.end(); iter++)
     {
         TunnelInfo	*tunnelinfo =(TunnelInfo*)*iter;
@@ -213,7 +213,7 @@ int RemoteSslInit(Sockinfo *tempinfo){
         #if OPENSSL
         setnonblocking(tempinfo->sock,1);
         #endif
-        /* ssl ³õÊ¼»¯Ê§°Ü£¬ÒÆ³ıÁ¬½Ó */
+        /* ssl åˆå§‹åŒ–å¤±è´¥ï¼Œç§»é™¤è¿æ¥ */
         clearsock(tempinfo );
         return -1;
     }
@@ -223,7 +223,7 @@ int RemoteSslInit(Sockinfo *tempinfo){
 int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
     int readlen;
     int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
-    //oolarssl ×î´ó·¢ËÍ³¤¶È²»ÄÜ³¬¹ı16K¡£¡£»¹ÊÇ¸Ä³É15°É
+    //oolarssl æœ€å¤§å‘é€é•¿åº¦ä¸èƒ½è¶…è¿‡16Kã€‚ã€‚è¿˜æ˜¯æ”¹æˆ15å§
     char buf[bufsize+1];
     memset(buf,0,bufsize+1);
     #if WIN32
@@ -233,7 +233,7 @@ int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
     #endif
     if ( readlen > 0&&sslinfo!=NULL )
     {
-        //·¢ËÍµ½Ô¶³Ì
+        //å‘é€åˆ°è¿œç¨‹
         #if OPENSSL
         sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
         #else
@@ -251,7 +251,7 @@ int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
 int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
    int readlen,sendlen;
    int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
-   //oolarssl ×î´ó·¢ËÍ³¤¶È²»ÄÜ³¬¹ı16K¡£¡£»¹ÊÇ¸Ä³É15°É
+   //oolarssl æœ€å¤§å‘é€é•¿åº¦ä¸èƒ½è¶…è¿‡16Kã€‚ã€‚è¿˜æ˜¯æ”¹æˆ15å§
    char buf[bufsize+1];
    memset(buf,0,bufsize+1);
     #if OPENSSL
@@ -269,7 +269,7 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
         int tosock=tempinfo->tosock;
         shutdown( tosock, 2 );
         clearsock(tempinfo );
-        //ÕâĞĞ¾ø¶Ô²»ÄÜÉ¾³ı£¬ÓÃ±ê¼ÇsslÒÑ¾­Ïú»Ù£¬É¾³ı»áµ¼ÖÂ±ÀÀ£¡£
+        //è¿™è¡Œç»å¯¹ä¸èƒ½åˆ é™¤ï¼Œç”¨æ ‡è®°sslå·²ç»é”€æ¯ï¼Œåˆ é™¤ä¼šå¯¼è‡´å´©æºƒã€‚
         if(G_SockList.count(tosock)==1)
         {
             G_SockList[tosock]->sslinfo=NULL;
@@ -284,20 +284,20 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
         char remotehost[256] = { 0 };
         char httpline[3]="\r\n";
         sscanf(tunnelreq->url,"%[^:]://%[^\n]",protocol,remotehost);
-        //²»ÊÇtcp²ÅĞèÒª×ª·¢
+        //ä¸æ˜¯tcpæ‰éœ€è¦è½¬å‘
         if(strncmp(protocol,"tcp",3)!=0){
-            //ĞèÒªhostÍ·×ª·¢
+            //éœ€è¦hostå¤´è½¬å‘
             if(strlen(tunnelreq->hostheader)>0){
-                //Æ´½Ó\r\nÓÃÓÚÊ¶±ğhttpÍ·rfcĞ­ÒéÃèÊöµÄ
+                //æ‹¼æ¥\r\nç”¨äºè¯†åˆ«httpå¤´rfcåè®®æè¿°çš„
                 memcpy(remotehost+strlen(remotehost),httpline,2);
                 char *p=strstr(buf,remotehost);
 
                 char srchost[256] = { 0 };
                 memcpy(srchost,tunnelreq->hostheader,strlen(tunnelreq->hostheader));
                 memcpy(srchost+strlen(srchost),httpline,2);
-                //²éµ½ÁË¡£¡£
+                //æŸ¥åˆ°äº†ã€‚ã€‚
                 if(p!=NULL){
-                    //Ìæ»»httpÇëÇóÍ·
+                    //æ›¿æ¢httpè¯·æ±‚å¤´
                     str_replace(p,strlen(remotehost),srchost);
                 }
             }
@@ -315,7 +315,7 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
 }
 
 int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
-    //±ÜÃâÖ¸ÕëÎª¿Õ±ÀÀ£
+    //é¿å…æŒ‡é’ˆä¸ºç©ºå´©æºƒ
     if(sslinfo==NULL){
          clearsock(tempinfo);
         return -1;
@@ -346,16 +346,16 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
 
     if ( readlen ==-1)
     {
-        return 0;//ÕâÀï²»ÄÜÓÃ-1²»È»»áµ¼ÖÂ£¬mapµü´úÆ÷²»×ÔÔö
+        return 0;//è¿™é‡Œä¸èƒ½ç”¨-1ä¸ç„¶ä¼šå¯¼è‡´ï¼Œmapè¿­ä»£å™¨ä¸è‡ªå¢
     }
-    //ÓĞÊ±ºòreadlen±ä³É-76µ¼ÖÂ±ÀÀ£
+    //æœ‰æ—¶å€™readlenå˜æˆ-76å¯¼è‡´å´©æºƒ
     if ( readlen <1)
     {
         clearsock(tempinfo);
         return -1;
     }
 
-    /* copyµ½ÁÙÊ±»º´æÇø */
+    /* copyåˆ°ä¸´æ—¶ç¼“å­˜åŒº */
     if ( tempinfo->packbuflen == 0 )
     {
         tempinfo->packbuf = (unsigned char *) malloc( MAXBUF );
@@ -413,7 +413,7 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
                         sinfo->tosock		= tempinfo->sock;
                         sinfo->sock         = tcp;
                         G_SockList.insert( map<int, Sockinfo*> :: value_type( tcp, sinfo ) );
-                        /* Ô¶³ÌµÄ´øÉÏ±¾µØÁ´½Ó */
+                        /* è¿œç¨‹çš„å¸¦ä¸Šæœ¬åœ°é“¾æ¥ */
                         tempinfo->tosock = tcp;
                         tempinfo->tunnelreq    = tunnelreq;
                         tempinfo->isconnectlocal= 1;
@@ -434,7 +434,7 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
 
 
 int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr){
-   //¼ì²âÊÇ·ñ¶Ï¿ª
+   //æ£€æµ‹æ˜¯å¦æ–­å¼€
    if(check_sock(*mainsock)!= 0)
    {
         return -1;
@@ -470,7 +470,7 @@ int CmdSock(int *mainsock,Sockinfo *tempinfo,struct sockaddr_in server_addr){
 
 
 
-    /* copyµ½ÁÙÊ±»º´æÇø */
+    /* copyåˆ°ä¸´æ—¶ç¼“å­˜åŒº */
     if ( tempinfo->packbuflen == 0 )
     {
         tempinfo->packbuf = (unsigned char *) malloc( MAXBUF );

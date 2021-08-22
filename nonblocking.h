@@ -2,7 +2,7 @@
 #define NONBLOCKING_H_INCLUDED
 #include "config.h"
 #include <string.h>
-#if  WIN32
+#if WIN32
 #include <winsock.h>
 #include <winsock2.h>
 #include <windows.h>
@@ -22,43 +22,45 @@ using namespace std;
 
 #if WIN32
 
-struct tcp_keepalive {
-  u_long onoff;
-  u_long keepalivetime;
-  u_long keepaliveinterval;
+struct tcp_keepalive
+{
+    u_long onoff;
+    u_long keepalivetime;
+    u_long keepaliveinterval;
 };
 
-#define SIO_RCVALL _WSAIOW(IOC_VENDOR,1)
-#define SIO_RCVALL_MCAST _WSAIOW(IOC_VENDOR,2)
-#define SIO_RCVALL_IGMPMCAST _WSAIOW(IOC_VENDOR,3)
-#define SIO_KEEPALIVE_VALS _WSAIOW(IOC_VENDOR,4)
-#define SIO_ABSORB_RTRALERT _WSAIOW(IOC_VENDOR,5)
-#define SIO_UCAST_IF _WSAIOW(IOC_VENDOR,6)
-#define SIO_LIMIT_BROADCASTS _WSAIOW(IOC_VENDOR,7)
-#define SIO_INDEX_BIND _WSAIOW(IOC_VENDOR,8)
-#define SIO_INDEX_MCASTIF _WSAIOW(IOC_VENDOR,9)
-#define SIO_INDEX_ADD_MCAST _WSAIOW(IOC_VENDOR,10)
-#define SIO_INDEX_DEL_MCAST _WSAIOW(IOC_VENDOR,11)
+#define SIO_RCVALL _WSAIOW(IOC_VENDOR, 1)
+#define SIO_RCVALL_MCAST _WSAIOW(IOC_VENDOR, 2)
+#define SIO_RCVALL_IGMPMCAST _WSAIOW(IOC_VENDOR, 3)
+#define SIO_KEEPALIVE_VALS _WSAIOW(IOC_VENDOR, 4)
+#define SIO_ABSORB_RTRALERT _WSAIOW(IOC_VENDOR, 5)
+#define SIO_UCAST_IF _WSAIOW(IOC_VENDOR, 6)
+#define SIO_LIMIT_BROADCASTS _WSAIOW(IOC_VENDOR, 7)
+#define SIO_INDEX_BIND _WSAIOW(IOC_VENDOR, 8)
+#define SIO_INDEX_MCASTIF _WSAIOW(IOC_VENDOR, 9)
+#define SIO_INDEX_ADD_MCAST _WSAIOW(IOC_VENDOR, 10)
+#define SIO_INDEX_DEL_MCAST _WSAIOW(IOC_VENDOR, 11)
 
 #define RCVALL_OFF 0
 #define RCVALL_ON 1
 #define RCVALL_SOCKETLEVELONLY 2
 
-inline int SetKeepAlive(int sock){
+inline int SetKeepAlive(int sock)
+{
     BOOL bKeepAlive = TRUE;
-    int nRet =setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char*)&bKeepAlive, sizeof(bKeepAlive));
+    int nRet = setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char *)&bKeepAlive, sizeof(bKeepAlive));
     if (nRet == SOCKET_ERROR)
     {
-    return -1;
+        return -1;
     }
 
-    // …Ë÷√KeepAlive≤Œ ˝
+    // ËÆæÁΩÆKeepAliveÂèÇÊï∞
     tcp_keepalive alive_in = {0};
     tcp_keepalive alive_out = {0};
-    alive_in.keepalivetime =60000; // ø™ º ◊¥ŒKeepAliveÃΩ≤‚«∞µƒTCPø’±’ ±º‰
-    alive_in.keepaliveinterval =60000; // ¡Ω¥ŒKeepAliveÃΩ≤‚º‰µƒ ±º‰º‰∏Ù
+    alive_in.keepalivetime = 60000;     // ÂºÄÂßãÈ¶ñÊ¨°KeepAliveÊé¢ÊµãÂâçÁöÑTCPÁ©∫Èó≠Êó∂Èó¥
+    alive_in.keepaliveinterval = 60000; // ‰∏§Ê¨°KeepAliveÊé¢ÊµãÈó¥ÁöÑÊó∂Èó¥Èó¥Èöî
     alive_in.onoff = TRUE;
-    unsigned long ulBytesReturn =0;
+    unsigned long ulBytesReturn = 0;
     //nRet = WSAIoctl(sock, SIO_KEEPALIVE_VALS, &alive_in, sizeof(alive_in),&alive_out, sizeof(alive_out), &ulBytesReturn, NULL, NULL);
     if (nRet == SOCKET_ERROR)
     {
@@ -69,74 +71,72 @@ inline int SetKeepAlive(int sock){
 #else
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-inline int SetKeepAlive(int sock){
-    /*”–»ÀÀµ «√Îµ•Œª°£°£”–»ÀÀµ «∫¡√Îµ•Œª*/
-int keepalive = 1; // ø™∆Ùkeepalive Ù–‘
-int keepidle = 60000; // »Á∏√¡¨Ω”‘⁄60√Îƒ⁄√ª”–»Œ∫Œ ˝æ›Õ˘¿¥,‘ÚΩ¯––ÃΩ≤‚
-int keepinterval = 60000; // ÃΩ≤‚ ±∑¢∞¸µƒ ±º‰º‰∏ÙŒ™5 √Î
-int keepcount = 1; // ÃΩ≤‚≥¢ ‘µƒ¥Œ ˝.»Áπ˚µ⁄1¥ŒÃΩ≤‚∞¸æÕ ’µΩœÏ”¶¡À,‘Ú∫Û2¥Œµƒ≤ª‘Ÿ∑¢.
-setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive , sizeof(keepalive ));
-setsockopt(sock, SOL_TCP, TCP_KEEPIDLE, (void*)&keepidle , sizeof(keepidle ));
-setsockopt(sock, SOL_TCP, TCP_KEEPINTVL, (void *)&keepinterval , sizeof(keepinterval ));
-setsockopt(sock, SOL_TCP, TCP_KEEPCNT, (void *)&keepcount , sizeof(keepcount ));
-return 0;
+inline int SetKeepAlive(int sock)
+{
+    /*Êúâ‰∫∫ËØ¥ÊòØÁßíÂçï‰Ωç„ÄÇ„ÄÇÊúâ‰∫∫ËØ¥ÊòØÊØ´ÁßíÂçï‰Ωç*/
+    int keepalive = 1;        // ÂºÄÂêØkeepaliveÂ±ûÊÄß
+    int keepidle = 60000;     // Â¶ÇËØ•ËøûÊé•Âú®60ÁßíÂÜÖÊ≤°Êúâ‰ªª‰ΩïÊï∞ÊçÆÂæÄÊù•,ÂàôËøõË°åÊé¢Êµã
+    int keepinterval = 60000; // Êé¢ÊµãÊó∂ÂèëÂåÖÁöÑÊó∂Èó¥Èó¥Èöî‰∏∫5 Áßí
+    int keepcount = 1;        // Êé¢ÊµãÂ∞ùËØïÁöÑÊ¨°Êï∞.Â¶ÇÊûúÁ¨¨1Ê¨°Êé¢ÊµãÂåÖÂ∞±Êî∂Âà∞ÂìçÂ∫î‰∫Ü,ÂàôÂêé2Ê¨°ÁöÑ‰∏çÂÜçÂèë.
+    setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive, sizeof(keepalive));
+    setsockopt(sock, SOL_TCP, TCP_KEEPIDLE, (void *)&keepidle, sizeof(keepidle));
+    setsockopt(sock, SOL_TCP, TCP_KEEPINTVL, (void *)&keepinterval, sizeof(keepinterval));
+    setsockopt(sock, SOL_TCP, TCP_KEEPCNT, (void *)&keepcount, sizeof(keepcount));
+    return 0;
 }
 #endif // WIN32
 
-
-
-
-inline int setnonblocking(int sServer,int _nMode)
+inline int setnonblocking(int sServer, int _nMode)
 {
-    #if WIN32
+#if WIN32
     DWORD nMode = _nMode;
-    return ioctlsocket( sServer, FIONBIO,&nMode);
-    #else
-    if(_nMode==1)
+    return ioctlsocket(sServer, FIONBIO, &nMode);
+#else
+    if (_nMode == 1)
     {
-       return fcntl(sServer,F_SETFL,O_NONBLOCK);
+        return fcntl(sServer, F_SETFL, O_NONBLOCK);
     }
     else
     {
-      return fcntl(sServer,F_SETFL, _nMode);
+        return fcntl(sServer, F_SETFL, _nMode);
     }
-    #endif
+#endif
 }
-inline int net_dns( struct sockaddr_in *server_addr, const char *host, int port )
+inline int net_dns(struct sockaddr_in *server_addr, const char *host, int port)
 {
     struct hostent *server_host;
-    if((server_host = gethostbyname(host)) == NULL )
+    if ((server_host = gethostbyname(host)) == NULL)
     {
         return -1;
     }
-    memcpy((void*)&server_addr->sin_addr,(void*)server_host->h_addr,server_host->h_length);
+    memcpy((void *)&server_addr->sin_addr, (void *)server_host->h_addr, server_host->h_length);
     server_addr->sin_family = AF_INET;
-    server_addr->sin_port   = htons( port );
+    server_addr->sin_port = htons(port);
     return 0;
 }
 
 inline int check_sock(int sock)
 {
-    int error=-1;
-    #if WIN32
-    int len ;
-    #else
+    int error = -1;
+#if WIN32
+    int len;
+#else
     socklen_t len;
-    #endif
+#endif
     len = sizeof(error);
-    getsockopt(sock, SOL_SOCKET, SO_ERROR, (char*)&error, &len);
+    getsockopt(sock, SOL_SOCKET, SO_ERROR, (char *)&error, &len);
     return error;
 }
 
-void clearsock(Sockinfo * sock_info);
+void clearsock(Sockinfo *sock_info);
 
 inline int SetBufSize(int sock)
 {
-    //Ω” ’ª∫≥Â«¯
-    int opt=25*1024;//30K
-    setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char*)&opt,sizeof(opt));
-    //∑¢ÀÕª∫≥Â«¯  (’‚∏ˆ«ßÕÚ≤ª“™°£°£∑¢ÀÕ≤ª–Ë“™ª∫¥Ê«¯)
-   // setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
+    //Êé•Êî∂ÁºìÂÜ≤Âå∫
+    int opt = 25 * 1024; //30K
+    setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (const char *)&opt, sizeof(opt));
+    //ÂèëÈÄÅÁºìÂÜ≤Âå∫  (Ëøô‰∏™ÂçÉ‰∏á‰∏çË¶Å„ÄÇ„ÄÇÂèëÈÄÅ‰∏çÈúÄË¶ÅÁºìÂ≠òÂå∫)
+    // setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (const char*)&opt,sizeof(opt));
     return 0;
 }
 

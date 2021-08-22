@@ -5,7 +5,7 @@
 #include <time.h>
 #include <list>
 #if WIN32
-#include <winsock.h>//这个得放bytestool.h前面
+#include <winsock.h> //杩欎釜寰楁斁bytestool.h鍓嶉潰
 #endif
 #include "string.h"
 #include "cJSON.h"
@@ -13,20 +13,19 @@
 #include "base64.h"
 #include "bytestool.h"
 
-
 using namespace std;
 
-int SendUdpReqTunnel(int sock, struct sockaddr_in servAddr,TunnelInfo *tunnelinfo);
-int SendUdpPack(int sock,  struct sockaddr_in servAddr,const char *msgstr);
+int SendUdpReqTunnel(int sock, struct sockaddr_in servAddr, TunnelInfo *tunnelinfo);
+int SendUdpPack(int sock, struct sockaddr_in servAddr, const char *msgstr);
 int SendUdpPing(int sock, struct sockaddr_in servAddr);
 int CheckUdpPing(int sock, struct sockaddr_in servAddr);
-int SendUdpAuth(int sock,struct sockaddr_in servAddr);
-int SendUdpProxy(int sock,struct sockaddr_in servAddr,char* Data,char* Url,const char* ClientAddr);
-int GetUdpRemoteAddr(int localport,char *url);
+int SendUdpAuth(int sock, struct sockaddr_in servAddr);
+int SendUdpProxy(int sock, struct sockaddr_in servAddr, char *Data, char *Url, const char *ClientAddr);
+int GetUdpRemoteAddr(int localport, char *url);
 int UdpClient();
 int initUdp();
 int CheckUdpPing(int sock);
 int CheckUdpAuth(int sock);
 int CheckRegTunnel(int sock);
-int UdpRecv(fd_set* readSet);
+int UdpRecv(fd_set *readSet);
 #endif // UDP_H_INCLUDED
