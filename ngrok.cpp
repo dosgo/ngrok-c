@@ -33,7 +33,7 @@ int ControlUdp(int port){
     int re_flag=1;
     int re_len=sizeof(int);
     setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,(char *)&re_flag,re_len);
-    if(bind(sockfd,(const struct sockaddr *)&my_addr,sizeof(struct sockaddr))==-1)
+    if(::bind(sockfd,(const struct sockaddr *)&my_addr,sizeof(struct sockaddr))==-1)
     {
         return -3;
     }

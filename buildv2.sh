@@ -26,4 +26,4 @@ $CC  $YH -c udp.cpp -o $DIR/udp.o
 $CC  $YH -c ngrok.cpp  -o $DIR/ngrok.o
 
 
-$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/global.o  $DIR/opensslbio.o $DIR/udp.o $DIR/base64.o $DIR/ngrok.o $DIR/openssldl.o -o $DIR/ngrokc $YH  -lpthread -ldl
+$CC $DIR/main.o $DIR/cJSON.o $DIR/sendmsg.o $DIR/nonblocking.o $DIR/global.o  $DIR/opensslbio.o $DIR/udp.o $DIR/base64.o $DIR/ngrok.o $DIR/openssldl.o -o $DIR/ngrokc $YH   -ldl
