@@ -2,7 +2,9 @@
 DIR=build
 mkdir -p $DIR
 
-
+export  MY_INCLUDE=$(pwd)/include
+export  C_INCLUDE_PATH=$MY_INCLUDE
+export  CPLUS_INCLUDE_PATH=$MY_INCLUDE
 rm -rf $DIR/main.o
 rm -rf $DIR/cJSON.o
 rm -rf $DIR/sendmsg.o
