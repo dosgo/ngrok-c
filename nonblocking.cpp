@@ -19,6 +19,22 @@ void clearsock(Sockinfo *sock_info)
                   sock_info->sslinfo = NULL;
             }
       }
+
+      if (sock_info->istype == 2)
+      {
+            if (sock_info->packbuflen > 0 && sock_info->packbuf != NULL)
+            {
+                  free(sock_info->packbuf);
+                  sock_info->packbuf = NULL;
+            }
+
+            if (sock_info->sslinfo != NULL)
+            {
+                  ssl_free_info(sock_info->sslinfo);
+                  free(sock_info->sslinfo);
+                  sock_info->sslinfo = NULL;
+            }
+      }
       //   net_close(sock);
 
       shutdown(sock_info->sock, 2);

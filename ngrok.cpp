@@ -358,8 +358,8 @@ int RemoteToLocal(Sockinfo *tempinfo)
         }
         if (tempinfo->tunnelreq->localtls == 1)
         {
-            ssl_info *localSslInfo = tempinfo->sslinfo;
-//发送到远程
+            ssl_info *localSslInfo = tempinfo->localSslinfo;
+//发送到本地
 #if OPENSSL
             sendlen = sendTls(tempinfo->tosock, localSslInfo->ssl, buf, readlen, 1);
 #else
@@ -486,7 +486,7 @@ int ConnectLocal(Sockinfo *tempinfo)
                     /* 远程的带上本地链接 */
                     tempinfo->tosock = tcp;
                     tempinfo->tunnelreq = tunnelreq;
-                    tempinfo->localSslinfo = sinfo->sslinfo;
+                    tempinfo->localSslinfo = sinfo->localSslinfo;
                     tempinfo->isconnectlocal = 1;
                     cJSON_Delete(json);
                 }
