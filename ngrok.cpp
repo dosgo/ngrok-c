@@ -155,6 +155,7 @@ int SetLocalAddrInfo(char *url,char *ReqId,int regstate){
             memcpy(tunnelreq->url,url,strlen(url));
             memcpy(tunnelreq->localhost,tunnelinfo->localhost,strlen(tunnelinfo->localhost));
             tunnelreq->localport=tunnelinfo->localport;
+            tunnelreq->localtls=tunnelinfo->localtls;
             memcpy(tunnelreq->hostheader,tunnelinfo->hostheader,strlen(tunnelinfo->hostheader));
 
             #if UDPTUNNEL
@@ -195,8 +196,6 @@ int NewTunnel(cJSON	*json){
 int RemoteSslInit(Sockinfo *tempinfo){
    ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
    tempinfo->sslinfo = sslinfo;
-
-
     if ( ssl_init_info(&tempinfo->sock, sslinfo ) != -1 )
     {
         #if OPENSSL
@@ -220,24 +219,64 @@ int RemoteSslInit(Sockinfo *tempinfo){
     return 0;
 }
 
-int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
+
+
+int LocalSslInit(Sockinfo *tempinfo){
+   ssl_info *sslinfo = (ssl_info *) malloc( sizeof(ssl_info) );
+   tempinfo->localSslinfo = sslinfo;
+    if ( ssl_init_info(&tempinfo->sock, sslinfo ) != -1 )
+    {
+        #if OPENSSL
+        setnonblocking(tempinfo->sock,1);
+        #endif
+    }else{
+        #if OPENSSL
+        setnonblocking(tempinfo->sock,1);
+        #endif
+        /*ssl初始化失败，移除连接 */
+        clearsock(tempinfo);
+        return -1;
+    }
+    return 0;
+}
+
+int LocalToRemote(Sockinfo *tempinfo){
+    ssl_info *sslinfo=tempinfo->sslinfo;
+    ssl_info *localSslinfo=tempinfo->localSslinfo;
     int readlen;
     int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
     //oolarssl 最大发送长度不能超过16K。。还是改成15吧
     char buf[bufsize+1];
     memset(buf,0,bufsize+1);
     #if WIN32
-    readlen = recv( tempinfo->sock, (char *) buf, bufsize, 0 );
+        if(tempinfo->tunnelreq->localtls==1){
+               #if OPENSSL
+               readlen =  SslRecv(localSslinfo->ssl,(unsigned char *)buf,bufsize);
+               #else
+               readlen =  SslRecv(&localSslinfo->ssl,(unsigned char *)buf,bufsize);
+               #endif
+           
+        }else{
+            readlen = recv( tempinfo->sock, (char *) buf, bufsize, 0 );
+        }
     #else
-    readlen = recv(  tempinfo->sock, buf, bufsize, 0 );
+        if(tempinfo->tunnelreq->localtls==1){
+            #if OPENSSL
+            readlen =  SslRecv(localSslinfo->ssl,(unsigned char *)buf,bufsize);
+            #else
+            readlen =  SslRecv(&localSslinfo->ssl,(unsigned char *)buf,bufsize);
+            #endif
+        }else{
+            readlen = recv( tempinfo->sock, buf, bufsize, 0 );
+        }
     #endif
     if ( readlen > 0&&sslinfo!=NULL )
     {
         //发送到远程
         #if OPENSSL
-        sendremote(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
+        sendTls(tempinfo->tosock,sslinfo->ssl,buf,readlen,1);
         #else
-        sendremote(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
+        sendTls(tempinfo->tosock,&sslinfo->ssl,buf,readlen,1);
         #endif
 
     }else  {
@@ -248,7 +287,8 @@ int LocalToRemote(Sockinfo *tempinfo,ssl_info *sslinfo){
     return 0;
 }
 
-int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
+int RemoteToLocal(Sockinfo *tempinfo){
+   ssl_info *sslinfo=tempinfo->sslinfo;
    int readlen,sendlen;
    int bufsize=1024*15;//15K  //oolarssl SSL_MAX_CONTENT_LEN 16384
    //oolarssl 最大发送长度不能超过16K。。还是改成15吧
@@ -259,10 +299,6 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
     #else
     readlen =  SslRecv(&sslinfo->ssl,(unsigned char *)buf,bufsize);
     #endif
-
-
-
-
     if ( readlen ==0||readlen ==-2)
     {
         /* close to sock */
@@ -302,9 +338,17 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
                 }
             }
         }
-
-
-        sendlen=sendlocal(tempinfo->tosock,buf,readlen,1);
+        if(tempinfo->tunnelreq->localtls==1){
+            ssl_info *localSslInfo=tempinfo->sslinfo;
+            //发送到远程
+            #if OPENSSL
+            sendlen=sendTls(tempinfo->tosock,localSslInfo->ssl,buf,readlen,1);
+            #else
+            sendlen=sendTls(tempinfo->tosock,&localSslInfo->ssl,buf,readlen,1);
+            #endif   
+        }else{
+            sendlen=sendlocal(tempinfo->tosock,buf,readlen,1);
+        }
         if(sendlen<1)
         {
             shutdown(tempinfo->sock,2);
@@ -314,7 +358,8 @@ int RemoteToLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
     return 0;
 }
 
-int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
+int ConnectLocal(Sockinfo *tempinfo){
+    ssl_info *sslinfo=tempinfo->sslinfo;
     //避免指针为空崩溃
     if(sslinfo==NULL){
          clearsock(tempinfo);
@@ -412,15 +457,21 @@ int ConnectLocal(ssl_info *sslinfo,Sockinfo *tempinfo){
                         sinfo->linktime=getUnixTime();
                         sinfo->tosock		= tempinfo->sock;
                         sinfo->sock         = tcp;
+                        if(tunnelreq->localtls==1){
+                            //ssl初始化
+                            LocalSslInit(sinfo);
+                        }
+
                         G_SockList.insert( map<int, Sockinfo*> :: value_type( tcp, sinfo ) );
+                       
+                       
                         /* 远程的带上本地链接 */
                         tempinfo->tosock = tcp;
                         tempinfo->tunnelreq    = tunnelreq;
+                        tempinfo->localSslinfo=sinfo->sslinfo;
                         tempinfo->isconnectlocal= 1;
                         cJSON_Delete( json );
-                }
-                else
-                {
+                }else{
 
                     clearsock(tempinfo);
                     cJSON_Delete( json );

@@ -16,6 +16,7 @@ struct TunnelInfo
 {
     char localhost[255];
     int localport;
+    int localtls;
     char hostheader[255];
     char subdomain[255];
     char hostname[255];
@@ -33,23 +34,25 @@ struct TunnelReq
     char url[255];
     char hostheader[255];
     int localport;
+    int localtls;
     int regtime;
 };
 
 
 struct Sockinfo
 {
-    ssl_info *sslinfo;
+    ssl_info *sslinfo;  //remote ssl
+    ssl_info *localSslinfo;  //local ssl
     TunnelReq *tunnelreq;
-    int isconnect;
+    int isconnect;  //remote connect flag
     int istype; //1=remote 2=local,3=cmd
     int tosock;
     int sock;
     unsigned char *packbuf;
     unsigned long long packbuflen;
-    int isconnectlocal;
+    int isconnectlocal;  //local connect flag
     int linktime;
-    int isauth;
+    int isauth;  //auth
 };
 
 struct MainInfo
@@ -81,7 +84,7 @@ struct UdpInfo
       int regTunnel;//login  flag
       int pingtime;
       int pongtime;
-      int ping; //不能大于30
+      int ping; //
       int msock;
       int lsock;
       sockaddr_in servAddr;

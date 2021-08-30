@@ -31,12 +31,13 @@
 #include "ngrok.h"
 #include "sslbio.h"
 #include "nonblocking.h"
+#include "param.h"
 #if UDPTUNNEL
 #include "udp.h"
 #endif
 using namespace std;
 //string VER = "1.35-(2016/5/13)";
-char VER[24]= "1.54-(2019/11/2)";
+char VER[24]= "1.55-(2021/8/30)";
 
 
 ssl_info *mainsslinfo=NULL;
@@ -159,7 +160,6 @@ void* proxy(  )
 
 	int		maxfdp		= 0;
 	int ret=0;
-	ssl_info *sslinfo1;
 	Sockinfo *tempinfo ;
 	Sockinfo *tempinfo1;
 	map<int, Sockinfo*>::iterator it;
@@ -326,15 +326,13 @@ void* proxy(  )
 			    /*等于1才是添加到 readSet的*/
 				if (FD_ISSET( it1->first, &readSet )&&tempinfo->isconnect==1 )
 				{
-
-                    sslinfo1 = tempinfo->sslinfo;
                     /* 远程的转发给本地 */
                     if ( tempinfo->istype == 1 )
                     {
                         //未连接本地
                         if ( tempinfo->isconnectlocal == 0 )
                         {
-                            backcode=ConnectLocal(sslinfo1,tempinfo);
+                            backcode=ConnectLocal(tempinfo);
                             if(backcode==-1)
                             {
                               G_SockList.erase(it1++);
@@ -349,7 +347,7 @@ void* proxy(  )
                         //本地连接完成转发
                         if( tempinfo->isconnectlocal == 2 )
                         {
-                            backcode=RemoteToLocal(sslinfo1,tempinfo);
+                            backcode=RemoteToLocal(tempinfo);
                             if(backcode==-1)
                             {
                               G_SockList.erase(it1++);
@@ -359,7 +357,7 @@ void* proxy(  )
                     }
                     /* 本地的转发给远程 */
                     else if(tempinfo->istype == 2){
-                        backcode=LocalToRemote(tempinfo,sslinfo1);
+                        backcode=LocalToRemote(tempinfo);
                         if(backcode==-1)
                         {
                           G_SockList.erase(it1++);

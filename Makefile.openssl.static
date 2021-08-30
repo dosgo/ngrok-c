@@ -2,11 +2,12 @@ CC?=gcc
 CXX?=g++
 CFLAGS+=-fexceptions -DOPENSSL=1 -DOPENSSLDL=0 -O2
 CXXFLAGS=-fexceptions -DOPENSSL=1 -DOPENSSLDL=0 -O2
-LIBS=sendmsg.o  cJSON.o  udp.o base64.o  global.o nonblocking.o opensslbio.o ngrok.o main.o
+LIBS=param.o sendmsg.o  cJSON.o  udp.o base64.o  global.o nonblocking.o opensslbio.o ngrok.o main.o
 all:: ngrokc $(LIBS)
 ngrokc: $(LIBS)
 	$(CXX) -s $(LIBS) -o ngrokc -lssl -lcrypto -lpthread -ldl  -Wl,-static -static -static-libgcc -static-libstdc++
 sendmsg.o: sendmsg.h
+param.o: param.h
 cJSON.o: cJSON.h
 nonblocking.o: nonblocking.h
 udp.o: udp.h
@@ -14,7 +15,7 @@ base64.o: base64.h
 global.o: global.h
 opensslbio.o: sslbio.h
 ngrok.o: ngrok.h
-main.o: global.h udp.h base64.h sendmsg.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h
+main.o: global.h udp.h base64.h param.h sendmsg.h sslbio.h ngrok.h cJSON.h bytestool.h nonblocking.h
 
 clean:
 	rm -f $(LIBS) ngrokc

@@ -20,22 +20,14 @@
 #include "bytestool.h"
 using namespace std;
 
+char *rand_str(char *str, const int len);
+
 inline int getUnixTime()
 {
     time_t now;
     return time(&now);
 }
 
-int loadargs(int argc, char **argv);
-char *rand_str(char *str, const int len);
-
-inline int strpos(char *str, char c)
-{
-    char *sc = strchr(str, c);
-    if (sc == NULL)
-        return (-1);
-    return (sc - str);
-}
 
 inline void str_replace(char *cp, int n, char *str)
 {
@@ -69,22 +61,9 @@ inline void str_replace(char *cp, int n, char *str)
     strncpy(cp, str, lenofstr);
 }
 
-inline int getvalue(char *str, const char *key, char *value)
-{
-    int ypos = 0;
-    if (strncmp(str, key, strlen(key)) == 0)
-    {
-        ypos = strpos(str, ':');
-        if (ypos != -1)
-        {
-            memcpy(value, str + ypos + 1, strlen(str + ypos));
-            return 0;
-        }
-    }
-    return -1;
-}
 
-inline int sendremote(int sock, ssl_context *ssl, const char *buf, int buflen, int isblock)
+
+inline int sendTls(int sock, ssl_context *ssl, const char *buf, int buflen, int isblock)
 {
     int sendlen = 0;
     if (isblock)
@@ -129,6 +108,8 @@ inline int sendlocal(int sock, const char *buf, int buflen, int isblock)
     }
     return sendlen;
 }
+
+
 
 inline int sendpack(int sock, ssl_context *ssl, const char *msgstr, int isblock)
 {

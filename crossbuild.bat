@@ -59,6 +59,7 @@ del %OPATH%\*.o
 %CC%  %YH% -c cJSON.c -o  %OPATH%/cJSON.o
 %CC%  %YH% -c main.cpp -o  %OPATH%/main.o
 %CC%  %YH% -c sendmsg.cpp -o  %OPATH%/sendmsg.o
+%CC%  %YH% -c param.cpp  -o %OPATH%/param.o
 %CC%  %YH% -c udp.cpp -o  %OPATH%/udp.o
 %CC%  %YH% -c base64.c -o  %OPATH%/base64.o 
 %CC%  %YH% -c nonblocking.cpp -o %OPATH%/nonblocking.o
@@ -69,7 +70,7 @@ del %OPATH%\*.o
 
 rem %CC%  %OPATH%\main.o %OPATH%\sendmsg.o %OPATH%\cJSON.o %OPATH%/opensslbio.o  %OPATH%\base64.o %OPATH%\udp.o %OPATH%\nonblocking.o  -o  %OPATH%\ngrokc 
 
- %CC% %YH%  -s %OPATH%\main.o %OPATH%\sendmsg.o  %OPATH%\ngrok.o  %OPATH%/opensslbio.o %OPATH%\cJSON.o %OPATH%\base64.o  %OPATH%\udp.o  %OPATH%\nonblocking.o  %OPATH%\openssldl.o %OPATH%\global.o -o  %OPATH%\ngrokc  
+ %CC% %YH%  -s %OPATH%\main.o %OPATH%\sendmsg.o  %OPATH%\param.o  %OPATH%\ngrok.o  %OPATH%/opensslbio.o %OPATH%\cJSON.o %OPATH%\base64.o  %OPATH%\udp.o  %OPATH%\nonblocking.o  %OPATH%\openssldl.o %OPATH%\global.o -o  %OPATH%\ngrokc  
 
 
  

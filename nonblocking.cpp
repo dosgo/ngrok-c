@@ -28,7 +28,7 @@ void clearsock(Sockinfo *sock_info)
 #else
       close(sock_info->sock);
 #endif
-      //脢脥路脜脛脷麓忙
+      //
       if (sock_info != NULL)
       {
             free(sock_info);

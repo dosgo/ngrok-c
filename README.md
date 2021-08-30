@@ -310,6 +310,12 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
       3. 把openssl.zip解压到你的下载的sdk,/xxx/OpenWrt-SDK/staging_dir/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/include目录下，
       4. 运行编辑openwrtbuildv2.sh,就会在build-mips生成一个叫ngrokc的文件。成功了。。把它复制到bin目录。就可以运行ngrokc了。
       5.记得安装，libopenssl.ipk，官网有下载。
+
+## 五.zig交叉编译ngrokc。
+      1. 去https://ziglang.org/download/下载zig编译器并且安装好，
+      2. 修改crossbuild.bat文件的TARGET=mipsel-linux-musl改成你的平台。
+	  3. 运行crossbuild.bat就会在当前目录生成编译文件。
+      4. 记得安装，libopenssl.ipk，官网有下载。
       
 
 
