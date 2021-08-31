@@ -472,6 +472,8 @@ int ConnectLocal(Sockinfo *tempinfo)
                     sinfo->linktime = getUnixTime();
                     sinfo->tosock = tempinfo->sock;
                     sinfo->sock = tcp;
+                    sinfo->packbuflen = 0;
+                    sinfo->packbuf = NULL;
                     sinfo->localSslinfo=NULL;
                     sinfo->tunnelreq = tunnelreq;
                     G_SockList.insert(map<int, Sockinfo *>::value_type(tcp, sinfo));

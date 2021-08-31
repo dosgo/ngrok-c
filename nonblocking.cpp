@@ -76,6 +76,27 @@ void clearsock(Sockinfo *sock_info)
             }
       }
 
+        if (sock_info->istype == 2)
+      {
+            if (sock_info->packbuflen > 0 && sock_info->packbuf != NULL)
+            {
+                  free(sock_info->packbuf);
+                  sock_info->packbuf = NULL;
+            }
+
+            if (sock_info->localSslinfo != NULL)
+            {
+#if ISMBEDTLS
+                  mbedtls_ssl_close_notify(&sock_info->localSslinfo->ssl);
+#else
+                  ssl_close_notify(&sock_info->localSslinfo->ssl);
+#endif // ISMBEDTLS
+                  ssl_free_info(sock_info->localSslinfo);
+                  free(sock_info->localSslinfo);
+                  sock_info->localSslinfo = NULL;
+            }
+      }
+
 #if ISMBEDTLS
       shutdown(sock_info->sock, 2);
 //closesocket(sock_info->sock);
