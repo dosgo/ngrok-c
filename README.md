@@ -198,6 +198,9 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
     Example  -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Httpauth:"test:test"]
  ## 2020/1/19
   中国联通4G，中国电信4G全部支持ipv6了，ipv6每个都是一个公网IP，所以这个没有价值了。ipv6搞ddns就行了。。
+ ## 2021/8/31
+   -1.55  add support local tls。
+    Example  -AddTun[Type:https,Lhost:127.0.0.1,Lport:443,Ltls:1]
   
 ### 关于编译对应路由的版本的ngrokc。
 ## 一。去http://downloads.openwrt.org/下载你路由对应的SDK版本 ，如OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2，并且解压。
