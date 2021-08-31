@@ -44,7 +44,7 @@ inline int SslRecv(SSL* ssl, unsigned char* buffer, int ilen)
 inline int ssl_free_info(ssl_info *sslinfo)
 {
     #if OPENSSLDL
-    SslShutdown( sslinfo->ssl );
+   // SslShutdown( sslinfo->ssl );
     SslFree( sslinfo->ssl );
     SslCtxFree( sslinfo->ctx  );
     #else

@@ -90,6 +90,7 @@ int ReqProxy(struct sockaddr_in server_addr)
     sinfo->packbuflen = 0;
     sinfo->linktime = getUnixTime();
     sinfo->sslinfo = NULL;
+    sinfo->localSslinfo=NULL;
     sinfo->isconnectlocal = 0;
     sinfo->sock = proxy_fd;
     G_SockList.insert(map<int, Sockinfo *>::value_type(proxy_fd, sinfo));
@@ -228,9 +229,10 @@ int RemoteSslInit(Sockinfo *tempinfo)
 int LocalSslInit(Sockinfo *tempinfo)
 {
     ssl_info *sslinfo = (ssl_info *)malloc(sizeof(ssl_info));
-    tempinfo->localSslinfo = sslinfo;
+     tempinfo->localSslinfo = sslinfo;
     if (ssl_init_info(&tempinfo->sock, sslinfo) != -1)
     {
+        
 #if OPENSSL
         setnonblocking(tempinfo->sock, 1);
 #endif
@@ -278,22 +280,18 @@ int LocalToRemote(Sockinfo *tempinfo)
         readlen = SslRecv(&localSslinfo->ssl, (unsigned char *)buf, bufsize);
 #endif
     }
-    else
-    {
+    else{
         readlen = recv(tempinfo->sock, buf, bufsize, 0);
     }
 #endif
-    if (readlen > 0 && sslinfo != NULL)
-    {
+    if (readlen > 0 && sslinfo != NULL){
 //发送到远程
 #if OPENSSL
         sendTls(tempinfo->tosock, sslinfo->ssl, buf, readlen, 1);
 #else
         sendTls(tempinfo->tosock, &sslinfo->ssl, buf, readlen, 1);
 #endif
-    }
-    else
-    {
+    }else{
         shutdown(tempinfo->tosock, 2);
         clearsock(tempinfo);
         return -1;
@@ -474,19 +472,13 @@ int ConnectLocal(Sockinfo *tempinfo)
                     sinfo->linktime = getUnixTime();
                     sinfo->tosock = tempinfo->sock;
                     sinfo->sock = tcp;
+                    sinfo->localSslinfo=NULL;
                     sinfo->tunnelreq = tunnelreq;
-                    if (tunnelreq->localtls == 1)
-                    {
-                        //ssl初始化
-                        LocalSslInit(sinfo);
-                    }
-
                     G_SockList.insert(map<int, Sockinfo *>::value_type(tcp, sinfo));
 
                     /* 远程的带上本地链接 */
                     tempinfo->tosock = tcp;
                     tempinfo->tunnelreq = tunnelreq;
-                    tempinfo->localSslinfo = sinfo->localSslinfo;
                     tempinfo->isconnectlocal = 1;
                     cJSON_Delete(json);
                 }

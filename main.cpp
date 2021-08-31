@@ -414,10 +414,24 @@ void* proxy(  )
                         //本地连接
                         if ( tempinfo->istype == 2 )
 						{
+
+                            if(tempinfo->tunnelreq->localtls==1){    
+                                //初始化远程连接
+                                backcode=LocalSslInit(tempinfo);
+                                if(backcode==-1)
+                                {
+                                    G_SockList.erase(it1++);
+                                    continue;
+                                }
+                            }
+
                             if(G_SockList.count(tempinfo->tosock)>0)
                             {
                                 tempinfo1 = G_SockList[tempinfo->tosock];
                                 tempinfo1->isconnectlocal=2;
+                                if(tempinfo->tunnelreq->localtls==1){    
+                                    tempinfo1->localSslinfo=tempinfo->localSslinfo;
+                                }
                             }
                             /* 置为1 */
                             tempinfo->isconnect = 1;

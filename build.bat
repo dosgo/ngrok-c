@@ -3,7 +3,7 @@ set C_INCLUDE_PATH=%MY_INCLUDE%
 set CPLUS_INCLUDE_PATH=%MY_INCLUDE%
 set OPATH=build-win32
 set CC=g++
-set YH=-Wall -fexceptions -O3 -DOPENSSL=1 -DOPENSSLDL=1
+set YH=-g -DOPENSSL=1 -DOPENSSLDL=1
 mkdir %OPATH%
 del %OPATH%\*.o
 %CC%  %YH% -c cJSON.c -o  %OPATH%/cJSON.o

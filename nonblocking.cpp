@@ -27,12 +27,12 @@ void clearsock(Sockinfo *sock_info)
                   free(sock_info->packbuf);
                   sock_info->packbuf = NULL;
             }
-
-            if (sock_info->sslinfo != NULL)
+           
+            if (sock_info->localSslinfo != NULL)
             {
-                  ssl_free_info(sock_info->sslinfo);
-                  free(sock_info->sslinfo);
-                  sock_info->sslinfo = NULL;
+                  ssl_free_info(sock_info->localSslinfo);
+                  free(sock_info->localSslinfo);
+                  sock_info->localSslinfo = NULL;
             }
       }
       //   net_close(sock);
