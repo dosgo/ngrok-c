@@ -249,9 +249,11 @@ void* proxy(  )
 			/* 如果未连接才添加，写入监听 */
 			if ( tempinfo->isconnect == 0 )
 			{
+                // printf("wit->first:%d\r\n",it->first);
 				FD_SET( it->first, &writeSet );
 			}
 			else{
+               // printf("rit->first:%d\r\n",it->first);
 				FD_SET( it->first, &readSet );
 			}
 			maxfdp = it->first > maxfdp ? it->first : maxfdp;

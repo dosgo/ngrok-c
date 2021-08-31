@@ -16,6 +16,7 @@ int NewTunnel(cJSON	*json);
 int InitTunnelList();
 int SetLocalAddrInfo(char *url,char *ReqId,int istunnel);
 int RemoteSslInit(Sockinfo *tempinfo);
+int LocalSslInit(Sockinfo *tempinfo);
 int LocalToRemote(Sockinfo *tempinfo);
 int RemoteToLocal(Sockinfo *tempinfo);
 int ConnectLocal(Sockinfo *tempinfo);
