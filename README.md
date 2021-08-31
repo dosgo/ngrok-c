@@ -196,8 +196,6 @@ ngrokc.exe -SER[Shost:tunnel.mobi,Sport:44433] -AddTun[Type:http,Lhost:127.0.0.1
  ## 2019/11/2
   -1.54  add support http basic auth。
     Example  -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Httpauth:"test:test"]
- ## 2020/1/19
-  中国联通4G，中国电信4G全部支持ipv6了，ipv6每个都是一个公网IP，所以这个没有价值了。ipv6搞ddns就行了。。
  ## 2021/8/31
    -1.55  add support local tls。
     Example  -AddTun[Type:https,Lhost:127.0.0.1,Lport:443,Ltls:1]
