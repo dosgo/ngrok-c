@@ -13,10 +13,14 @@
 				<Option compiler="gcc" />
 				<Option parameters="-SER[Shost:tunnel.qydev.com,Sport:4443] -AddTun[Type:http,Lhost:127.0.0.1,Lport:80,Sdname:xxdosgo,Hostheader:localhost] " />
 				<Compiler>
+					<Add option="-m32" />
 					<Add option="-g" />
+					<Add option="-DOPENSSL=1 -DOPENSSLDL=1" />
 				</Compiler>
 				<Linker>
-					<Add option="-ldl" />
+					<Add option="-static" />
+					<Add option="-m32" />
+					<Add library="C:/llvm-mingw/i686-w64-mingw32/lib/libws2_32.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -28,13 +32,14 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-m32" />
+					<Add option="-DOPENSSL=1 -DOPENSSLDL=1" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-static" />
 					<Add option="-m32" />
-					<Add library="C:/TDM-GCC-64/x86_64-w64-mingw32/lib32/libws2_32.a" />
-					<Add library="D:/c/ngrok-c/openssl/libcrypto.dll.a" />
-					<Add library="D:/c/ngrok-c/openssl/libssl.dll.a" />
+					<Add library="C:/llvm-mingw/x86_64-w64-mingw32/lib/libws2_32.a" />
+					<Add library="C:/llvm-mingw/i686-w64-mingw32/lib/libws2_32.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -42,6 +47,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="base64.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="base64.h" />
 		<Unit filename="bytestool.h" />
 		<Unit filename="cJSON.c">
 			<Option compilerVar="CC" />
@@ -59,15 +68,15 @@
 		<Unit filename="opensslbio.h" />
 		<Unit filename="openssldl.cpp" />
 		<Unit filename="openssldl.h" />
+		<Unit filename="param.cpp" />
+		<Unit filename="param.h" />
 		<Unit filename="polarsslbio.cpp" />
 		<Unit filename="polarsslbio.h" />
 		<Unit filename="sendmsg.cpp" />
 		<Unit filename="sendmsg.h" />
 		<Unit filename="sslbio.h" />
-		<Extensions>
-			<code_completion />
-			<debugger />
-			<envvars />
-		</Extensions>
+		<Unit filename="udp.cpp" />
+		<Unit filename="udp.h" />
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
