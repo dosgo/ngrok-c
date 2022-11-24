@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1525747553 source:d:\c\ngrok-c\cjson.c
+1564149050 source:d:\c\ngrok-c\cjson.c
 	<string.h>
 	<stdio.h>
 	<math.h>
@@ -9,9 +9,9 @@
 	<ctype.h>
 	"cJSON.h"
 
-1525747553 d:\c\ngrok-c\cjson.h
+1564149050 d:\c\ngrok-c\cjson.h
 
-1525747617 source:d:\c\ngrok-c\main.cpp
+1630327005 source:d:\c\ngrok-c\main.cpp
 	"config.h"
 	<string.h>
 	<stdio.h>
@@ -37,22 +37,24 @@
 	"ngrok.h"
 	"sslbio.h"
 	"nonblocking.h"
+	"param.h"
+	"udp.h"
 
-1525747553 d:\c\ngrok-c\config.h
+1572698127 d:\c\ngrok-c\config.h
 	<stdarg.h>
 	<stdio.h>
 	<string.h>
 	"global.h"
 
-1525747553 d:\c\ngrok-c\mytime.h
+1629645325 d:\c\ngrok-c\mytime.h
 	<windows.h>
 	<errno.h>
 	<sys/select.h>
 	<netinet/in.h>
 
-1525747553 d:\c\ngrok-c\bytestool.h
+1564149050 d:\c\ngrok-c\bytestool.h
 
-1525747553 d:\c\ngrok-c\ngrok.h
+1630327005 d:\c\ngrok-c\ngrok.h
 	"config.h"
 	<string>
 	<map>
@@ -60,7 +62,7 @@
 	"nonblocking.h"
 	"cJSON.h"
 
-1525747553 d:\c\ngrok-c\sendmsg.h
+1630327005 d:\c\ngrok-c\sendmsg.h
 	"config.h"
 	"nonblocking.h"
 	<string>
@@ -73,7 +75,7 @@
 	<sys/select.h>
 	"bytestool.h"
 
-1525747553 d:\c\ngrok-c\nonblocking.h
+1629645627 d:\c\ngrok-c\nonblocking.h
 	"config.h"
 	<string.h>
 	<winsock.h>
@@ -90,13 +92,13 @@
 	<netinet/in.h>
 	<netinet/tcp.h>
 
-1525747553 d:\c\ngrok-c\sslbio.h
+1564149050 d:\c\ngrok-c\sslbio.h
 	"config.h"
 	<malloc.h>
 	"opensslbio.h"
 	"polarsslbio.h"
 
-1525747553 d:\c\ngrok-c\opensslbio.h
+1564149050 d:\c\ngrok-c\opensslbio.h
 	"config.h"
 	<malloc.h>
 	<openssl/ssl.h>
@@ -104,10 +106,10 @@
 	<openssl/err.h>
 	"openssldl.h"
 
-1525747553 d:\c\ngrok-c\openssldl.h
+1564246755 d:\c\ngrok-c\openssldl.h
 	<openssl/ssl.h>
 
-1525747553 d:\c\ngrok-c\polarsslbio.h
+1564149050 d:\c\ngrok-c\polarsslbio.h
 	"config.h"
 	<malloc.h>
 	<mbedtls/ssl.h>
@@ -125,16 +127,16 @@
 	<polarssl/error.h>
 	<polarssl/certs.h>
 
-1525747553 source:d:\c\ngrok-c\nonblocking.cpp
+1630336827 source:d:\c\ngrok-c\nonblocking.cpp
 	"nonblocking.h"
 
-1525747553 source:d:\c\ngrok-c\opensslbio.cpp
+1564228490 source:d:\c\ngrok-c\opensslbio.cpp
 	"config.h"
 	<string.h>
 	"mytime.h"
 	"opensslbio.h"
 
-1525747553 source:d:\c\ngrok-c\openssldl.cpp
+1630330309 source:d:\c\ngrok-c\openssldl.cpp
 	<stdio.h>
 	<stdlib.h>
 	<unistd.h>
@@ -142,13 +144,13 @@
 	<windows.h>
 	<dlfcn.h>
 
-1525747553 source:d:\c\ngrok-c\polarsslbio.cpp
+1564149050 source:d:\c\ngrok-c\polarsslbio.cpp
 	"config.h"
 	<string.h>
 	"mytime.h"
 	"polarsslbio.h"
 
-1525747553 source:d:\c\ngrok-c\sendmsg.cpp
+1630327005 source:d:\c\ngrok-c\sendmsg.cpp
 	"config.h"
 	<string>
 	<windows.h>
@@ -157,10 +159,12 @@
 	"sendmsg.h"
 	<stdlib.h>
 
-1525748171 source:d:\c\ngrok-c\ngrok.cpp
+1630337701 source:d:\c\ngrok-c\ngrok.cpp
 	"config.h"
 	<string>
 	<windows.h>
+	<string>
+	<strings.h>
 	<unistd.h>
 	<arpa/inet.h>
 	<errno.h>
@@ -169,12 +173,62 @@
 	"sslbio.h"
 	<stdlib.h>
 
-1525747553 d:\c\ngrok-c\global.h
+1630327005 d:\c\ngrok-c\global.h
 	<string>
 	<map>
 	<list>
 	"sslbio.h"
+	<netinet/in.h>
 
-1525747553 source:d:\c\ngrok-c\global.cpp
+1630327005 source:d:\c\ngrok-c\global.cpp
 	"global.h"
+
+1630327005 d:\c\ngrok-c\param.h
+	"config.h"
+	"nonblocking.h"
+	<string>
+	<map>
+	"sslbio.h"
+	<windows.h>
+	<errno.h>
+	<netinet/in.h>
+	<string.h>
+	<sys/select.h>
+	"bytestool.h"
+
+1629730455 d:\c\ngrok-c\udp.h
+	<string>
+	<map>
+	<time.h>
+	<list>
+	<winsock.h>
+	"string.h"
+	"cJSON.h"
+	"sendmsg.h"
+	"base64.h"
+	"bytestool.h"
+
+1629730455 d:\c\ngrok-c\base64.h
+	<stdio.h>
+
+1629730455 source:d:\c\ngrok-c\base64.c
+	"base64.h"
+	<stdio.h>
+	<stdlib.h>
+
+1630327005 source:d:\c\ngrok-c\param.cpp
+	"config.h"
+	<string>
+	<windows.h>
+	<arpa/inet.h>
+	<errno.h>
+	"param.h"
+	<stdlib.h>
+
+1629730455 source:d:\c\ngrok-c\udp.cpp
+	"udp.h"
+	"ngrok.h"
+	"mytime.h"
+	<windows.h>
+	<arpa/inet.h>
 
